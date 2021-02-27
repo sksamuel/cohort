@@ -1,6 +1,6 @@
 object Libs {
 
-  const val kotlinVersion = "1.4.30"
+  const val kotlinVersion = "1.4.31"
   const val org = "com.sksamuel.healthcheck"
 
   object Kotlin {
