@@ -56,14 +56,14 @@ publishing {
     register("mavenJava", MavenPublication::class) {
       from(components["java"])
       pom {
-        name.set("hoplite")
-        description.set("Configuration for Kotlin")
-        url.set("http://www.github.com/sksamuel/hoplite")
+        name.set("healthcheck")
+        description.set("Healthchecks for JVM apps")
+        url.set("http://www.github.com/sksamuel/healthcheck")
 
         scm {
-          connection.set("scm:git:http://www.github.com/sksamuel/hoplite/")
+          connection.set("scm:git:http://www.github.com/sksamuel/healthcheck/")
           developerConnection.set("scm:git:http://github.com/sksamuel/")
-          url.set("http://www.github.com/sksamuel/hoplite/")
+          url.set("http://www.github.com/sksamuel/healthcheck/")
         }
 
         licenses {

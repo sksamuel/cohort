@@ -1,7 +1,5 @@
-package com.sksamuel.healthcheck.rds
+package com.sksamuel.healthcheck
 
-import com.sksamuel.healthcheck.HealthCheck
-import com.sksamuel.healthcheck.HealthCheckResult
 import javax.sql.DataSource
 
 /**
