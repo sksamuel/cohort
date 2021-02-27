@@ -6,7 +6,7 @@ on:
       - 'doc/**'
       - '*.md'
     branches:
-      - master
+      - main
 
 jobs:
   build:
