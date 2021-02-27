@@ -14,7 +14,7 @@ class DatabaseHealthCheck(
     val conn = ds.connection
     return try {
       conn.createStatement().executeQuery("SELECT * FROM $tableName WHERE 1=0")
-      HealthCheckResult.Healthy
+      HealthCheckResult.Healthy("Connected to database and queried $tableName successfully")
     } catch (t: Throwable) {
       HealthCheckResult.Unhealthy("Error connecting to database", t)
     } finally {

@@ -18,7 +18,7 @@ class KafkaClusterHealthCheck(private val bootstrapServers: String, private val 
     return try {
       val client = AdminClient.create(props)
       client.describeCluster().controller().get(1, TimeUnit.MINUTES)
-      HealthCheckResult.Healthy
+      HealthCheckResult.Healthy("Connected to kafka cluster at $bootstrapServers")
     } catch (t: Throwable) {
       HealthCheckResult.Unhealthy("Could not connect to kafka cluster at $bootstrapServers", t)
     }

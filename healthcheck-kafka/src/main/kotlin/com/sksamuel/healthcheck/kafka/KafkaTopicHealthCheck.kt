@@ -25,7 +25,7 @@ class KafkaTopicHealthCheck(
       if (desc == null)
         HealthCheckResult.Unhealthy("Topic $topic does not exist on kafka cluster $bootstrapServers", null)
       else
-        HealthCheckResult.Healthy
+        HealthCheckResult.Healthy("Kafka topic $topic confirmed exists (${desc.partitions()} partitions)")
     } catch (t: Throwable) {
       HealthCheckResult.Unhealthy("Could not connect to kafka cluster at $bootstrapServers", t)
     }
