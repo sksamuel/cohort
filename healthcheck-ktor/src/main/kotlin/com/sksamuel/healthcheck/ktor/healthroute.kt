@@ -15,6 +15,8 @@ data class ResultJson(
   val lastCheck: String,
   val message: String?,
   val cause: String?,
+  val consecutiveSuccesses: Int,
+  val consecutiveFailures: Int,
 )
 
 val mapper = jacksonObjectMapper()
@@ -26,10 +28,12 @@ fun Route.healthcheck(registry: HealthCheckRegistry, path: String = "health") {
     val results = status.results.map {
       ResultJson(
         name = it.key,
-        healthy = it.value.first.isHealthy,
-        lastCheck = it.value.second.toLocalDateTime().toString(),
-        message = it.value.first.message,
-        cause = it.value.first.cause?.stackTraceToString()
+        healthy = it.value.healthy,
+        lastCheck = it.value.timestamp.toLocalDateTime().toString(),
+        message = it.value.result.message,
+        cause = it.value.result.cause?.stackTraceToString(),
+        consecutiveSuccesses = it.value.consecutiveSuccesses,
+        consecutiveFailures = it.value.consecutiveFailures,
       )
     }
     val json = mapper.writeValueAsString(results)
