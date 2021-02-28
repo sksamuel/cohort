@@ -3,6 +3,7 @@ package com.sksamuel.healthcheck
 import java.nio.file.FileStore
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import kotlin.math.roundToInt
 
 class DiskSpaceHealthCheck(
   private val fileStore: FileStore,
@@ -11,7 +12,7 @@ class DiskSpaceHealthCheck(
 
   override suspend fun check(): HealthCheckResult {
     return try {
-      val availablePercent = fileStore.usableSpace / fileStore.totalSpace
+      val availablePercent = (fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100).roundToInt()
       if (availablePercent < minFreeSpacePercentage)
         HealthCheckResult.Unhealthy("Disk space has dropped to $availablePercent on ${fileStore.name()}", null)
       else
