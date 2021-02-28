@@ -10,8 +10,8 @@ class HealthCheckRegistry(private val healthchecks: List<HealthCheck>) {
     return HealthCheckRegistry(healthchecks + healthCheck)
   }
 
-  suspend fun execute(dispatcher: CoroutineDispatcher): List<HealthCheckResult> {
-    return coroutineScope {
+  suspend fun execute(dispatcher: CoroutineDispatcher): HealthCheckResponse {
+    val results = coroutineScope {
       val jobs = healthchecks.map {
         async(dispatcher) {
           it.check()
@@ -19,5 +19,13 @@ class HealthCheckRegistry(private val healthchecks: List<HealthCheck>) {
       }
       jobs.map { it.await() }
     }
+    val status = if (results.any { it is HealthCheckResult.Unhealthy }) HealthStatus.Green else HealthStatus.Red
+    return HealthCheckResponse(status, results)
   }
 }
+
+enum class HealthStatus {
+  Green, Red
+}
+
+data class HealthCheckResponse(val status: HealthStatus, val results: List<HealthCheckResult>)
