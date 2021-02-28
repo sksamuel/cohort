@@ -1,6 +1,6 @@
 package com.sksamuel.healthcheck
 
-class MemoryHealthCheck(private val minFreeMb: Int) : HealthCheck {
+class FreeMemoryHealthCheck(private val minFreeMb: Int) : HealthCheck {
   override fun check(): HealthCheckResult {
     val free = Runtime.getRuntime().freeMemory()
     val freeMb = free / 1000_000
