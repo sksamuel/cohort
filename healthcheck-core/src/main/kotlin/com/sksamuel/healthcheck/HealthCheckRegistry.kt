@@ -28,4 +28,11 @@ enum class HealthStatus {
   Green, Red
 }
 
-data class HealthCheckResponse(val status: HealthStatus, val results: List<HealthCheckResult>)
+data class HealthCheckResponse(val status: HealthStatus, val results: List<HealthCheckResult>) {
+  fun <A> fold(ifRed: (List<HealthCheckResult>) -> A, ifGreen: (List<HealthCheckResult>) -> A): A {
+    return when (status) {
+      HealthStatus.Green -> ifGreen(results)
+      HealthStatus.Red -> ifRed(results)
+    }
+  }
+}
