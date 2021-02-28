@@ -40,7 +40,7 @@ fun Route.healthcheck(registry: HealthCheckRegistry, path: String = "health") {
 
     val code = when (status.healthy) {
       true -> HttpStatusCode.OK
-      false -> HttpStatusCode.InternalServerError
+      false -> HttpStatusCode.ServiceUnavailable
     }
 
     call.respondText(json, ContentType.Application.Json, code)
