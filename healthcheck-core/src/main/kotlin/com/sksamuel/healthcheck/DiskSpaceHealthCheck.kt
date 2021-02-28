@@ -2,6 +2,7 @@ package com.sksamuel.healthcheck
 
 import java.nio.file.FileStore
 import java.nio.file.FileSystems
+import java.nio.file.Files
 
 class DiskSpaceHealthCheck(
   private val fileStore: FileStore,
@@ -23,12 +24,12 @@ class DiskSpaceHealthCheck(
   companion object {
 
     /**
-     * For systems which only have one file system, eg unix, this will return a [DiskSpaceHealthCheck]
-     * for that file system. If there is more than one, an error will be thrown.
+     * Returns a [DiskSpaceHealthCheck] for a single root directory for the default file system.
+     * If there is more than one root dir, an error will be thrown.
      */
-    fun default(minFreeSpacePercentage: Double = 10.0): DiskSpaceHealthCheck {
-      val filestore = FileSystems.getDefault().fileStores.single()
-      return DiskSpaceHealthCheck(filestore, minFreeSpacePercentage)
+    fun root(minFreeSpacePercentage: Double = 10.0): DiskSpaceHealthCheck {
+      val root = FileSystems.getDefault().rootDirectories.single()
+      return DiskSpaceHealthCheck(Files.getFileStore(root), minFreeSpacePercentage)
     }
 
     fun defaults(minFreeSpacePercentage: Double = 10.0): List<HealthCheck> =
