@@ -3,18 +3,17 @@ package com.sksamuel.healthcheck
 import javax.sql.DataSource
 
 /**
- * A [HealthCheck] that checks that a connection can be made to a database and a
- * basic select can be issued against a table.
+ * A [HealthCheck] that checks that a connection can be established with a database.
  */
 class DatabaseHealthCheck(
   private val ds: DataSource,
-  private val tableName: String,
+  private val query: String = "SELECT 1",
 ) : HealthCheck {
   override fun check(): HealthCheckResult {
     val conn = ds.connection
     return try {
-      conn.createStatement().executeQuery("SELECT * FROM $tableName WHERE 1=0")
-      HealthCheckResult.Healthy("Connected to database and queried $tableName successfully")
+      conn.createStatement().executeQuery(query)
+      HealthCheckResult.Healthy("Connected to database successfully")
     } catch (t: Throwable) {
       HealthCheckResult.Unhealthy("Error connecting to database", t)
     } finally {
