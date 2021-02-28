@@ -8,7 +8,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
-import java.sql.Timestamp
 
 data class ResultJson(
   val name: String,
@@ -20,8 +19,8 @@ data class ResultJson(
 
 val mapper = jacksonObjectMapper()
 
-fun Route.healthcheck(registry: HealthCheckRegistry) {
-  get("health") {
+fun Route.healthcheck(registry: HealthCheckRegistry, path: String = "health") {
+  get(path) {
 
     val status = registry.status()
     val results = status.results.map {
