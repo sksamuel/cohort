@@ -8,10 +8,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import java.sql.Timestamp
 
 data class ResultJson(
   val name: String,
   val healthy: Boolean,
+  val lastCheck: Timestamp,
   val message: String?,
   val cause: String?,
 )
@@ -24,10 +26,11 @@ fun Route.healthcheck(registry: HealthCheckRegistry) {
     val status = registry.status()
     val results = status.results.map {
       ResultJson(
-        it.key,
-        it.value.isHealthy,
-        it.value.message,
-        it.value.cause?.stackTraceToString()
+        name = it.key,
+        healthy = it.value.first.isHealthy,
+        lastCheck = it.value.second,
+        message = it.value.first.message,
+        cause = it.value.first.cause?.stackTraceToString()
       )
     }
     val json = mapper.writeValueAsString(results)
