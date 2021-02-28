@@ -3,6 +3,7 @@ package com.sksamuel.healthcheck
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
@@ -10,7 +11,7 @@ import kotlin.time.Duration
 class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
 
   private val scheduler = Executors.newScheduledThreadPool(1)
-  private val results = mutableMapOf<String, HealthCheckResult>()
+  private val results = ConcurrentHashMap<String, HealthCheckResult>()
 
   fun register(
     name: String,
@@ -35,7 +36,7 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
 
   fun status(): HealthStatus {
     val unhealthy = results.values.any { it is HealthCheckResult.Unhealthy }
-    return HealthStatus(!unhealthy, results)
+    return HealthStatus(!unhealthy, results.toMap())
   }
 }
 
