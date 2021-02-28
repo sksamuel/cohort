@@ -22,7 +22,7 @@ class KafkaClusterHealthCheck(private val config: KafkaClusterConfig) : HealthCh
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override suspend fun check(): HealthCheckResult {
+  override fun check(): HealthCheckResult {
     return try {
       val client = AdminClient.create(props)
       val controller = client.describeCluster().controller().get(1, TimeUnit.MINUTES)

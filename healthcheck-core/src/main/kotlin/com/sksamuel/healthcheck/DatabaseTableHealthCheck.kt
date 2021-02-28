@@ -1,7 +1,5 @@
 package com.sksamuel.healthcheck
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.sql.DataSource
 
 /**
@@ -11,10 +9,10 @@ class DatabaseTableHealthCheck(
   private val ds: DataSource,
   private val tableName: String,
 ) : HealthCheck {
-  override suspend fun check(): HealthCheckResult = withContext(Dispatchers.IO) {
+  override fun check(): HealthCheckResult {
     val conn = ds.connection
     conn.createStatement().executeQuery("SELECT * FROM $tableName LIMIT 1")
     conn.close()
-    HealthCheckResult.Healthy("Executed query against $tableName successfully")
+    return HealthCheckResult.Healthy("Executed query against $tableName successfully")
   }
 }

@@ -1,7 +1,7 @@
 package com.sksamuel.healthcheck
 
 interface HealthCheck {
-  suspend fun check(): HealthCheckResult
+  fun check(): HealthCheckResult
 }
 
 sealed class HealthCheckResult {

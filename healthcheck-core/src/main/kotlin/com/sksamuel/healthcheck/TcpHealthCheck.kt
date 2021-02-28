@@ -1,7 +1,5 @@
 package com.sksamuel.healthcheck
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.time.Duration
@@ -16,12 +14,12 @@ class TcpHealthCheck(
   private val connectionTimeout: Duration = 4.seconds
 ) : HealthCheck {
 
-  override suspend fun check(): HealthCheckResult = withContext(Dispatchers.IO) {
+  override fun check(): HealthCheckResult {
     val socket = Socket()
     val time = measureTime {
       socket.connect(InetSocketAddress(host, port), connectionTimeout.toLongMilliseconds().toInt())
     }
-    if (socket.isConnected) {
+    return if (socket.isConnected) {
       socket.close()
       HealthCheckResult.Healthy("Connected to $host:$port after ${time.toLongMilliseconds()}ms")
     } else {

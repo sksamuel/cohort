@@ -2,8 +2,6 @@ package com.sksamuel.healthcheck.elastic
 
 import com.sksamuel.healthcheck.HealthCheck
 import com.sksamuel.healthcheck.HealthCheckResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.Requests
@@ -16,8 +14,8 @@ class ElasticClusterHealthCheck(
   private val errorOnYellow: Boolean = false
 ) : HealthCheck {
 
-  override suspend fun check(): HealthCheckResult = withContext(Dispatchers.IO) {
-    try {
+  override fun check(): HealthCheckResult {
+    return try {
       val client = RestHighLevelClient(RestClient.builder(*hosts.toTypedArray()))
       val resp = client.cluster().health(Requests.clusterHealthRequest(), RequestOptions.DEFAULT)
       val status: ClusterHealthStatus = resp.status

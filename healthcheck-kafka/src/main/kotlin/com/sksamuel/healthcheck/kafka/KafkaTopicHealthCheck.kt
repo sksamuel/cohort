@@ -20,7 +20,7 @@ class KafkaTopicHealthCheck(
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override suspend fun check(): HealthCheckResult {
+  override fun check(): HealthCheckResult {
     val client = AdminClient.create(props)
     val desc = client.describeTopics(listOf(topic)).all().get(1, TimeUnit.MINUTES)[topic]
     return if (desc == null)

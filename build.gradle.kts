@@ -42,7 +42,6 @@ allprojects {
       testImplementation(Libs.Kotest.assertions)
       testImplementation(Libs.Kotest.junit5)
       implementation(Libs.Kotlin.stdlib)
-      implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
    }
 
    tasks.named<Test>("test") {

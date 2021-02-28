@@ -10,7 +10,7 @@ class DiskSpaceHealthCheck(
   private val minFreeSpacePercentage: Double = 10.0
 ) : HealthCheck {
 
-  override suspend fun check(): HealthCheckResult {
+  override fun check(): HealthCheckResult {
     return try {
       val availablePercent = (fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100).roundToInt()
       if (availablePercent < minFreeSpacePercentage)

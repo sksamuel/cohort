@@ -1,8 +1,5 @@
 package com.sksamuel.healthcheck
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -10,9 +7,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
+class HealthCheckRegistry(threads: Int) {
 
-  private val scheduler = Executors.newScheduledThreadPool(1)
+  private val scheduler = Executors.newScheduledThreadPool(threads)
   private val results = ConcurrentHashMap<String, Pair<HealthCheckResult, Timestamp>>()
 
   fun register(
@@ -24,14 +21,12 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
 
     val millis = interval.toLongMilliseconds()
     scheduler.scheduleAtFixedRate({
-      GlobalScope.launch(dispatcher) {
-        val result = try {
-          healthcheck.check()
-        } catch (t: Throwable) {
-          HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
-        }
-        results[name] = result to Timestamp.from(Instant.now())
+      val result = try {
+        healthcheck.check()
+      } catch (t: Throwable) {
+        HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
       }
+      results[name] = result to Timestamp.from(Instant.now())
     }, if (runImmediately) 0 else millis, millis, TimeUnit.MILLISECONDS)
     return this
   }
