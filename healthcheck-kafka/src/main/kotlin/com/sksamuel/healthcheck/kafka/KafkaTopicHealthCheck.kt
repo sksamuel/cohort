@@ -26,6 +26,6 @@ class KafkaTopicHealthCheck(
     return if (desc == null)
       HealthCheckResult.Unhealthy("Topic $topic does not exist on kafka cluster ${config.bootstrapServers}", null)
     else
-      HealthCheckResult.Healthy("Kafka topic $topic confirmed (${desc.partitions()} partitions)")
+      HealthCheckResult.Healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
   }
 }
