@@ -1,42 +1,44 @@
 package com.sksamuel.healthcheck
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
-class HealthCheckRegistry(private val healthchecks: List<Pair<String, HealthCheck>>) {
+class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
 
-  fun register(name: String, healthCheck: HealthCheck): HealthCheckRegistry {
-    return HealthCheckRegistry(healthchecks + (name to healthCheck))
-  }
+  private val scheduler = Executors.newScheduledThreadPool(1)
+  private val results = mutableMapOf<String, HealthCheckResult>()
 
-  suspend fun execute(dispatcher: CoroutineDispatcher): HealthCheckResponse {
-    val results = coroutineScope {
-      val jobs = healthchecks.map { (name, healthcheck) ->
-        async(dispatcher) {
-          try {
-            healthcheck.check()
-          } catch (t: Throwable) {
-            HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
-          }
+  fun register(name: String, healthcheck: HealthCheck, interval: Duration) {
+    scheduler.schedule({
+      GlobalScope.launch(dispatcher) {
+        val result = try {
+          healthcheck.check()
+        } catch (t: Throwable) {
+          HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
         }
+        results[name] = result
       }
-      jobs.map { it.await() }
-    }
-    val status = if (results.any { it is HealthCheckResult.Unhealthy }) HealthStatus.Unhealthy else HealthStatus.Healthy
-    return HealthCheckResponse(status, results)
+    }, interval.toLongMilliseconds(), TimeUnit.MILLISECONDS)
+  }
+
+  fun status(): HealthStatus {
+    val unhealthy = results.values.any { it is HealthCheckResult.Unhealthy }
+    return HealthStatus(!unhealthy, results)
   }
 }
 
-enum class HealthStatus {
-  Healthy, Unhealthy
-}
+data class HealthStatus(val healthy: Boolean, val results: Map<String, HealthCheckResult>)
 
-data class HealthCheckResponse(val status: HealthStatus, val results: List<HealthCheckResult>) {
-  fun <A> fold(ifUnhealthy: (List<HealthCheckResult>) -> A, ifHealthy: (List<HealthCheckResult>) -> A): A {
-    return when (status) {
-      HealthStatus.Healthy -> ifHealthy(results)
-      HealthStatus.Unhealthy -> ifUnhealthy(results)
-    }
+fun <A> HealthStatus.fold(
+  ifUnhealthy: (Map<String, HealthCheckResult>) -> A,
+  ifHealthy: (Map<String, HealthCheckResult>) -> A
+): A {
+  return when (healthy) {
+    true -> ifHealthy(results)
+    false -> ifUnhealthy(results)
   }
 }
