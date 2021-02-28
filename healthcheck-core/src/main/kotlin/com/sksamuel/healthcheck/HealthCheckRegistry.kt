@@ -13,7 +13,7 @@ class HealthCheckRegistry(private val healthchecks: List<HealthCheck>) {
   suspend fun execute(dispatcher: CoroutineDispatcher): List<HealthCheckResult> {
     return coroutineScope {
       val jobs = healthchecks.map {
-        async {
+        async(dispatcher) {
           it.check()
         }
       }
