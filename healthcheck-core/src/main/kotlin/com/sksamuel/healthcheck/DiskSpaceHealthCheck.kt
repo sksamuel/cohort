@@ -21,6 +21,16 @@ class DiskSpaceHealthCheck(
   }
 
   companion object {
+
+    /**
+     * For systems which only have one file system, eg unix, this will return a [DiskSpaceHealthCheck]
+     * for that file system. If there is more than one, an error will be thrown.
+     */
+    fun default(minFreeSpacePercentage: Double = 10.0): DiskSpaceHealthCheck {
+      val filestore = FileSystems.getDefault().fileStores.single()
+      return DiskSpaceHealthCheck(filestore, minFreeSpacePercentage)
+    }
+
     fun defaults(minFreeSpacePercentage: Double = 10.0): List<HealthCheck> =
       FileSystems.getDefault().fileStores.map { DiskSpaceHealthCheck(it, minFreeSpacePercentage) }
   }
