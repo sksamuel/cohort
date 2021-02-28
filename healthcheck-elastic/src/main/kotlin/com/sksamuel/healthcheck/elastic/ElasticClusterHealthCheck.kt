@@ -3,23 +3,33 @@ package com.sksamuel.healthcheck.elastic
 import com.sksamuel.healthcheck.HealthCheck
 import com.sksamuel.healthcheck.HealthCheckResult
 import org.apache.http.HttpHost
-import org.elasticsearch.client.Request
+import org.elasticsearch.client.RequestOptions
+import org.elasticsearch.client.Requests
 import org.elasticsearch.client.RestClient
+import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.cluster.health.ClusterHealthStatus
 
-class ElasticClusterHealthCheck(private val hosts: List<HttpHost>) : HealthCheck {
-
-  private val request = Request("GET", "/")
+class ElasticClusterHealthCheck(
+  private val hosts: List<HttpHost>,
+  private val errorOnYellow: Boolean = false
+) : HealthCheck {
 
   override fun check(): HealthCheckResult {
     return try {
-      val client = RestClient.builder(*hosts.toTypedArray()).build()
-      val response = client.performRequest(request)
-      return when (response.statusLine.statusCode) {
-        200 -> HealthCheckResult.Healthy("Connected to elastic cluster at $hosts")
-        else -> HealthCheckResult.Unhealthy("Check returned status ${response.statusLine}", null)
+      val client = RestHighLevelClient(RestClient.builder(*hosts.toTypedArray()))
+      val resp = client.cluster().health(Requests.clusterHealthRequest(), RequestOptions.DEFAULT)
+      val status: ClusterHealthStatus = resp.status
+      val msg = "Elastic cluster is ${status.name}"
+      return when (status) {
+        ClusterHealthStatus.GREEN -> HealthCheckResult.Healthy(msg)
+        ClusterHealthStatus.YELLOW -> if (errorOnYellow)
+          HealthCheckResult.Healthy(msg)
+        else
+          HealthCheckResult.Unhealthy(msg, null)
+        ClusterHealthStatus.RED -> HealthCheckResult.Unhealthy(msg, null)
       }
     } catch (t: Throwable) {
-      HealthCheckResult.Unhealthy("Error performing elastic check", t)
+      HealthCheckResult.Unhealthy("Error querying elastic cluster status", t)
     }
   }
 }
