@@ -13,7 +13,7 @@ import java.sql.Timestamp
 data class ResultJson(
   val name: String,
   val healthy: Boolean,
-  val lastCheck: Timestamp,
+  val lastCheck: String,
   val message: String?,
   val cause: String?,
 )
@@ -28,7 +28,7 @@ fun Route.healthcheck(registry: HealthCheckRegistry) {
       ResultJson(
         name = it.key,
         healthy = it.value.first.isHealthy,
-        lastCheck = it.value.second,
+        lastCheck = it.value.second.toLocalDateTime().toString(),
         message = it.value.first.message,
         cause = it.value.first.cause?.stackTraceToString()
       )
