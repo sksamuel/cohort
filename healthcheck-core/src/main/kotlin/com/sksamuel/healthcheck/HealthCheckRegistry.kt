@@ -6,7 +6,7 @@ class HealthCheckRegistry(private val healthchecks: List<HealthCheck>) {
     return HealthCheckRegistry(healthchecks + healthCheck)
   }
 
-  fun execute(): List<HealthCheckResult> {
+  suspend fun execute(): List<HealthCheckResult> {
     return healthchecks.map { it.check() }
   }
 }

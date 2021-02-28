@@ -15,7 +15,7 @@ class KafkaTopicHealthCheck(
   private val ssl: Boolean,
   private val topic: String
 ) : HealthCheck {
-  override fun check(): HealthCheckResult {
+  override suspend fun check(): HealthCheckResult {
     val props = Properties()
     props[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
     if (ssl) props[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"

@@ -11,10 +11,13 @@ import java.util.concurrent.TimeUnit
  * A [HealthCheck] that checks that a connection can be made to a kafka cluster.
  */
 class KafkaClusterHealthCheck(private val bootstrapServers: String, private val ssl: Boolean) : HealthCheck {
-  override fun check(): HealthCheckResult {
-    val props = Properties()
-    props[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
-    if (ssl) props[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
+
+  private val props = Properties().apply {
+    this[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
+    if (ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
+  }
+
+  override suspend fun check(): HealthCheckResult {
     return try {
       val client = AdminClient.create(props)
       val controller = client.describeCluster().controller().get(1, TimeUnit.MINUTES)
