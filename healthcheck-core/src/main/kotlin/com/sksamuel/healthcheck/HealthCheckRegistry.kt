@@ -12,8 +12,15 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   private val scheduler = Executors.newScheduledThreadPool(1)
   private val results = mutableMapOf<String, HealthCheckResult>()
 
-  fun register(name: String, healthcheck: HealthCheck, interval: Duration): HealthCheckRegistry {
-    scheduler.schedule({
+  fun register(
+    name: String,
+    healthcheck: HealthCheck,
+    interval: Duration,
+    runImmediately: Boolean = true
+  ): HealthCheckRegistry {
+
+    val millis = interval.toLongMilliseconds()
+    scheduler.scheduleAtFixedRate({
       GlobalScope.launch(dispatcher) {
         val result = try {
           healthcheck.check()
@@ -22,7 +29,7 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
         }
         results[name] = result
       }
-    }, interval.toLongMilliseconds(), TimeUnit.MILLISECONDS)
+    }, if (runImmediately) 0 else millis, millis, TimeUnit.MILLISECONDS)
     return this
   }
 
