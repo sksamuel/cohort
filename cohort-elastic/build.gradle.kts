@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-   implementation(project(":healthcheck-core"))
+   implementation(project(":cohort-core"))
    implementation("org.elasticsearch.client:elasticsearch-rest-high-level-client:7.11.1")
 }
 

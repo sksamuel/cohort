@@ -3,7 +3,8 @@ package com.sksamuel.healthcheck
 import javax.sql.DataSource
 
 /**
- * A [HealthCheck] that checks that a connection can be established with a database.
+ * A [HealthCheck] that checks that a connection can be established with
+ * a [DataSource] and a basic query executed.
  */
 class DatabaseHealthCheck(
   private val ds: DataSource,

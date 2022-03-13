@@ -1,6 +1,4 @@
-enableFeaturePreview("GRADLE_METADATA")
-
-include("healthcheck-core")
-include("healthcheck-kafka")
-include("healthcheck-elastic")
-include("healthcheck-ktor")
+include("cohort-core")
+include("cohort-kafka")
+include("cohort-elastic")
+include("cohort-ktor")
