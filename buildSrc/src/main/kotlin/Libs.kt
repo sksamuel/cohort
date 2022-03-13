@@ -1,7 +1,7 @@
 object Libs {
 
   const val kotlinVersion = "1.6.10"
-  const val org = "com.sksamuel.healthcheck"
+  const val org = "com.sksamuel.cohort"
 
   object Kotlin {
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
