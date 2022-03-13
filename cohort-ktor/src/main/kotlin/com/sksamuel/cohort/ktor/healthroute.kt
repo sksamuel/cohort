@@ -1,7 +1,7 @@
-package com.sksamuel.healthcheck.ktor
+package com.sksamuel.cohort.ktor
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.sksamuel.healthcheck.HealthCheckRegistry
+import com.sksamuel.cohort.HealthCheckRegistry
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode

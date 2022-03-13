@@ -1,4 +1,4 @@
-package com.sksamuel.healthcheck
+package com.sksamuel.cohort
 
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -8,22 +8,22 @@ import kotlin.time.measureTime
 import kotlin.time.seconds
 
 @ExperimentalTime
-class TcpHealthCheck(
+class TcpCheck(
   private val host: String,
   private val port: Int,
   private val connectionTimeout: Duration = 4.seconds
-) : HealthCheck {
+) : Check {
 
-  override fun check(): HealthCheckResult {
+  override fun check(): CheckResult {
     val socket = Socket()
     val time = measureTime {
       socket.connect(InetSocketAddress(host, port), connectionTimeout.toLongMilliseconds().toInt())
     }
     return if (socket.isConnected) {
       socket.close()
-      HealthCheckResult.Healthy("Connected to $host:$port after ${time.toLongMilliseconds()}ms")
+      CheckResult.Healthy("Connected to $host:$port after ${time.toLongMilliseconds()}ms")
     } else {
-      HealthCheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
+      CheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
     }
   }
 }

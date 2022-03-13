@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.sksamuel.healthcheck
+package com.sksamuel.cohort
 
 import java.sql.Timestamp
 import java.time.Instant
@@ -33,7 +33,7 @@ class HealthCheckRegistry(threads: Int) {
 
   fun register(
     name: String,
-    healthcheck: HealthCheck,
+    healthcheck: Check,
     schedule: Schedule
   ): HealthCheckRegistry {
 
@@ -46,19 +46,19 @@ class HealthCheckRegistry(threads: Int) {
     return this
   }
 
-  private fun run(name: String, healthcheck: HealthCheck, schedule: Schedule) {
+  private fun run(name: String, healthcheck: Check, schedule: Schedule) {
     try {
       when (val result = healthcheck.check()) {
-        is HealthCheckResult.Healthy -> success(name, result, schedule, healthcheck)
-        is HealthCheckResult.Unhealthy -> failure(name, result, schedule, healthcheck)
+        is CheckResult.Healthy -> success(name, result, schedule, healthcheck)
+        is CheckResult.Unhealthy -> failure(name, result, schedule, healthcheck)
       }
     } catch (t: Throwable) {
-      val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
+      val result = CheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
       failure(name, result, schedule, healthcheck)
     }
   }
 
-  private fun success(name: String, result: HealthCheckResult.Healthy, schedule: Schedule, healthcheck: HealthCheck) {
+  private fun success(name: String, result: CheckResult.Healthy, schedule: Schedule, healthcheck: Check) {
 
     val previous = results[name]
     val timestamp = Timestamp.from(Instant.now())
@@ -79,7 +79,7 @@ class HealthCheckRegistry(threads: Int) {
     )
   }
 
-  private fun failure(name: String, result: HealthCheckResult.Unhealthy, schedule: Schedule, healthcheck: HealthCheck) {
+  private fun failure(name: String, result: CheckResult.Unhealthy, schedule: Schedule, healthcheck: Check) {
 
     val previous = results[name]
     val timestamp = Timestamp.from(Instant.now())
@@ -112,7 +112,7 @@ data class HealthCheckStatus(
   val consecutiveFailures: Int,
   val healthy: Boolean,
   val timestamp: Timestamp,
-  val result: HealthCheckResult
+  val result: CheckResult
 )
 
 data class HealthStatus(val healthy: Boolean, val results: Map<String, HealthCheckStatus>)

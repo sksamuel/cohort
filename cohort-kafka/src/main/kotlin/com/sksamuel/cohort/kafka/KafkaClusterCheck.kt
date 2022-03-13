@@ -1,7 +1,7 @@
-package com.sksamuel.healthcheck.kafka
+package com.sksamuel.cohort.kafka
 
-import com.sksamuel.healthcheck.HealthCheck
-import com.sksamuel.healthcheck.HealthCheckResult
+import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.CheckResult
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.AdminClientConfig
 import java.util.Properties
@@ -13,25 +13,25 @@ data class KafkaClusterConfig(
 )
 
 /**
- * A [HealthCheck] that checks that a connection can be made to a kafka cluster.
+ * A [Check] that checks that a connection can be made to a kafka cluster.
  */
-class KafkaClusterHealthCheck(private val config: KafkaClusterConfig) : HealthCheck {
+class KafkaClusterCheck(private val config: KafkaClusterConfig) : Check {
 
   private val props = Properties().apply {
     this[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = config.bootstrapServers
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override fun check(): HealthCheckResult {
+  override fun check(): CheckResult {
     return try {
       val client = AdminClient.create(props)
       val controller = client.describeCluster().controller().get(1, TimeUnit.MINUTES)
       if (controller.host() != null)
-        HealthCheckResult.Healthy("Connected to kafka cluster at ${config.bootstrapServers}")
+        CheckResult.Healthy("Connected to kafka cluster at ${config.bootstrapServers}")
       else
-        HealthCheckResult.Healthy("Kafka cluster returned without controller at ${config.bootstrapServers}")
+        CheckResult.Healthy("Kafka cluster returned without controller at ${config.bootstrapServers}")
     } catch (t: Throwable) {
-      HealthCheckResult.Unhealthy("Could not connect to kafka cluster at ${config.bootstrapServers}", t)
+      CheckResult.Unhealthy("Could not connect to kafka cluster at ${config.bootstrapServers}", t)
     }
   }
 }
