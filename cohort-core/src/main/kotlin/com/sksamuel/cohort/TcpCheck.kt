@@ -14,7 +14,7 @@ class TcpCheck(
   private val connectionTimeout: Duration = 4.seconds
 ) : Check {
 
-  override fun check(): CheckResult {
+  override suspend fun check(): CheckResult {
     val socket = Socket()
     val time = measureTime {
       socket.connect(InetSocketAddress(host, port), connectionTimeout.toLongMilliseconds().toInt())

@@ -22,7 +22,7 @@ class KafkaClusterCheck(private val config: KafkaClusterConfig) : Check {
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override fun check(): CheckResult {
+  override suspend fun check(): CheckResult {
     return try {
       val client = AdminClient.create(props)
       val controller = client.describeCluster().controller().get(1, TimeUnit.MINUTES)

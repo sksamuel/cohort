@@ -10,7 +10,7 @@ class DatabaseCheck(
   private val ds: DataSource,
   private val query: String = "SELECT 1",
 ) : Check {
-  override fun check(): CheckResult {
+  override suspend fun check(): CheckResult {
     val conn = ds.connection
     conn.createStatement().executeQuery(query)
     conn.close()

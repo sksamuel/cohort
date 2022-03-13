@@ -37,16 +37,16 @@ class HealthCheckRegistry(threads: Int) {
     schedule: Schedule
   ): HealthCheckRegistry {
 
-    scheduler.schedule(
-      { run(name, healthcheck, schedule) },
-      schedule.initialDelay.toLongMilliseconds(),
-      TimeUnit.MILLISECONDS
-    )
+//    scheduler.schedule(
+//      run(name, healthcheck, schedule) },
+//      schedule.initialDelay.toLongMilliseconds(),
+//      TimeUnit.MILLISECONDS
+//    )
 
     return this
   }
 
-  private fun run(name: String, healthcheck: Check, schedule: Schedule) {
+  private suspend fun run(name: String, healthcheck: Check, schedule: Schedule) {
     try {
       when (val result = healthcheck.check()) {
         is CheckResult.Healthy -> success(name, result, schedule, healthcheck)
@@ -72,11 +72,11 @@ class HealthCheckRegistry(threads: Int) {
       result = result
     )
 
-    scheduler.schedule(
-      { run(name, healthcheck, schedule) },
-      schedule.checkInterval.toLongMilliseconds(),
-      TimeUnit.MILLISECONDS
-    )
+//    scheduler.schedule(
+//      { run(name, healthcheck, schedule) },
+//      schedule.checkInterval.toLongMilliseconds(),
+//      TimeUnit.MILLISECONDS
+//    )
   }
 
   private fun failure(name: String, result: CheckResult.Unhealthy, schedule: Schedule, healthcheck: Check) {
@@ -93,11 +93,11 @@ class HealthCheckRegistry(threads: Int) {
       result = result
     )
 
-    scheduler.schedule(
-      { run(name, healthcheck, schedule) },
-      schedule.downtimeInterval.toLongMilliseconds(),
-      TimeUnit.MILLISECONDS
-    )
+//    scheduler.schedule(
+//      { run(name, healthcheck, schedule) },
+//      schedule.downtimeInterval.toLongMilliseconds(),
+//      TimeUnit.MILLISECONDS
+//    )
   }
 
   fun status(): HealthStatus {

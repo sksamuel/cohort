@@ -9,7 +9,7 @@ class DatabaseTableCheck(
   private val ds: DataSource,
   private val tableName: String,
 ) : Check {
-  override fun check(): CheckResult {
+  override suspend fun check(): CheckResult {
     val conn = ds.connection
     conn.createStatement().executeQuery("SELECT * FROM $tableName LIMIT 1")
     conn.close()

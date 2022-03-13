@@ -14,7 +14,7 @@ class ElasticClusterCheck(
   private val errorOnYellow: Boolean = false
 ) : Check {
 
-  override fun check(): CheckResult {
+  override suspend fun check(): CheckResult {
     return try {
       val client = RestHighLevelClient(RestClient.builder(*hosts.toTypedArray()))
       val resp = client.cluster().health(Requests.clusterHealthRequest(), RequestOptions.DEFAULT)
