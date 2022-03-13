@@ -1,6 +1,14 @@
-package com.sksamuel.cohort
+package com.sksamuel.cohort.system
 
-class FreeMemoryCheck(private val minFreeMb: Int) : Check {
+import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.CheckResult
+
+/**
+ * A Cohort [Check] that checks free memory in the system.
+ * The check is considered healthy if the amount of free memory is above [minFreeMb].
+ */
+class MemoryCheck(private val minFreeMb: Int) : Check {
+
   override suspend fun check(): CheckResult {
     val free = Runtime.getRuntime().freeMemory()
     val freeMb = free / 1000_000
@@ -10,4 +18,5 @@ class FreeMemoryCheck(private val minFreeMb: Int) : Check {
       CheckResult.Healthy("Freemem is above threshold [$freeMb >= $minFreeMb]")
     }
   }
+
 }

@@ -7,6 +7,7 @@ interface Check {
 sealed class CheckResult {
 
   val isHealthy: Boolean by lazy { this is Healthy }
+
   abstract val message: String?
   abstract val cause: Throwable?
 
