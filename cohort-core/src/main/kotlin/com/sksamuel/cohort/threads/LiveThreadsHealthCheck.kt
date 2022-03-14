@@ -16,9 +16,9 @@ class LiveThreadsHealthCheck(private val maxThreadCount: Int) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.threadCount
     return if (count <= maxThreadCount) {
-      HealthCheckResult.Healthy("Thread count is below threshold [$count < $maxThreadCount]")
+      HealthCheckResult.Healthy("Live threads is below threshold [$count < $maxThreadCount]")
     } else {
-      HealthCheckResult.Healthy("System CPU is below threshold [$count < $maxThreadCount]")
+      HealthCheckResult.Unhealthy("Live threads is above threshold [$count < $maxThreadCount]", null)
     }
   }
 }

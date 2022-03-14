@@ -18,7 +18,7 @@ class AvailableCoresHealthCheck(private val minCores: Double) : HealthCheck {
     return if (cores < minCores) {
       HealthCheckResult.Unhealthy("Available CPU cores are below threshold [$cores < $minCores]", null)
     } else {
-      HealthCheckResult.Healthy("Available CPU cores are above threshold [$cores >= $minCores]")
+      HealthCheckResult.Healthy("Available CPU cores are equal or above threshold [$cores >= $minCores]")
     }
   }
 
