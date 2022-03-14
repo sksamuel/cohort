@@ -1,5 +1,6 @@
 include("cohort-core")
 include("cohort-elastic")
+include("cohort-hikari")
 include("cohort-kafka")
 include("cohort-ktor")
 include("cohort-redis")
