@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.threads
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import java.lang.management.ManagementFactory
 
 /**
@@ -13,12 +13,12 @@ class LiveThreadsHealthCheck(private val maxThreadCount: Int) : HealthCheck {
 
   private val threadBean = ManagementFactory.getThreadMXBean()
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val count = threadBean.threadCount
     return if (count <= maxThreadCount) {
-      CheckResult.Healthy("Thread count is below threshold [$count < $maxThreadCount]")
+      HealthCheckResult.Healthy("Thread count is below threshold [$count < $maxThreadCount]")
     } else {
-      CheckResult.Healthy("System CPU is below threshold [$count < $maxThreadCount]")
+      HealthCheckResult.Healthy("System CPU is below threshold [$count < $maxThreadCount]")
     }
   }
 }

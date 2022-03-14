@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.AdminClientConfig
 import java.util.Properties
@@ -22,16 +22,16 @@ class KafkaClusterHealthCheck(private val config: KafkaClusterConfig) : HealthCh
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     return try {
       val client = AdminClient.create(props)
       val controller = client.describeCluster().controller().get(1, TimeUnit.MINUTES)
       if (controller.host() != null)
-        CheckResult.Healthy("Connected to kafka cluster at ${config.bootstrapServers}")
+        HealthCheckResult.Healthy("Connected to kafka cluster at ${config.bootstrapServers}")
       else
-        CheckResult.Healthy("Kafka cluster returned without controller at ${config.bootstrapServers}")
+        HealthCheckResult.Healthy("Kafka cluster returned without controller at ${config.bootstrapServers}")
     } catch (t: Throwable) {
-      CheckResult.Unhealthy("Could not connect to kafka cluster at ${config.bootstrapServers}", t)
+      HealthCheckResult.Unhealthy("Could not connect to kafka cluster at ${config.bootstrapServers}", t)
     }
   }
 }

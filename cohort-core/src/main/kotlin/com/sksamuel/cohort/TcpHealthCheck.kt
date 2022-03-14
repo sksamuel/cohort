@@ -14,16 +14,16 @@ class TcpHealthCheck(
   private val connectionTimeout: Duration = 4.seconds
 ) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val socket = Socket()
     val time = measureTime {
       socket.connect(InetSocketAddress(host, port), connectionTimeout.toLongMilliseconds().toInt())
     }
     return if (socket.isConnected) {
       socket.close()
-      CheckResult.Healthy("Connected to $host:$port after ${time.toLongMilliseconds()}ms")
+      HealthCheckResult.Healthy("Connected to $host:$port after ${time.toLongMilliseconds()}ms")
     } else {
-      CheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
+      HealthCheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
     }
   }
 }

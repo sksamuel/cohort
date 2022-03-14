@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.AdminClientConfig
 import java.util.Properties
@@ -20,12 +20,12 @@ class KafkaTopicHealthCheck(
     if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
   }
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val client = AdminClient.create(props)
     val desc = client.describeTopics(listOf(topic)).all().get(1, TimeUnit.MINUTES)[topic]
     return if (desc == null)
-      CheckResult.Unhealthy("Topic $topic does not exist on kafka cluster ${config.bootstrapServers}", null)
+      HealthCheckResult.Unhealthy("Topic $topic does not exist on kafka cluster ${config.bootstrapServers}", null)
     else
-      CheckResult.Healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
+      HealthCheckResult.Healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
   }
 }

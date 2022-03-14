@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.system
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 
 /**
  * A Cohort [HealthCheck] that checks free memory in the system.
@@ -9,13 +9,13 @@ import com.sksamuel.cohort.CheckResult
  */
 class MemoryHealthCheck(private val minFreeMb: Int) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val free = Runtime.getRuntime().freeMemory()
     val freeMb = free / 1000_000
     return if (freeMb < minFreeMb) {
-      CheckResult.Unhealthy("Freemem is below threshold [$freeMb < $minFreeMb]", null)
+      HealthCheckResult.Unhealthy("Freemem is below threshold [$freeMb < $minFreeMb]", null)
     } else {
-      CheckResult.Healthy("Freemem is above threshold [$freeMb >= $minFreeMb]")
+      HealthCheckResult.Healthy("Freemem is above threshold [$freeMb >= $minFreeMb]")
     }
   }
 

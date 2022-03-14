@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.system
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import com.sun.management.OperatingSystemMXBean
 import java.lang.management.ManagementFactory
 
@@ -14,12 +14,12 @@ class SystemCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val load = bean.systemCpuLoad
     return if (load < maxLoad) {
-      CheckResult.Healthy("System CPU is below threshold [$load < $maxLoad]")
+      HealthCheckResult.Healthy("System CPU is below threshold [$load < $maxLoad]")
     } else {
-      CheckResult.Unhealthy("System CPU is above threshold [$load >= $maxLoad]", null)
+      HealthCheckResult.Unhealthy("System CPU is above threshold [$load >= $maxLoad]", null)
     }
   }
 

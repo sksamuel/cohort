@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.system
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import java.nio.file.FileStore
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -28,15 +28,15 @@ class DiskSpaceHealthCheck(
   private val minFreeSpacePercentage: Double = 10.0
 ) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     return try {
       val availablePercent = (fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100).roundToInt()
       if (availablePercent < minFreeSpacePercentage)
-        CheckResult.Unhealthy("Available disk space is $availablePercent% on ${fileStore.name()}", null)
+        HealthCheckResult.Unhealthy("Available disk space is $availablePercent% on ${fileStore.name()}", null)
       else
-        CheckResult.Healthy("Available disk space is $availablePercent% on ${fileStore.name()}")
+        HealthCheckResult.Healthy("Available disk space is $availablePercent% on ${fileStore.name()}")
     } catch (t: Throwable) {
-      CheckResult.Unhealthy("Error querying disk space on ${fileStore.name()}", t)
+      HealthCheckResult.Unhealthy("Error querying disk space on ${fileStore.name()}", t)
     }
   }
 

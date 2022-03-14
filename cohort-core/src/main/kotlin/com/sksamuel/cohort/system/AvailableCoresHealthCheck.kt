@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.system
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 
 /**
  * A Cohort [HealthCheck] for the number of available CPU cores.
@@ -13,12 +13,12 @@ import com.sksamuel.cohort.CheckResult
  */
 class AvailableCoresHealthCheck(private val minCores: Double) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val cores = Runtime.getRuntime().availableProcessors()
     return if (cores < minCores) {
-      CheckResult.Unhealthy("Available CPU cores are below threshold [$cores < $minCores]", null)
+      HealthCheckResult.Unhealthy("Available CPU cores are below threshold [$cores < $minCores]", null)
     } else {
-      CheckResult.Healthy("Available CPU cores are above threshold [$cores >= $minCores]")
+      HealthCheckResult.Healthy("Available CPU cores are above threshold [$cores >= $minCores]")
     }
   }
 

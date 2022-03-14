@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.redis
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import redis.clients.jedis.HostAndPort
@@ -18,14 +18,14 @@ class RedisHealthCheck(
   private val config: JedisClientConfig,
 ) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     return withContext(Dispatchers.IO) {
       runCatching {
         val jedis = Jedis(hostsAndPort, config)
         jedis.connection.use { it.ping() }
-        CheckResult.Healthy("Connected to redis cluster")
+        HealthCheckResult.Healthy("Connected to redis cluster")
       }.getOrElse {
-        CheckResult.Unhealthy("Could not connect to redis at $hostsAndPort", it)
+        HealthCheckResult.Unhealthy("Could not connect to redis at $hostsAndPort", it)
       }
     }
   }

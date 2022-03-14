@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.redis
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import redis.clients.jedis.HostAndPort
@@ -18,18 +18,18 @@ class RedisClusterHealthCheck(
   private val config: JedisClientConfig,
 ) : HealthCheck {
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     return withContext(Dispatchers.IO) {
       runCatching {
         val jedis = JedisCluster(hostsAndPorts, config)
         jedis.use {
           when (val nodes = it.clusterNodes.size) {
-            0 -> CheckResult.Unhealthy("Connected to redis cluster but 0 nodes are available", null)
-            else -> CheckResult.Healthy("Connected to redis cluster and $nodes nodes are available")
+            0 -> HealthCheckResult.Unhealthy("Connected to redis cluster but 0 nodes are available", null)
+            else -> HealthCheckResult.Healthy("Connected to redis cluster and $nodes nodes are available")
           }
         }
       }.getOrElse {
-        CheckResult.Unhealthy("Could not connect to redis cluster at ${hostsAndPorts.joinToString(", ")}", it)
+        HealthCheckResult.Unhealthy("Could not connect to redis cluster at ${hostsAndPorts.joinToString(", ")}", it)
       }
     }
   }

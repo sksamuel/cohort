@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.db
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import javax.sql.DataSource
 
 /**
@@ -12,10 +12,10 @@ class DatabaseHealthCheck(
   private val ds: DataSource,
   private val query: String = "SELECT 1",
 ) : HealthCheck {
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     val conn = ds.connection
     conn.createStatement().executeQuery(query)
     conn.close()
-    return CheckResult.Healthy("Connected to database successfully")
+    return HealthCheckResult.Healthy("Connected to database successfully")
   }
 }

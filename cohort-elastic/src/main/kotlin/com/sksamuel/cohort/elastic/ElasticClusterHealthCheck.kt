@@ -7,7 +7,7 @@ import co.elastic.clients.elasticsearch._types.HealthStatus
 import co.elastic.clients.json.jackson.JacksonJsonpMapper
 import co.elastic.clients.transport.rest_client.RestClientTransport
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.CheckResult
+import com.sksamuel.cohort.HealthCheckResult
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 
@@ -24,21 +24,21 @@ class ElasticClusterHealthCheck(
   private val transport = RestClientTransport(restClient, JacksonJsonpMapper())
   private val client = ElasticsearchClient(transport)
 
-  override suspend fun check(): CheckResult {
+  override suspend fun check(): HealthCheckResult {
     return runCatching {
       val health = client.cluster().health()
       val status = health.status()
       val msg = "Elastic cluster is ${status.name}"
       when (status) {
-        HealthStatus.Green -> CheckResult.Healthy(msg)
-        HealthStatus.Yellow -> CheckResult.Unhealthy(msg, null)
+        HealthStatus.Green -> HealthCheckResult.Healthy(msg)
+        HealthStatus.Yellow -> HealthCheckResult.Unhealthy(msg, null)
         HealthStatus.Red -> when (errorOnYellow) {
-          true -> CheckResult.Healthy(msg)
-          false -> CheckResult.Unhealthy(msg, null)
+          true -> HealthCheckResult.Healthy(msg)
+          false -> HealthCheckResult.Unhealthy(msg, null)
         }
       }
     }.getOrElse {
-      CheckResult.Unhealthy("Error querying elastic cluster status", it)
+      HealthCheckResult.Unhealthy("Error querying elastic cluster status", it)
     }
   }
 }
