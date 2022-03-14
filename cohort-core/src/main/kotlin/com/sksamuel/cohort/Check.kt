@@ -4,6 +4,11 @@ interface Check {
   suspend fun check(): CheckResult
 }
 
+/**
+ * The result of a [Check].
+ *
+ * Can be either [Healthy] or [Unhealthy].
+ */
 sealed class CheckResult {
 
   val isHealthy: Boolean by lazy { this is Healthy }

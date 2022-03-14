@@ -17,9 +17,9 @@ class SystemCpuCheck(private val maxLoad: Double) : Check {
     val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
     val load = bean.systemCpuLoad
     return if (load < maxLoad) {
-      CheckResult.Unhealthy("System CPU is below threshold [$load < $maxLoad]", null)
+      CheckResult.Healthy("System CPU is below threshold [$load < $maxLoad]")
     } else {
-      CheckResult.Healthy("System CPU is above threshold [$load >= $maxLoad]")
+      CheckResult.Unhealthy("System CPU is above threshold [$load >= $maxLoad]", null)
     }
   }
 
