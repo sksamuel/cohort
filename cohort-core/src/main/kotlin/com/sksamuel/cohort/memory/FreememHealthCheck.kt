@@ -1,4 +1,4 @@
-package com.sksamuel.cohort.system
+package com.sksamuel.cohort.memory
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
