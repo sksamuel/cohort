@@ -8,11 +8,11 @@ import com.sksamuel.cohort.HealthCheckResult
  *
  * The check is considered healthy if the amount of free memory is above [minFreeBytes].
  */
-class MemoryHealthCheck(private val minFreeBytes: Int) : HealthCheck {
+class FreememHealthCheck(private val minFreeBytes: Int) : HealthCheck {
 
   companion object {
-    fun mb(mb: Int) = MemoryHealthCheck(mb * 1024 * 1024)
-    fun gb(gb: Int) = MemoryHealthCheck(gb * 1024 * 1024 * 1024)
+    fun mb(mb: Int) = FreememHealthCheck(mb * 1024 * 1024)
+    fun gb(gb: Int) = FreememHealthCheck(gb * 1024 * 1024 * 1024)
   }
 
   override suspend fun check(): HealthCheckResult {
