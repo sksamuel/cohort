@@ -30,6 +30,17 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   private val names = mutableSetOf<String>()
   private val results = ConcurrentHashMap<String, CheckStatus>()
 
+  companion object {
+    operator fun invoke(
+      dispatcher: CoroutineDispatcher,
+      configure: HealthCheckRegistry.() -> Unit
+    ): HealthCheckRegistry {
+      val registry = HealthCheckRegistry(dispatcher)
+      registry.configure()
+      return registry
+    }
+  }
+
   /**
    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
    * The name is derived from the check class.
