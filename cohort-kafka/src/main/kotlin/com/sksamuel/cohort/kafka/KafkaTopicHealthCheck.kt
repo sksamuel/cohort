@@ -1,6 +1,6 @@
 package com.sksamuel.cohort.kafka
 
-import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.CheckResult
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.admin.AdminClientConfig
@@ -8,12 +8,12 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 /**
- * A [Check] that checks that a topic exists on a kafka cluster.
+ * A [HealthCheck] that checks that a topic exists on a kafka cluster.
  */
-class KafkaTopicCheck(
+class KafkaTopicHealthCheck(
   private val config: KafkaClusterConfig,
   private val topic: String
-) : Check {
+) : HealthCheck {
 
   private val props = Properties().apply {
     this[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = config.bootstrapServers

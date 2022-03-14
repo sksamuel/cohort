@@ -4,14 +4,16 @@ package com.sksamuel.cohort
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import java.sql.Timestamp
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
 /**
- * Defines the schedule for running a [Check].
+ * Defines the schedule for running a [HealthCheck].
  *
  * @param checkInterval how often to initiate this check.
  * @param initialDelay the delay before the first check is executed.
@@ -34,106 +36,121 @@ data class Schedule(
 }
 
 /**
- * Executes health checks based on provided schedules using the provided dispatcher.
- * Individual checks may shift the dispatcher, typically for IO operations this would be [Dispatchers.IO].
+ * A [HealthCheckRegistry] executes [HealthCheck]s based on provided schedules.
+ *
+ * All executions happen on the provided [CoroutineDispatcher].
+ *
+ * Individual checks are free to shift the dispatcher onto a [Dispatchers.IO] for IO calls.
+ * It is recommended that the provided dispatcher has parallelism limited to 1.
+ *
+ * This registry creates one additional thread for its own use, to run the scheduler. This thread remains
+ * in [Thread.State.BLOCKED] while waiting to fire a scheduled event, and this thread is not used
+ * for the actual execution of the scheduled events.
  */
-class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
 
   private val scheduler = Executors.newScheduledThreadPool(1)
-  private val results = ConcurrentHashMap<String, HealthCheckStatus>()
+  private val names = mutableSetOf<String>()
+  private val results = ConcurrentHashMap<String, CheckStatus>()
 
   /**
-   * Adds a new [Check] to this registry with the given [schedule].
+   * Adds a new [HealthCheck] to this registry with the given [schedule].
+   */
+  fun register(
+    check: HealthCheck,
+    schedule: Schedule
+  ): HealthCheckRegistry = register(check::class.java.name, check, schedule)
+
+  /**
+   * Adds a new [HealthCheck] to this registry with the given [schedule].
+   *
+   * @param name the name is associated with the result in the output json.
+   * This is useful to allow the same check to be registered multiple times against different configurations.
    */
   fun register(
     name: String,
-    healthcheck: Check,
-    schedule: Schedule
+    check: HealthCheck,
+    schedule: Schedule,
   ): HealthCheckRegistry {
-
-//    scheduler.schedule(
-//      run(name, healthcheck, schedule) },
-//      schedule.initialDelay.toLongMilliseconds(),
-//      TimeUnit.MILLISECONDS
-//    )
-
+    if (names.contains(name)) error("Check $name already registered")
+    names.add(name)
+    schedule(name, check, schedule, schedule.initialDelay)
     return this
   }
 
-  private suspend fun run(name: String, healthcheck: Check, schedule: Schedule) {
+  private fun schedule(name: String, check: HealthCheck, schedule: Schedule, duration: Duration) {
+    scheduler.schedule(
+      {
+        GlobalScope.launch(dispatcher) {
+          run(name, check, schedule)
+        }
+      },
+      duration.inWholeMilliseconds,
+      TimeUnit.MILLISECONDS
+    )
+  }
+
+  private suspend fun run(name: String, check: HealthCheck, schedule: Schedule) {
     try {
-      when (val result = healthcheck.check()) {
-        is CheckResult.Healthy -> success(name, result, schedule, healthcheck)
-        is CheckResult.Unhealthy -> failure(name, result, schedule, healthcheck)
+      when (val result = check.check()) {
+        is CheckResult.Healthy -> success(name, result)
+        is CheckResult.Unhealthy -> failure(name, result)
       }
     } catch (t: Throwable) {
       val result = CheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
-      failure(name, result, schedule, healthcheck)
+      failure(name, result)
     }
+    schedule(name, check, schedule, schedule.checkInterval)
   }
 
-  private fun success(name: String, result: CheckResult.Healthy, schedule: Schedule, healthcheck: Check) {
+  private fun success(name: String, result: CheckResult.Healthy) {
 
     val previous = results[name]
-    val timestamp = Timestamp.from(Instant.now())
     val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
 
-    results[name] = HealthCheckStatus(
+    results[name] = CheckStatus(
       consecutiveSuccesses = successes,
       consecutiveFailures = 0, // reset to 0 when we have a success
-      healthy = if (successes >= schedule.successAttempts) true else previous?.healthy ?: true,
-      timestamp = timestamp,
+      healthy = true,
+      timestamp = Instant.now(),
       result = result
     )
-
-//    scheduler.schedule(
-//      { run(name, healthcheck, schedule) },
-//      schedule.checkInterval.toLongMilliseconds(),
-//      TimeUnit.MILLISECONDS
-//    )
   }
 
-  private fun failure(name: String, result: CheckResult.Unhealthy, schedule: Schedule, healthcheck: Check) {
+  private fun failure(name: String, result: CheckResult.Unhealthy) {
 
     val previous = results[name]
-    val timestamp = Timestamp.from(Instant.now())
     val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
 
-    results[name] = HealthCheckStatus(
+    results[name] = CheckStatus(
       consecutiveSuccesses = 0, // reset to 0 when we have a failure
       consecutiveFailures = failures,
-      healthy = if (failures >= schedule.failureAttempts) false else previous?.healthy ?: false,
-      timestamp = timestamp,
+      healthy = false,
+      timestamp = Instant.now(),
       result = result
     )
-
-//    scheduler.schedule(
-//      { run(name, healthcheck, schedule) },
-//      schedule.downtimeInterval.toLongMilliseconds(),
-//      TimeUnit.MILLISECONDS
-//    )
   }
 
-  fun status(): HealthStatus {
+  fun status(): Health {
     val unhealthy = results.values.any { !it.healthy }
-    return HealthStatus(!unhealthy, results.toMap())
+    return Health(!unhealthy, results.toMap())
   }
 }
 
 
-data class HealthCheckStatus(
+data class CheckStatus(
   val consecutiveSuccesses: Int,
   val consecutiveFailures: Int,
-  val healthy: Boolean,
-  val timestamp: Timestamp,
-  val result: CheckResult
+  val healthy: Boolean, // overall health status
+  val timestamp: Instant,
+  val result: CheckResult,
 )
 
-data class HealthStatus(val healthy: Boolean, val results: Map<String, HealthCheckStatus>)
+data class Health(val healthy: Boolean, val results: Map<String, CheckStatus>)
 
-fun <A> HealthStatus.fold(
-  ifUnhealthy: (Map<String, HealthCheckStatus>) -> A,
-  ifHealthy: (Map<String, HealthCheckStatus>) -> A
+fun <A> Health.fold(
+  ifUnhealthy: (Map<String, CheckStatus>) -> A,
+  ifHealthy: (Map<String, CheckStatus>) -> A
 ): A {
   return when (healthy) {
     true -> ifHealthy(results)

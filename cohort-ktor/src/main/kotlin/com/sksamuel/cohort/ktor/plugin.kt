@@ -1,6 +1,6 @@
 package com.sksamuel.cohort.ktor
 
-import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.HealthCheckRegistry
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
@@ -13,6 +13,7 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.util.AttributeKey
+import java.time.ZoneOffset
 
 class Cohort private constructor(
   private val config: CohortConfiguration
@@ -27,10 +28,30 @@ class Cohort private constructor(
   fun interceptor(pipeline: Application) {
     pipeline.intercept(ApplicationCallPipeline.Monitoring) {
       val routing: Routing.() -> Unit = {
-        config.endpoints.forEach { (endpoint, checks) ->
+        config.endpoints.forEach { (endpoint, registry) ->
           get(endpoint) {
-            val (status, responseBody) = Pair(HttpStatusCode.OK, "")
-            call.respondText(responseBody, ContentType.Application.Json, status)
+
+            val status = registry.status()
+
+            val results = status.results.map {
+              ResultJson(
+                name = it.key,
+                healthy = it.value.healthy,
+                lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
+                message = it.value.result.message,
+                cause = it.value.result.cause?.stackTraceToString(),
+                consecutiveSuccesses = it.value.consecutiveSuccesses,
+                consecutiveFailures = it.value.consecutiveFailures,
+              )
+            }
+            val json = mapper.writeValueAsString(results)
+
+            val httpStatusCode = when (status.healthy) {
+              true -> HttpStatusCode.OK
+              false -> HttpStatusCode.ServiceUnavailable
+            }
+
+            call.respondText(json, ContentType.Application.Json, httpStatusCode)
             finish()
           }
         }
@@ -42,8 +63,8 @@ class Cohort private constructor(
 }
 
 class CohortConfiguration {
-  val endpoints = mutableMapOf<String, List<Check>>()
-  fun configure(endpoint: String, vararg checks: Check) {
-    endpoints[endpoint] = checks.toList()
+  val endpoints = mutableMapOf<String, HealthCheckRegistry>()
+  fun configure(endpoint: String, registry: HealthCheckRegistry) {
+    endpoints[endpoint] = registry
   }
 }

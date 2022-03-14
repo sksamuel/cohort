@@ -8,11 +8,11 @@ import kotlin.time.measureTime
 import kotlin.time.seconds
 
 @ExperimentalTime
-class TcpCheck(
+class TcpHealthCheck(
   private val host: String,
   private val port: Int,
   private val connectionTimeout: Duration = 4.seconds
-) : Check {
+) : HealthCheck {
 
   override suspend fun check(): CheckResult {
     val socket = Socket()

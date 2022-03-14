@@ -1,16 +1,16 @@
 package com.sksamuel.cohort.system
 
-import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.CheckResult
 import com.sun.management.OperatingSystemMXBean
 import java.lang.management.ManagementFactory
 
 /**
- * A Cohort [Check] for the maximum system cpu between 0 and 1.0
+ * A Cohort [HealthCheck] for the maximum system cpu between 0 and 1.0
  *
  * The check is considered healthy if the system cpu load is < [maxLoad].
  */
-class SystemCpuCheck(private val maxLoad: Double) : Check {
+class SystemCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 

@@ -1,11 +1,11 @@
 package com.sksamuel.cohort
 
-interface Check {
+interface HealthCheck {
   suspend fun check(): CheckResult
 }
 
 /**
- * The result of a [Check].
+ * The result of a [HealthCheck].
  *
  * Can be either [Healthy] or [Unhealthy].
  */

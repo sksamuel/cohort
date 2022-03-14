@@ -6,19 +6,19 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient
 import co.elastic.clients.elasticsearch._types.HealthStatus
 import co.elastic.clients.json.jackson.JacksonJsonpMapper
 import co.elastic.clients.transport.rest_client.RestClientTransport
-import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.CheckResult
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 
 /**
- * A [Check] which checks the state of the cluster and returns unhealthy
+ * A [HealthCheck] which checks the state of the cluster and returns unhealthy
  * if the cluster is red, or yellow if [errorOnYellow] is set to true.
  */
-class ElasticClusterCheck(
+class ElasticClusterHealthCheck(
   private val hosts: List<HttpHost>,
   private val errorOnYellow: Boolean = false
-) : Check {
+) : HealthCheck {
 
   private val restClient = RestClient.builder(*hosts.toTypedArray()).build()
   private val transport = RestClientTransport(restClient, JacksonJsonpMapper())
