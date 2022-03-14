@@ -2,6 +2,7 @@ package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.heap.Heapdump
+import com.sksamuel.cohort.os.getOperatingSystem
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
@@ -35,6 +36,13 @@ class Cohort private constructor(
             val live = call.request.queryParameters["live"].toBoolean()
             val dump = Heapdump.run(live)
             call.respondText(dump, ContentType.Text.Plain, HttpStatusCode.OK)
+          }
+        }
+
+        if (config.operatingSystem) {
+          get("cohort/os") {
+            val os = getOperatingSystem()
+            call.respondText(mapper.writeValueAsString(os), ContentType.Application.Json, HttpStatusCode.OK)
           }
         }
 
@@ -77,6 +85,7 @@ class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
   var heapdump: Boolean = false
+  var operatingSystem: Boolean = false
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry
