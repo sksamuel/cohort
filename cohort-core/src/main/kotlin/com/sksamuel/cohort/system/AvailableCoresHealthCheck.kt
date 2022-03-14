@@ -11,7 +11,7 @@ import com.sksamuel.cohort.HealthCheckResult
  *
  * The check is considered healthy if the cpu core count is >= [minCores].
  */
-class AvailableCoresHealthCheck(private val minCores: Double) : HealthCheck {
+class AvailableCoresHealthCheck(private val minCores: Int) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
     val cores = Runtime.getRuntime().availableProcessors()
