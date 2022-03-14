@@ -13,6 +13,10 @@ import com.sksamuel.cohort.HealthCheckResult
  */
 class AvailableCoresHealthCheck(private val minCores: Int) : HealthCheck {
 
+  companion object {
+    val multiple = AvailableCoresHealthCheck(2)
+  }
+
   override suspend fun check(): HealthCheckResult {
     val cores = Runtime.getRuntime().availableProcessors()
     return if (cores < minCores) {

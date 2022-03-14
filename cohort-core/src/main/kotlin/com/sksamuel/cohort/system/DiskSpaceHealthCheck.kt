@@ -7,10 +7,6 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import kotlin.math.roundToInt
 
-fun main() {
-  FileSystems.getDefault().rootDirectories.forEach { println(it) }
-}
-
 /**
  * A Cohort [HealthCheck] that examines disk space on the given [FileStore].
  *
