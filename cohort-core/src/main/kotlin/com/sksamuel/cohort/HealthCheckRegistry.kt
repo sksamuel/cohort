@@ -2,13 +2,20 @@
 
 package com.sksamuel.cohort
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
+/**
+ * Defines the schedule for running a [Check].
+ *
+ * @param checkInterval how often to initiate this check.
+ * @param initialDelay the delay before the first check is executed.
+ */
 data class Schedule(
   val checkInterval: Duration,
   val downtimeInterval: Duration,
@@ -26,11 +33,18 @@ data class Schedule(
 
 }
 
-class HealthCheckRegistry(threads: Int) {
+/**
+ * Executes health checks based on provided schedules using the provided dispatcher.
+ * Individual checks may shift the dispatcher, typically for IO operations this would be [Dispatchers.IO].
+ */
+class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
-  private val scheduler = Executors.newScheduledThreadPool(threads)
+  private val scheduler = Executors.newScheduledThreadPool(1)
   private val results = ConcurrentHashMap<String, HealthCheckStatus>()
 
+  /**
+   * Adds a new [Check] to this registry with the given [schedule].
+   */
   fun register(
     name: String,
     healthcheck: Check,
