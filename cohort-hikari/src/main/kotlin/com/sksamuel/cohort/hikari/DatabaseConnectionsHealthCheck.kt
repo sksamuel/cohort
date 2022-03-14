@@ -5,7 +5,7 @@ import com.sksamuel.cohort.HealthCheckResult
 import com.zaxxer.hikari.HikariDataSource
 
 /**
- * A Cohort [HealthCheck] that checks for the number of connections in a Hikari datasource.
+ * A Cohort [HealthCheck] that checks for the number of connections in a [HikariDataSource].
  *
  * This is useful to detect when connections are unable to be made.
  *
