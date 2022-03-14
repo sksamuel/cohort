@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
+import com.sksamuel.cohort.heap.Heapdump
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
@@ -28,7 +29,16 @@ class Cohort private constructor(
   fun interceptor(pipeline: Application) {
     pipeline.intercept(ApplicationCallPipeline.Monitoring) {
       val routing: Routing.() -> Unit = {
-        config.endpoints.forEach { (endpoint, registry) ->
+
+        if (config.heapdump) {
+          get("cohort/heapdump") {
+            val live = call.request.queryParameters["live"].toBoolean()
+            val dump = Heapdump.run(live)
+            call.respondText(dump, ContentType.Text.Plain, HttpStatusCode.OK)
+          }
+        }
+
+        config.healthchecks.forEach { (endpoint, registry) ->
           get(endpoint) {
 
             val status = registry.status()
@@ -56,6 +66,7 @@ class Cohort private constructor(
           }
         }
       }
+
       pipeline.featureOrNull(Routing)?.apply(routing) ?: pipeline.install(Routing, routing)
       proceed()
     }
@@ -63,8 +74,12 @@ class Cohort private constructor(
 }
 
 class CohortConfiguration {
-  val endpoints = mutableMapOf<String, HealthCheckRegistry>()
-  fun configure(endpoint: String, registry: HealthCheckRegistry) {
-    endpoints[endpoint] = registry
+
+  val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+  var heapdump: Boolean = false
+
+  fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+    healthchecks[endpoint] = registry
   }
+
 }
