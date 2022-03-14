@@ -12,9 +12,9 @@ import java.lang.management.ManagementFactory
  */
 class SystemCpuCheck(private val maxLoad: Double) : Check {
 
-  override suspend fun check(): CheckResult {
+  private val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 
-    val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
+  override suspend fun check(): CheckResult {
     val load = bean.systemCpuLoad
     return if (load < maxLoad) {
       CheckResult.Healthy("System CPU is below threshold [$load < $maxLoad]")
