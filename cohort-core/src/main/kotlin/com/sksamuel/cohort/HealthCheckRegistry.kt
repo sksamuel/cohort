@@ -40,6 +40,15 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   ): HealthCheckRegistry = register(check::class.java.name, check, delay, delay)
 
   /**
+   * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
+   */
+  fun register(
+    name: String,
+    check: HealthCheck,
+    delay: Duration,
+  ): HealthCheckRegistry = register(name, check, delay, delay)
+
+  /**
    * Adds a new [HealthCheck] to this registry with the given schedule.
    *
    * @param name the name is associated with the result in the output json.
