@@ -13,7 +13,7 @@ import com.zaxxer.hikari.HikariDataSource
  *
  * The check is considered healthy if the current count of awaiting threads is <= [maxAwaiting].
  */
-class ThreadsAwaitingConnectionHealthCheck(
+class ThreadsAwaitingHikariConnectionHealthCheck(
   private val ds: HikariDataSource,
   private val maxAwaiting: Int,
 ) : HealthCheck {
