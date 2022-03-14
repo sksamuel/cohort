@@ -1,5 +1,7 @@
-package com.sksamuel.cohort
+package com.sksamuel.cohort.db
 
+import com.sksamuel.cohort.Check
+import com.sksamuel.cohort.CheckResult
 import javax.sql.DataSource
 
 /**
