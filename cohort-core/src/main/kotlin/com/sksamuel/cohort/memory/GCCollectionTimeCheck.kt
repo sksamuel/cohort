@@ -3,6 +3,7 @@ package com.sksamuel.cohort.memory
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import java.lang.management.ManagementFactory
+import kotlin.math.roundToInt
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -25,7 +26,7 @@ class GCCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
     lastMark?.let {
       val diff = time - lastTime
       val period = it.elapsedNow().inWholeMilliseconds
-      val pc = diff / period.toDouble()
+      val pc = (diff / period.toDouble()).roundToInt()
       return if (pc <= maxGcTime) {
         HealthCheckResult.Healthy("GC Collection time was $pc% [Max is $maxGcTime]")
       } else {
