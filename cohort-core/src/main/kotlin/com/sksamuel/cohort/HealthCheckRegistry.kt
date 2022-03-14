@@ -13,29 +13,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
 /**
- * Defines the schedule for running a [HealthCheck].
- *
- * @param checkInterval how often to initiate this check.
- * @param initialDelay the delay before the first check is executed.
- */
-data class Schedule(
-  val checkInterval: Duration,
-  val downtimeInterval: Duration,
-  val initialDelay: Duration,
-  val failureAttempts: Int,
-  val successAttempts: Int,
-) {
-  init {
-    require(successAttempts > 0)
-    require(failureAttempts > 0)
-  }
-
-  constructor(interval: Duration) : this(interval, interval, Duration.ZERO, 1, 1)
-  constructor(interval: Duration, failureAttempts: Int) : this(interval, interval, Duration.ZERO, failureAttempts, 1)
-
-}
-
-/**
  * A [HealthCheckRegistry] executes [HealthCheck]s based on provided schedules.
  *
  * All executions happen on the provided [CoroutineDispatcher].
@@ -54,15 +31,16 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   private val results = ConcurrentHashMap<String, CheckStatus>()
 
   /**
-   * Adds a new [HealthCheck] to this registry with the given [schedule].
+   * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
+   * The name is derived from the check class.
    */
   fun register(
     check: HealthCheck,
-    schedule: Schedule
-  ): HealthCheckRegistry = register(check::class.java.name, check, schedule)
+    delay: Duration,
+  ): HealthCheckRegistry = register(check::class.java.name, check, delay, delay)
 
   /**
-   * Adds a new [HealthCheck] to this registry with the given [schedule].
+   * Adds a new [HealthCheck] to this registry with the given schedule.
    *
    * @param name the name is associated with the result in the output json.
    * This is useful to allow the same check to be registered multiple times against different configurations.
@@ -70,27 +48,28 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   fun register(
     name: String,
     check: HealthCheck,
-    schedule: Schedule,
+    initialDelay: Duration,
+    checkInterval: Duration
   ): HealthCheckRegistry {
     if (names.contains(name)) error("Check $name already registered")
     names.add(name)
-    schedule(name, check, schedule, schedule.initialDelay)
+    schedule(name, check, initialDelay, checkInterval)
     return this
   }
 
-  private fun schedule(name: String, check: HealthCheck, schedule: Schedule, duration: Duration) {
+  private fun schedule(name: String, check: HealthCheck, thisDelay: Duration, nextDelay: Duration) {
     scheduler.schedule(
       {
         GlobalScope.launch(dispatcher) {
-          run(name, check, schedule)
+          run(name, check, nextDelay)
         }
       },
-      duration.inWholeMilliseconds,
+      thisDelay.inWholeMilliseconds,
       TimeUnit.MILLISECONDS
     )
   }
 
-  private suspend fun run(name: String, check: HealthCheck, schedule: Schedule) {
+  private suspend fun run(name: String, check: HealthCheck, delay: Duration) {
     try {
       when (val result = check.check()) {
         is HealthCheckResult.Healthy -> success(name, result)
@@ -100,7 +79,7 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
       val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
       failure(name, result)
     }
-    schedule(name, check, schedule, schedule.checkInterval)
+    schedule(name, check, delay, delay)
   }
 
   private fun success(name: String, result: HealthCheckResult.Healthy) {
