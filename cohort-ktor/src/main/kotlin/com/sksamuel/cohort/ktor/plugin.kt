@@ -6,6 +6,7 @@ import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
 import com.sksamuel.cohort.logging.Logger
 import com.sksamuel.cohort.os.getOperatingSystem
+import com.sksamuel.cohort.system.getSysProps
 import com.sksamuel.cohort.threads.getThreadDump
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
@@ -79,10 +80,7 @@ class Cohort private constructor(
         if (config.jvmInfo) {
           get("cohort/jvm") {
             getJvmDetails().fold(
-              {
-                val json = mapper.writeValueAsString(it)
-                call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
-              },
+              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
@@ -92,6 +90,15 @@ class Cohort private constructor(
           get("cohort/threaddump") {
             getThreadDump().fold(
               { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            )
+          }
+        }
+
+        if (config.sysprops) {
+          get("cohort/sysprops") {
+            getSysProps().fold(
+              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
@@ -155,6 +162,9 @@ class CohortConfiguration {
 
   // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
   var threadDump: Boolean = false
+
+  // set to true to enable the /cohort/sysprops endpoint which returns current system properties
+  var sysprops: Boolean = false
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry
