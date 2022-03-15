@@ -12,8 +12,9 @@ fun getHeapDump(): Result<String> = runCatching {
   val server = ManagementFactory.getPlatformMBeanServer()
   val mxBean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, HotSpotDiagnosticMXBean::class.java)
   val path = Paths.get("/tmp/heapdump" + System.currentTimeMillis() + ".hprof")
+  println(path)
   mxBean.dumpHeap(path.toString(), true)
   val dump = Files.readString(path)
-  path.deleteIfExists()
+//  path.deleteIfExists()
   dump
 }
