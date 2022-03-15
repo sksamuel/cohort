@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
+import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.heap.Heapdump
 import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
@@ -51,6 +52,10 @@ class Cohort private constructor(
           }
         }
 
+        config.dataSourceManager?.let {
+
+        }
+
         config.logManager?.let { manager ->
 
           data class LogInfo(val levels: List<String>, val loggers: List<Logger>)
@@ -64,7 +69,6 @@ class Cohort private constructor(
               { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
-
           }
 
           put("cohort/logging/{name}/{level}") {
@@ -153,9 +157,16 @@ class Cohort private constructor(
 class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+
+  // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
   var heapDump: Boolean = false
+
+  // set to true to enable the /cohort/os endpoint which returns operating system information
   var operatingSystem: Boolean = false
+
   var logManager: LogManager? = null
+
+  var dataSourceManager: DataSourceManager? = null
 
   // set to true to enable the /cohort/jvm endpoint which returns JVM information
   var jvmInfo: Boolean = false
