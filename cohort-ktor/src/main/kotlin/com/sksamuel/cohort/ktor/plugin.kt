@@ -44,7 +44,7 @@ class Cohort private constructor(
               Heapdump.run(live)
             }.fold(
               { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
-              { call.respond(HttpStatusCode.InternalServerError, it) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
         }
@@ -60,7 +60,7 @@ class Cohort private constructor(
               mapper.writeValueAsString(LogInfo(levels, loggers))
             }.fold(
               { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
-              { call.respond(HttpStatusCode.InternalServerError, it) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
 
           }
@@ -70,7 +70,7 @@ class Cohort private constructor(
             val level = call.parameters.getOrFail("level")
             manager.set(name, level).fold(
               { call.respond(HttpStatusCode.OK) },
-              { call.respond(HttpStatusCode.InternalServerError, it) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
         }
@@ -82,17 +82,19 @@ class Cohort private constructor(
                 val json = mapper.writeValueAsString(it)
                 call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
               },
-              { call.respond(HttpStatusCode.InternalServerError, it) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
         }
 
         if (config.operatingSystem) {
           get("cohort/os") {
-            call.respondText(
-              mapper.writeValueAsString(getOperatingSystem()),
-              ContentType.Application.Json,
-              HttpStatusCode.OK
+            getOperatingSystem().fold(
+              {
+                val json = mapper.writeValueAsString(it)
+                call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+              },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
         }
