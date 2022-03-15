@@ -1,6 +1,7 @@
 include("cohort-core")
 include("cohort-elastic")
 include("cohort-flyway")
+include("cohort-liquibase")
 include("cohort-hikari")
 include("cohort-kafka")
 include("cohort-ktor")

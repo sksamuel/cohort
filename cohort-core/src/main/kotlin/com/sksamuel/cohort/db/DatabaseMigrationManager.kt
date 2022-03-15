@@ -9,9 +9,9 @@ interface DatabaseMigrationManager {
 data class Migration(
   val script: String,
   val description: String,
-  val checksum: Int,
-  val installedBy: String,
-  val installedOn: Instant,
+  val checksum: String,
+  val author: String,
+  val timestamp: Instant,
   val version: String,
   val state: String
 )

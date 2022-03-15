@@ -16,13 +16,13 @@ class FlywayManager(private val ds: DataSource) : DatabaseMigrationManager {
       .all()
       .map {
         Migration(
-          it.script,
-          it.description,
-          it.checksum,
-          it.installedBy,
-          it.installedOn.toInstant(),
-          it.version.toString(),
-          it.state.displayName,
+          script = it.script,
+          description = it.description,
+          checksum = it.checksum.toString(),
+          author = it.installedBy,
+          timestamp = it.installedOn.toInstant(),
+          version = it.version.toString(),
+          state = it.state.displayName,
         )
       }
   }
