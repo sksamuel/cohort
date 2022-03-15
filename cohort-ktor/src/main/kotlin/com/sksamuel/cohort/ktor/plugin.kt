@@ -6,6 +6,7 @@ import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
 import com.sksamuel.cohort.logging.Logger
 import com.sksamuel.cohort.os.getOperatingSystem
+import com.sksamuel.cohort.threads.getThreadDump
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
@@ -37,7 +38,7 @@ class Cohort private constructor(
     pipeline.intercept(ApplicationCallPipeline.Monitoring) {
       val routing: Routing.() -> Unit = {
 
-        if (config.heapdump) {
+        if (config.heapDump) {
           get("cohort/heapdump") {
             runCatching {
               val live = call.request.queryParameters["live"].toBoolean()
@@ -82,6 +83,15 @@ class Cohort private constructor(
                 val json = mapper.writeValueAsString(it)
                 call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
               },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            )
+          }
+        }
+
+        if (config.threadDump) {
+          get("cohort/threaddump") {
+            getThreadDump().fold(
+              { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
@@ -136,12 +146,15 @@ class Cohort private constructor(
 class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
-  var heapdump: Boolean = false
+  var heapDump: Boolean = false
   var operatingSystem: Boolean = false
   var logManager: LogManager? = null
 
   // set to true to enable the /cohort/jvm endpoint which returns JVM information
   var jvmInfo: Boolean = false
+
+  // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
+  var threadDump: Boolean = false
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry
