@@ -5,7 +5,7 @@
 [<img src="https://img.shields.io/nexus/s/https/oss.sonatype.org/com.sksamuel.cohort/cohort-core.svg?label=latest%20snapshot&style=plastic"/>](https://oss.sonatype.org/content/repositories/snapshots/com/sksamuel/cohort/)
 
 Cohort is a [Spring Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html) style
-replacement for non Spring services. It provides HTTP endpoints to help monitor and manage apps in production. For
+replacement for [Ktor](https://ktor.io). It provides HTTP endpoints to help monitor and manage apps in production. For
 example health, logging, database and JVM metrics.
 
 ## How to use
