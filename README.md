@@ -37,6 +37,87 @@ to kill the application, but you don't want to send it requests either. Kubernet
 and mitigate these situations. A pod with containers reporting that they are not ready does not receive traffic through
 Kubernetes Services.
 
+### Endpoints
+
+Here is an example of output from a health check with a series of configured health checks.
+
+```json
+[
+  {
+    "name": "com.sksamuel.cohort.memory.FreememHealthCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.445932Z",
+    "message": "Freemem is above threshold [433441040 >= 67108864]",
+    "cause": null,
+    "consecutiveSuccesses": 75,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "com.sksamuel.cohort.system.OpenFileDescriptorsHealthCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.429469Z",
+    "message": "Open file descriptor count within threshold [209 <= 16000]",
+    "cause": null,
+    "consecutiveSuccesses": 25,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "com.sksamuel.cohort.memory.GarbageCollectionTimeCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:00:54.422194Z",
+    "message": "GC Collection time was 0% [Max is 25]",
+    "cause": null,
+    "consecutiveSuccesses": 6,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "writer connections",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.445868Z",
+    "message": "Database connections is equal or above threshold [8 >= 8]",
+    "cause": null,
+    "consecutiveSuccesses": 75,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "reader connections",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.445841Z",
+    "message": "Database connections is equal or above threshold [8 >= 8]",
+    "cause": null,
+    "consecutiveSuccesses": 75,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "com.sksamuel.cohort.hikari.ThreadsAwaitingHikariConnectionHealthCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.445928Z",
+    "message": "Threads awaiting database connection is equal or above threshold [0 <= 32]",
+    "cause": null,
+    "consecutiveSuccesses": 75,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "com.sksamuel.cohort.system.SystemCpuHealthCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:01:09.463421Z",
+    "message": "System CPU is below threshold [0.12667261373773417 < 0.9]",
+    "cause": null,
+    "consecutiveSuccesses": 75,
+    "consecutiveFailures": 0
+  },
+  {
+    "name": "com.sksamuel.cohort.threads.ThreadDeadlockHealthCheck",
+    "healthy": true,
+    "lastCheck": "2022-03-15T03:00:54.419733Z",
+    "message": "There are 0 deadlocked threads",
+    "cause": null,
+    "consecutiveSuccesses": 6,
+    "consecutiveFailures": 0
+  }
+]
+```
+
 ## Logging
 
 Cohort allows you to view the current logging configuration and update log levels at runtime.
@@ -46,3 +127,4 @@ Cohort allows you to view the current logging configuration and update log level
 Cohort provides several endpoints to reflect the current environment.
 
 * operating system - displays the running os and version
+
