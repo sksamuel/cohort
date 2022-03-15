@@ -14,7 +14,7 @@ import kotlin.time.TimeSource
  *
  * The check is considered healthy if the amount of time in GC is <= [maxGcTime].
  */
-class GCCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
+class GarbageCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
 
   private val beans = ManagementFactory.getGarbageCollectorMXBeans()
   private var lastTime = 0L
