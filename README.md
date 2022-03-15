@@ -116,15 +116,6 @@ Here is an example of output from a health check with a series of configured hea
     "consecutiveFailures": 0
   },
   {
-    "name": "com.sksamuel.cohort.hikari.ThreadsAwaitingHikariConnectionHealthCheck",
-    "healthy": true,
-    "lastCheck": "2022-03-15T03:01:09.445928Z",
-    "message": "Threads awaiting database connection is equal or above threshold [0 <= 32]",
-    "cause": null,
-    "consecutiveSuccesses": 75,
-    "consecutiveFailures": 0
-  },
-  {
     "name": "com.sksamuel.cohort.system.SystemCpuHealthCheck",
     "healthy": true,
     "lastCheck": "2022-03-15T03:01:09.463421Z",
@@ -151,13 +142,42 @@ Cohort allows you to view the current logging configuration and update log level
 
 Here is the example output of `/cohort/logging` which shows the current log levels:
 
+## Jvm Info
 
+Displays information about the JVM state, including VM options, JVM version, and vendor name.
 
-## Runtime Information
+```json
+{
+  "name": "106637@sam-H310M-A-2-0",
+  "pid": 106637,
+  "vmOptions": [
+    "-Dvisualvm.id=32227655111670",
+    "-javaagent:/home/sam/development/idea-IU-213.5744.125/lib/idea_rt.jar=36667:/home/sam/development/idea-IU-213.5744.125/bin",
+    "-Dfile.encoding=UTF-8"
+  ],
+  "classPath": "/home/sam/development/workspace/......",
+  "specName": "Java Virtual Machine Specification",
+  "specVendor": "Oracle Corporation",
+  "specVersion": "11",
+  "vmName": "OpenJDK 64-Bit Server VM",
+  "vmVendor": "AdoptOpenJDK",
+  "vmVersion": "11.0.10+9",
+  "startTime": 1647315704746,
+  "uptime": 405278
+}
+```
 
-Cohort provides several endpoints to reflect the current environment.
+## Operating System
 
-* operating system - displays the running os and version
+Displays the running os and version.
+
+```json
+{
+  "arch": "amd64",
+  "name": "Linux",
+  "version": "5.13.0-35-generic"
+}
+```
 
 ## Datasources
 
