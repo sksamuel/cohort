@@ -47,15 +47,18 @@ class Cohort private constructor(
 
         config.logManager?.let { manager ->
 
+          data class LogInfo(val levels: List<String>, val loggers: List<Logger>)
+
           get("cohort/logging") {
-            val levels = manager.levels()
-            val loggers = manager.loggers()
+            runCatching {
+              val levels = manager.levels()
+              val loggers = manager.loggers()
+              mapper.writeValueAsString(LogInfo(levels, loggers))
+            }.fold(
+              { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
+              { call.respond(HttpStatusCode.InternalServerError, it) },
+            )
 
-            data class LogInfo(val levels: List<String>, val loggers: List<Logger>)
-
-            val json = mapper.writeValueAsString(LogInfo(levels, loggers))
-
-            call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
           }
 
           put("cohort/logging/{name}/{level}") {
@@ -63,7 +66,7 @@ class Cohort private constructor(
             val level = call.parameters.getOrFail("level")
             manager.set(name, level).fold(
               { call.respond(HttpStatusCode.OK) },
-              { call.respond(HttpStatusCode.InternalServerError) },
+              { call.respond(HttpStatusCode.InternalServerError, it) },
             )
           }
         }
@@ -75,7 +78,7 @@ class Cohort private constructor(
                 val json = mapper.writeValueAsString(it)
                 call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
               },
-              { call.respond(HttpStatusCode.InternalServerError) },
+              { call.respond(HttpStatusCode.InternalServerError, it) },
             )
           }
         }
