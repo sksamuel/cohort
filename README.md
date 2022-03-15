@@ -262,3 +262,45 @@ Here is an example of the output:
   "java.class.version": "55.0"
 }
 ```
+
+## Thread Dump
+
+Send a GET request to `/cohort/threaddump` to retrieve a thread dump for all current threads.
+
+Example output:
+
+```text
+"main" prio=5 Id=1 WAITING on io.netty.channel.AbstractChannel$CloseFuture@291c536c
+	at java.base@11.0.10/java.lang.Object.wait(Native Method)
+	-  waiting on io.netty.channel.AbstractChannel$CloseFuture@291c536c
+	at java.base@11.0.10/java.lang.Object.wait(Object.java:328)
+	at app//io.netty.util.concurrent.DefaultPromise.await(DefaultPromise.java:253)
+	at app//io.netty.channel.DefaultChannelPromise.await(DefaultChannelPromise.java:131)
+	at app//io.netty.channel.DefaultChannelPromise.await(DefaultChannelPromise.java:30)
+	at app//io.netty.util.concurrent.DefaultPromise.sync(DefaultPromise.java:404)
+	at app//io.netty.channel.DefaultChannelPromise.sync(DefaultChannelPromise.java:119)
+	at app//io.netty.channel.DefaultChannelPromise.sync(DefaultChannelPromise.java:30)
+	...
+
+"Reference Handler" daemon prio=10 Id=2 RUNNABLE
+	at java.base@11.0.10/java.lang.ref.Reference.waitForReferencePendingList(Native Method)
+	at java.base@11.0.10/java.lang.ref.Reference.processPendingReferences(Reference.java:241)
+	at java.base@11.0.10/java.lang.ref.Reference$ReferenceHandler.run(Reference.java:213)
+
+"Finalizer" daemon prio=8 Id=3 WAITING on java.lang.ref.ReferenceQueue$Lock@1392e5c7
+	at java.base@11.0.10/java.lang.Object.wait(Native Method)
+	-  waiting on java.lang.ref.ReferenceQueue$Lock@1392e5c7
+	at java.base@11.0.10/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)
+	at java.base@11.0.10/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:176)
+	at java.base@11.0.10/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:170)
+
+"Signal Dispatcher" daemon prio=9 Id=4 RUNNABLE
+
+"Common-Cleaner" daemon prio=8 Id=19 TIMED_WAITING on java.lang.ref.ReferenceQueue$Lock@78e1959d
+	at java.base@11.0.10/java.lang.Object.wait(Native Method)
+	-  waiting on java.lang.ref.ReferenceQueue$Lock@78e1959d
+	at java.base@11.0.10/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)
+	at java.base@11.0.10/jdk.internal.ref.CleanerImpl.run(CleanerImpl.java:148)
+	at java.base@11.0.10/java.lang.Thread.run(Thread.java:834)
+	at java.base@11.0.10/jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:134)
+```
