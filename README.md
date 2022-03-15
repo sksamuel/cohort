@@ -262,6 +262,11 @@ Here is an example of the output:
   "java.class.version": "55.0"
 }
 ```
+## Heap Dump
+
+Send a GET request to `/cohort/heapdump` to retrieve a heap dump for all live objects.
+
+The file returned is in the format used by [hprof](https://docs.oracle.com/javase/7/docs/technotes/samples/hprof.html).
 
 ## Thread Dump
 
