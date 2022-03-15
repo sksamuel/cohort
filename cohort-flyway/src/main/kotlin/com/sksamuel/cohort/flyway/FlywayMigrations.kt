@@ -5,7 +5,7 @@ import com.sksamuel.cohort.db.Migration
 import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
-class FlywayManager(private val ds: DataSource) : DatabaseMigrationManager {
+class FlywayMigrations(private val ds: DataSource) : DatabaseMigrationManager {
 
   override fun migrations() = runCatching {
     Flyway

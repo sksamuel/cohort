@@ -8,7 +8,7 @@ import liquibase.resource.ClassLoaderResourceAccessor
 import java.time.Instant
 import javax.sql.DataSource
 
-class LiquibaseManager(
+class LiquibaseMigrations(
   private val ds: DataSource,
   private val changelogFile: String,
 ) : DatabaseMigrationManager {
