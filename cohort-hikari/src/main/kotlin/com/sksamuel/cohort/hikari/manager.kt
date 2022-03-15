@@ -5,7 +5,7 @@ import com.sksamuel.cohort.db.DataSourceManager
 import com.zaxxer.hikari.HikariDataSource
 
 class HikariDataSourceManager(private vararg val datasources: HikariDataSource) : DataSourceManager {
-  override fun details(): Result<List<DataSourceInfo>> {
+  override fun infos(): Result<List<DataSourceInfo>> {
     return runCatching {
       datasources.map { ds ->
         DataSourceInfo(

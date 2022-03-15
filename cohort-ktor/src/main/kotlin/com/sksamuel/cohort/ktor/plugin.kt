@@ -52,8 +52,16 @@ class Cohort private constructor(
           }
         }
 
-        config.dataSourceManager?.let {
-
+        config.dataSourceManager?.let { dsm ->
+          get("cohort/datasources") {
+            runCatching {
+              val info = dsm.infos()
+              mapper.writeValueAsString(info)
+            }.fold(
+              { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            )
+          }
         }
 
         config.logManager?.let { manager ->
