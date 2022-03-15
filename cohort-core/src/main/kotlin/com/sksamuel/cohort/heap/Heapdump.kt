@@ -14,7 +14,7 @@ object Heapdump {
       "com.sun.management:type=HotSpotDiagnostic",
       HotSpotDiagnosticMXBean::class.java,
     )
-    val path = Files.createTempFile("heapdump", ".hprof")
+    val path = Files.createTempFile("heapdump" + System.currentTimeMillis(), ".hprof")
     mxBean.dumpHeap(path.toString(), live)
     val dump = Files.readString(path)
     path.deleteIfExists()
