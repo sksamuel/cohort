@@ -4,6 +4,7 @@ import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.heap.Heapdump
 import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
+import com.sksamuel.cohort.logging.Logger
 import com.sksamuel.cohort.os.getOperatingSystem
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
@@ -47,8 +48,13 @@ class Cohort private constructor(
         config.logManager?.let { manager ->
 
           get("cohort/logging") {
+            val levels = manager.levels()
             val loggers = manager.loggers()
-            val json = mapper.writeValueAsString(loggers)
+
+            data class LogInfo(val levels: List<String>, val loggers: List<Logger>)
+
+            val json = mapper.writeValueAsString(LogInfo(levels, loggers))
+
             call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
           }
 
