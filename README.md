@@ -10,8 +10,35 @@ example health, logging, database and JVM metrics.
 
 ## How to use
 
-Include the core dependency `com.sksamuel.cohort:cohort-core:<version>` in your build along with the additional modules
-for the features you wish to activate.
+Include the core dependency `com.sksamuel.cohort:cohort-core:<version>` and the ktor
+dependency `com.sksamuel.cohort:cohort-ktor:<version>` in your build along with the additional modules for the features
+you wish to activate.
+
+Then to wire into Ktor, we would install the `Cohort` plugin, and enable whichever features we want to expose. **By
+default all features are disabled**.
+
+Here is an example with each feature enabled.
+
+```kotlin
+install(Cohort) {
+
+  // enable an endpoint to display operating system name and version
+  operatingSystem = true
+
+  // enable runtime JVM information such as vm options and vendor name
+  jvmInfo = true
+
+  // configure the Logback log manager to show effective log levels and allow runtime adjustment
+  logManager = LogbackManager
+
+  // enable an endpoint to dump the heap
+  heapdump = true
+
+  // enable healthchecks for kubernetes
+  healthcheck("/liveness", livechecks)
+  healthcheck("/readiness", readychecks)
+}
+```
 
 ## Healthchecks
 
