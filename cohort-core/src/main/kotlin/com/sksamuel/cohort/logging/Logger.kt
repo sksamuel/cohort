@@ -9,5 +9,4 @@ interface LogManager {
 data class Logger(
   val name: String,
   val level: String,
-  val effectiveLevel: String,
 )

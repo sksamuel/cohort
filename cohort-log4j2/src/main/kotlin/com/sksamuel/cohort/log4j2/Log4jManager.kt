@@ -24,7 +24,6 @@ object Log4jManager : LogManager {
       Logger(
         name = it.name,
         level = it.level.name(),
-        effectiveLevel = it.level.name(),
       )
     }
   }

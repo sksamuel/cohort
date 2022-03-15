@@ -149,6 +149,10 @@ Here is an example of output from a health check with a series of configured hea
 
 Cohort allows you to view the current logging configuration and update log levels at runtime.
 
+Here is the example output of `/cohort/logging` which shows the current log levels:
+
+
+
 ## Runtime Information
 
 Cohort provides several endpoints to reflect the current environment.
