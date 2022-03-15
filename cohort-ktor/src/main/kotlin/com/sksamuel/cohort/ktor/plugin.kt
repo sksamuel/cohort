@@ -2,7 +2,7 @@ package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.db.DataSourceManager
-import com.sksamuel.cohort.heap.Heapdump
+import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
 import com.sksamuel.cohort.logging.Logger
@@ -42,10 +42,7 @@ class Cohort private constructor(
 
         if (config.heapDump) {
           get("cohort/heapdump") {
-            runCatching {
-              val live = call.request.queryParameters["live"].toBoolean()
-              Heapdump.run(live)
-            }.fold(
+            getHeapDump().fold(
               { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
