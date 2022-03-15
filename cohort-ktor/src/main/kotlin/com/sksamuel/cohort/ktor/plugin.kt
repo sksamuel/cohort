@@ -39,9 +39,13 @@ class Cohort private constructor(
 
         if (config.heapdump) {
           get("cohort/heapdump") {
-            val live = call.request.queryParameters["live"].toBoolean()
-            val dump = Heapdump.run(live)
-            call.respondText(dump, ContentType.Text.Plain, HttpStatusCode.OK)
+            runCatching {
+              val live = call.request.queryParameters["live"].toBoolean()
+              Heapdump.run(live)
+            }.fold(
+              { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
+              { call.respond(HttpStatusCode.InternalServerError, it) },
+            )
           }
         }
 
