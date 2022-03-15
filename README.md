@@ -191,12 +191,25 @@ By passing one or more datasource managers to Cohort, you can see at runtime the
 Once enabled, a GET request to `/cohort/datasources` will return information such as idle connection count, pool size
 and connection timeout levels.
 
-Here is an example output for a Hikari datasource:
+Here is an example output for two configured Hikari datasources:
 
 ```json
 [
   {
-    "name": "HikariPool-2",
+    "name": "writer",
+    "activeConnections": 0,
+    "idleConnections": 8,
+    "totalConnections": 8,
+    "threadsAwaitingConnection": 0,
+    "connectionTimeout": 30000,
+    "idleTimeout": 600000,
+    "maxLifetime": 1800000,
+    "leakDetectionThreshold": 0,
+    "maximumPoolSize": 16,
+    "validationTimeout": 5000
+  },
+  {
+    "name": "reader",
     "activeConnections": 0,
     "idleConnections": 8,
     "totalConnections": 8,
