@@ -1,10 +1,11 @@
 package com.sksamuel.cohort.db
 
 interface DataSourceManager {
-  fun details(): Result<DataSourceInfo>
+  fun details(): Result<List<DataSourceInfo>>
 }
 
 data class DataSourceInfo(
+  val name: String,
   val activeConnections: Int,
   val idleConnections: Int,
   val totalConnections: Int,
@@ -14,6 +15,5 @@ data class DataSourceInfo(
   val maxLifetime: Long,
   val leakDetectionThreshold: Long,
   val maximumPoolSize: Int,
-  val poolName: String,
   val validationTimeout: Long
 )
