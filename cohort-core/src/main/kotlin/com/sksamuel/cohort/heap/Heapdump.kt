@@ -3,6 +3,7 @@ package com.sksamuel.cohort.heap
 import com.sun.management.HotSpotDiagnosticMXBean
 import java.lang.management.ManagementFactory
 import java.nio.file.Files
+import java.nio.file.Paths
 import kotlin.io.path.deleteIfExists
 
 object Heapdump {
@@ -14,7 +15,7 @@ object Heapdump {
       "com.sun.management:type=HotSpotDiagnostic",
       HotSpotDiagnosticMXBean::class.java,
     )
-    val path = Files.createTempFile("heapdump" + System.currentTimeMillis(), ".hprof")
+    val path = Paths.get("/tmp/heapdump" + System.currentTimeMillis() + ".hprof")
     mxBean.dumpHeap(path.toString(), live)
     val dump = Files.readString(path)
     path.deleteIfExists()
