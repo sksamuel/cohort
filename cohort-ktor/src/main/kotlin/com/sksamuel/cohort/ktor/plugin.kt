@@ -44,7 +44,7 @@ class Cohort private constructor(
         if (config.heapDump) {
           get("cohort/heapdump") {
             getHeapDump().fold(
-              { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
+              { call.respond(HttpStatusCode.OK, it) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }

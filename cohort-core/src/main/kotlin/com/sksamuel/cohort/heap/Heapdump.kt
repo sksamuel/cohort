@@ -8,13 +8,12 @@ import kotlin.io.path.deleteIfExists
 
 private const val HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic"
 
-fun getHeapDump(): Result<String> = runCatching {
+fun getHeapDump(): Result<ByteArray> = runCatching {
   val server = ManagementFactory.getPlatformMBeanServer()
   val mxBean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, HotSpotDiagnosticMXBean::class.java)
   val path = Paths.get("/tmp/heapdump" + System.currentTimeMillis() + ".hprof")
-  println(path)
   mxBean.dumpHeap(path.toString(), true)
-  val dump = Files.readString(path)
-//  path.deleteIfExists()
+  val dump = Files.readAllBytes(path)
+  path.deleteIfExists()
   dump
 }
