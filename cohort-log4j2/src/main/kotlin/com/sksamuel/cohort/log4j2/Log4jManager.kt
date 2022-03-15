@@ -5,7 +5,7 @@ import com.sksamuel.cohort.logging.Logger
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.config.Configurator
 
-class Log4jManager : LogManager {
+object Log4jManager : LogManager {
 
   override fun levels(): List<String> {
     return listOf(

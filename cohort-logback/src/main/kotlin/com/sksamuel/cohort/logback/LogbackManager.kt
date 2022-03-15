@@ -6,7 +6,7 @@ import com.sksamuel.cohort.logging.LogManager
 import com.sksamuel.cohort.logging.Logger
 import org.slf4j.LoggerFactory
 
-class LogbackManager : LogManager {
+object LogbackManager : LogManager {
 
   override fun levels() =
     listOf(Level.DEBUG, Level.TRACE, Level.INFO, Level.ERROR, Level.OFF, Level.WARN).map { it.levelStr }
