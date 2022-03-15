@@ -2,6 +2,7 @@ package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.heap.Heapdump
+import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
 import com.sksamuel.cohort.os.getOperatingSystem
 import io.ktor.application.Application
@@ -48,10 +49,20 @@ class Cohort private constructor(
           }
         }
 
+        if (config.jvmInfo) {
+          get("cohort/jvm") {
+            val json = mapper.writeValueAsString(getJvmDetails())
+            call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+          }
+        }
+
         if (config.operatingSystem) {
           get("cohort/os") {
-            val os = getOperatingSystem()
-            call.respondText(mapper.writeValueAsString(os), ContentType.Application.Json, HttpStatusCode.OK)
+            call.respondText(
+              mapper.writeValueAsString(getOperatingSystem()),
+              ContentType.Application.Json,
+              HttpStatusCode.OK
+            )
           }
         }
 
@@ -96,6 +107,9 @@ class CohortConfiguration {
   var heapdump: Boolean = false
   var operatingSystem: Boolean = false
   var logManager: LogManager? = null
+
+  // set to true to enable the /cohort/jvm endpoint which returns JVM information
+  var jvmInfo: Boolean = false
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry
