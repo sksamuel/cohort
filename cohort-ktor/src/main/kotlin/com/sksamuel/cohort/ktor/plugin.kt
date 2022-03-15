@@ -42,7 +42,8 @@ class Cohort private constructor(
 
         config.logManager?.let { manager ->
           get("cohort/logging") {
-            val json = mapper.writeValueAsString(manager.loggers())
+            val loggers = manager.loggers()
+            val json = mapper.writeValueAsString(loggers)
             call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
           }
         }
