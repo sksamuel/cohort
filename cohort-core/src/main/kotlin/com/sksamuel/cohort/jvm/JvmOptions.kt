@@ -2,9 +2,9 @@ package com.sksamuel.cohort.jvm
 
 import java.lang.management.ManagementFactory
 
-fun getJvmDetails(): Jvm {
+fun getJvmDetails(): Result<Jvm> = runCatching {
   val bean = ManagementFactory.getRuntimeMXBean()
-  return Jvm(
+  Jvm(
     name = bean.name,
     pid = bean.pid,
     vmOptions = bean.inputArguments,

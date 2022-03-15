@@ -70,8 +70,13 @@ class Cohort private constructor(
 
         if (config.jvmInfo) {
           get("cohort/jvm") {
-            val json = mapper.writeValueAsString(getJvmDetails())
-            call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+            getJvmDetails().fold(
+              {
+                val json = mapper.writeValueAsString(it)
+                call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+              },
+              { call.respond(HttpStatusCode.InternalServerError) },
+            )
           }
         }
 
@@ -113,7 +118,6 @@ class Cohort private constructor(
           }
         }
       }
-
       pipeline.featureOrNull(Routing)?.apply(routing) ?: pipeline.install(Routing, routing)
       proceed()
     }
