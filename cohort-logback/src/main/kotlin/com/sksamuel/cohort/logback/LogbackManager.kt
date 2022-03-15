@@ -1,6 +1,8 @@
-package com.sksamuel.cohort.logging
+package com.sksamuel.cohort.logback
 
 import ch.qos.logback.classic.LoggerContext
+import com.sksamuel.cohort.logging.LogManager
+import com.sksamuel.cohort.logging.Logger
 import org.slf4j.LoggerFactory
 
 class LogbackManager : LogManager {
