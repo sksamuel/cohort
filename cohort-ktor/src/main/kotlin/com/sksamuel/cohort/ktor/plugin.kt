@@ -13,10 +13,13 @@ import io.ktor.application.featureOrNull
 import io.ktor.application.install
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import io.ktor.routing.put
 import io.ktor.util.AttributeKey
+import io.ktor.util.getOrFail
 import java.time.ZoneOffset
 
 class Cohort private constructor(
@@ -42,10 +45,20 @@ class Cohort private constructor(
         }
 
         config.logManager?.let { manager ->
+
           get("cohort/logging") {
             val loggers = manager.loggers()
             val json = mapper.writeValueAsString(loggers)
             call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
+          }
+
+          put("cohort/logging/{name}/{level}") {
+            val name = call.parameters.getOrFail("name")
+            val level = call.parameters.getOrFail("level")
+            manager.set(name, level).fold(
+              { call.respond(HttpStatusCode.OK) },
+              { call.respond(HttpStatusCode.InternalServerError) },
+            )
           }
         }
 
