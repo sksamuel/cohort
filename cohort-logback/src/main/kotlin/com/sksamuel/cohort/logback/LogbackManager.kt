@@ -16,7 +16,7 @@ object LogbackManager : LogManager {
     return context.loggerList.map {
       Logger(
         name = it.name,
-        level = it.level.levelStr,
+        level = it.effectiveLevel.levelStr,
         effectiveLevel = it.effectiveLevel.levelStr,
       )
     }
