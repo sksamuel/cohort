@@ -11,7 +11,7 @@ import com.zaxxer.hikari.HikariDataSource
  *
  * The check is considered healthy if the current connection count (sum of idle and active) is >= [minConnections].
  */
-class MinHikariConnectionsHealthCheck(
+class HikariMinConnectionsHealthCheck(
   private val ds: HikariDataSource,
   private val minConnections: Int,
 ) : HealthCheck {
