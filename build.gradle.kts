@@ -37,6 +37,7 @@ allprojects {
    dependencies {
       implementation(Libs.Kotlin.stdlib)
       implementation(Libs.Kotlin.coroutines)
+      implementation(Libs.Kotlin.coroutinesJdk8)
       testImplementation(Libs.Kotest.assertions)
       testImplementation(Libs.Kotest.junit5)
    }

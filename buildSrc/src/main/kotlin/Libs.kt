@@ -7,6 +7,7 @@ object Libs {
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.1"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
+    const val coroutinesJdk8 = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0"
   }
 
   object Kotest {
