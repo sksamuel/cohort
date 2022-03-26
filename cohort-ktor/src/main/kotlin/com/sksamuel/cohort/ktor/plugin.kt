@@ -1,7 +1,6 @@
 package com.sksamuel.cohort.ktor
 
 import com.sksamuel.cohort.HealthCheckRegistry
-import com.sksamuel.cohort.config.ConfigProvider
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.heap.getHeapDump
@@ -46,15 +45,6 @@ class Cohort private constructor(
           get("cohort/heapdump") {
             getHeapDump().fold(
               { call.respond(HttpStatusCode.OK, it) },
-              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-            )
-          }
-        }
-
-        config.configProvider?.let { p ->
-          get("cohort/config") {
-            p.config().fold(
-              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
               { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
             )
           }
@@ -200,8 +190,6 @@ class CohortConfiguration {
 
   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
   var sysprops: Boolean = false
-
-  var configProvider: ConfigProvider? = null
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry
