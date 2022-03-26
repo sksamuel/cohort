@@ -17,10 +17,11 @@ class PeakThreadsHealthCheck(
 
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.peakThreadCount
+    val msg = "Peak threads is $count [threshold is $maxPeakThreads]"
     return if (count <= maxPeakThreads) {
-      HealthCheckResult.Healthy("Peak threads is below threshold [$count <= $maxPeakThreads]")
+      HealthCheckResult.Healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy("Peak threads is above threshold [$count > $maxPeakThreads]", null)
+      HealthCheckResult.Unhealthy(msg, null)
     }
   }
 }
