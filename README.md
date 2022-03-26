@@ -37,12 +37,17 @@ install(Cohort) {
   // show current system properties
   sysprops = true
 
-  // enable an endpoint to dump the heap
+  // enable an endpoint to dump the heap in hprof format
   heapdump = true
 
+  // enable an endpoint to dump threads
+  threaddump = true
+
   // enable healthchecks for kubernetes
+  // each of these is optional and can map to any healthchecks/url you wish
   healthcheck("/liveness", livechecks)
   healthcheck("/readiness", readychecks)
+  healthcheck("/startup", startupchecks)
 }
 ```
 
