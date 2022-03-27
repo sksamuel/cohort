@@ -52,7 +52,7 @@ install(Cohort) {
   logManager = LogbackManager
 
   // show connection pool information
-  dataSourceManager = HikariDataSourceManager(writerDs, readerDs)
+  dataSources = listOf(HikariDataSourceManager(ds))
 
   // show current system properties
   sysprops = true
@@ -204,9 +204,7 @@ To enable, set `jvmInfo` to true inside the `Cohort` ktor configuration block:
 
 ```kotlin
 install(Cohort) {
-  ...
   jvmInfo = true
-  ...
 }
 ```
 
@@ -239,9 +237,7 @@ To enable, set `operatingSystem` to true inside the `Cohort` ktor configuration 
 
 ```kotlin
 install(Cohort) {
-  ...
   operatingSystem = true
-  ...
 }
 ```
 
@@ -270,12 +266,10 @@ For example, if we had two connection pools, a writer pool using Hikari, and a r
 
 ```kotlin
 install(Cohort) {
-  ...
   dataSources = listOf(
     ApacheDBCPDataSourceManager(reader),
     HikariDataSourceManager(writer),
   )
-  ...
 }
 ```
 
@@ -315,6 +309,14 @@ Here is an example output for the above**** datasources:
 ## System Properties
 
 Send a GET request to `/cohort/sysprops` to return the current system properties.
+
+To enable, set `sysprops` to true inside the `Cohort` plugin configuration block:
+
+```kotlin
+install(Cohort) {
+  sysprops = true
+}
+```
 
 Here is an example of the output:
 
@@ -356,9 +358,25 @@ Send a GET request to `/cohort/heapdump` to retrieve a heap dump for all live ob
 
 The file returned is in the format used by [hprof](https://docs.oracle.com/javase/7/docs/technotes/samples/hprof.html).
 
+To enable, set `heapdump` to true inside the `Cohort` plugin configuration block:
+
+```kotlin
+install(Cohort) {
+  heapdump = true
+}
+```
+
 ## Thread Dump
 
 Send a GET request to `/cohort/threaddump` to retrieve a thread dump for all current threads.
+
+To enable, set `threaddump` to true inside the `Cohort` plugin configuration block:
+
+```kotlin
+install(Cohort) {
+  threaddump = true
+}
+```
 
 Example output:
 
