@@ -6,7 +6,7 @@
 
 Cohort is a [Spring Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html) style
 replacement for [Ktor](https://ktor.io). It provides HTTP endpoints to help monitor and manage apps in production. For
-example health, logging, database and JVM metrics.
+example healthchecks, logging, database and JVM metrics.
 
 ## Features
 
