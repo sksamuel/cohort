@@ -38,6 +38,7 @@ allprojects {
       implementation(Libs.Kotlin.stdlib)
       implementation(Libs.Kotlin.coroutines)
       implementation(Libs.Kotlin.coroutinesJdk8)
+      implementation("com.sksamuel.tabby:tabby-fp:2.0.14")
       testImplementation(Libs.Kotest.assertions)
       testImplementation(Libs.Kotest.junit5)
    }

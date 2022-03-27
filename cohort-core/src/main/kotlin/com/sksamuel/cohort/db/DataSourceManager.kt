@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.db
 
 interface DataSourceManager {
-  fun infos(): Result<List<DataSourceInfo>>
+  fun info(): Result<DataSourceInfo>
 }
 
 data class DataSourceInfo(

@@ -10,6 +10,7 @@ import com.sksamuel.cohort.logging.Logger
 import com.sksamuel.cohort.os.getOperatingSystem
 import com.sksamuel.cohort.system.getSysProps
 import com.sksamuel.cohort.threads.getThreadDump
+import com.sksamuel.tabby.results.sequence
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
@@ -50,12 +51,20 @@ class Cohort private constructor(
           }
         }
 
-        config.dataSourceManager?.let { dsm ->
-          get("cohort/datasources") {
-            dsm.infos().fold(
-              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
-              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-            )
+        config.dataSources.let { dsm ->
+          if (dsm.isNotEmpty()) {
+            get("cohort/datasources") {
+              dsm.map { it.info() }.sequence().fold(
+                { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+                {
+                  call.respondText(
+                    it.stackTraceToString(),
+                    ContentType.Text.Plain,
+                    HttpStatusCode.InternalServerError
+                  )
+                }
+              )
+            }
           }
         }
 
@@ -178,7 +187,7 @@ class CohortConfiguration {
 
   var logManager: LogManager? = null
 
-  var dataSourceManager: DataSourceManager? = null
+  var dataSources: List<DataSourceManager> = emptyList()
 
   var migrations: DatabaseMigrationManager? = null
 

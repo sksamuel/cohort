@@ -255,13 +255,31 @@ install(Cohort) {
 
 ## Datasources
 
-By passing one or more database pools to Cohort, you can see at runtime the current state of the pool(s).
-Once enabled, a GET request to `/cohort/datasources` will return information such as idle connection count, pool size
-and connection timeout levels.
+By passing one or more database pools to Cohort, you can see at runtime the current state of the pool(s). Once enabled,
+a GET request to `/cohort/datasources` will return information such as idle connection count, max pool size, connection
+timeouts and so on.
 
-To enable wrap your datasources in an appropriate _data manager_ instance.
+Cohort supports two connection pool libraries:
 
-Here is an example output for two configured Hikari datasources:
+* Apache Commons DBCP - add module `com.sksamuel.cohort:cohort-dbcp`
+* HikariCP - add module `com.sksamuel.cohort:cohort-hikari`
+
+To activate this feature, wrap your `DataSource` in an appropriate _DataSourceManager_ instance and pass through to the Cohort plugin.
+
+For example, if we had two connection pools, a writer pool using Hikari, and a reader pool using Apache DBCP, then we could configure like this:
+
+```kotlin
+install(Cohort) {
+  ...
+  dataSources = listOf(
+    ApacheDBCPDataSourceManager(reader),
+    HikariDataSourceManager(writer),
+  )
+  ...
+}
+```
+
+Here is an example output for the above**** datasources:
 
 ```json
 [
