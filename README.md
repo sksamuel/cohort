@@ -255,9 +255,11 @@ install(Cohort) {
 
 ## Datasources
 
-By passing one or more datasource managers to Cohort, you can see at runtime the current state of the database pool(s).
+By passing one or more database pools to Cohort, you can see at runtime the current state of the pool(s).
 Once enabled, a GET request to `/cohort/datasources` will return information such as idle connection count, pool size
 and connection timeout levels.
+
+To enable wrap your datasources in an appropriate _data manager_ instance.
 
 Here is an example output for two configured Hikari datasources:
 

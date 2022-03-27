@@ -14,12 +14,18 @@ class HikariDataSourceManager(private vararg val datasources: HikariDataSource) 
           idleConnections = ds.hikariPoolMXBean.idleConnections,
           totalConnections = ds.hikariPoolMXBean.totalConnections,
           threadsAwaitingConnection = ds.hikariPoolMXBean.threadsAwaitingConnection,
-          connectionTimeout = ds.hikariConfigMXBean.connectionTimeout,
-          idleTimeout = ds.hikariConfigMXBean.idleTimeout,
-          maxLifetime = ds.hikariConfigMXBean.maxLifetime,
+          connectionTimeoutMs = ds.hikariConfigMXBean.connectionTimeout,
+          idleTimeoutMs = ds.hikariConfigMXBean.idleTimeout,
+          maxLifetimeMs = ds.hikariConfigMXBean.maxLifetime,
           leakDetectionThreshold = ds.hikariConfigMXBean.leakDetectionThreshold,
           maximumPoolSize = ds.hikariConfigMXBean.maximumPoolSize,
-          validationTimeout = ds.hikariConfigMXBean.validationTimeout,
+          validationTimeoutMs = ds.hikariConfigMXBean.validationTimeout,
+          maximumIdle = -1,
+          minIdle = ds.minimumIdle,
+          maxOpenPreparedStatements = -1,
+          testOnBorrow = ds.connectionTestQuery != null,
+          testOnReturn = null,
+          testOnCreate = ds.connectionInitSql != null,
         )
       }
     }

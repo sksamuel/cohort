@@ -9,9 +9,9 @@ import com.zaxxer.hikari.HikariDataSource
  *
  * This is useful to detect when connections are unable to be made.
  *
- * The check is considered healthy if the current connection count (sum of idle and active) is >= [minConnections].
+ * The check is considered healthy if the total connection count (sum of idle and active) is >= [minConnections].
  */
-class HikariMinConnectionsHealthCheck(
+class HikariConnectionsHealthCheck(
   private val ds: HikariDataSource,
   private val minConnections: Int,
 ) : HealthCheck {
