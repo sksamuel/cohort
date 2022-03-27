@@ -8,14 +8,34 @@ Cohort is a [Spring Actuator](https://docs.spring.io/spring-boot/docs/current/re
 replacement for [Ktor](https://ktor.io). It provides HTTP endpoints to help monitor and manage apps in production. For
 example health, logging, database and JVM metrics.
 
+## Features
+
+**All features are disabled by default**.
+
+* **Comprehensive system healthchecks:** Expose healthcheck endpoints that check for thread deadlocks, memory usage,
+  disk space, cpu usage, garbage collection and more.
+* **Resource healthchecks:** Additional modules to monitor the health of Redis, Kafka, Elasticsearch, databases and
+  other resources.
+* **Database pools:** See runtime metrics such as active and idle connections in database pools such as Hikari
+  Connection Pool.
+* **JVM Info:** Enable endpoints to export system properties, JVM arguments and version information, and O/S name / version.
+* **Thread and heap dumps:** Optional endpoints to export a thread dump or heap dump, in the standard JVM format, for
+  analysis locally.
+* **Database migrations:** See the status of applied and pending database migrations from
+  either [Flyway](https://flywaydb.org/) or [Liquibase](https://liquibase.org/).
+* **Logging configuration:** View configured loggers and levels and modify log levels at runtime.
+
 ## How to use
 
-Include the core dependency `com.sksamuel.cohort:cohort-core:<version>` and the ktor
-dependency `com.sksamuel.cohort:cohort-ktor:<version>` in your build along with the additional modules for the features
-you wish to activate.
+Include the following dependencies in your build:
 
-Then to wire into Ktor, we would install the `Cohort` plugin, and enable whichever features we want to expose. **By
-default all features are disabled**.
+* `com.sksamuel.cohort:cohort-core:<version>`
+* `com.sksamuel.cohort:cohort-ktor:<version>`
+
+along with the additional modules for any features you wish to activate. For example the kafka module
+requires `com.sksamuel.cohort:cohort-kafka:<version>`.
+
+Then to wire into Ktor, install the `Cohort` plugin, and enable whichever features / endpoints we want to expose.
 
 Here is an example with each feature enabled.
 
@@ -98,7 +118,7 @@ to kill the application, but you don't want to send it requests either. Kubernet
 and mitigate these situations. A pod with containers reporting that they are not ready does not receive traffic through
 Kubernetes Services.
 
-### Endpoints
+### Healthcheck Endpoint Output
 
 Here is an example of output from a health check with a series of configured health checks.
 
@@ -180,6 +200,16 @@ Here is the example output of `/cohort/logging` which shows the current log leve
 
 Displays information about the JVM state, including VM options, JVM version, and vendor name.
 
+To enable, set `jvmInfo` to true inside the `Cohort` ktor configuration block:
+
+```kotlin
+install(Cohort) {
+  ...
+  jvmInfo = true
+  ...
+}
+```
+
 ```json
 {
   "name": "106637@sam-H310M-A-2-0",
@@ -204,6 +234,16 @@ Displays information about the JVM state, including VM options, JVM version, and
 ## Operating System
 
 Displays the running os and version.
+
+To enable, set `operatingSystem` to true inside the `Cohort` ktor configuration block:
+
+```kotlin
+install(Cohort) {
+  ...
+  operatingSystem = true
+  ...
+}
+```
 
 ```json
 {
