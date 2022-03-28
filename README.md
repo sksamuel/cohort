@@ -245,6 +245,19 @@ Here is an example of output from a health check with a series of configured hea
 
 Cohort allows you to view the current logging configuration and update log levels at runtime.
 
+To enable this, pass an instance of the logging manager suitable for the logging framework you are using to the
+logManager parameter in the Cohort plugin configuration. Cohort currently supports two logging frameworks:
+
+* Logback - add module `com.sksamuel.cohort:cohort-logback` and use LogbackManager
+
+For example:
+
+```kotlin
+install(Cohort) {
+  logManager = Logback
+}
+```
+
 Here is the example output of `/cohort/logging` which shows the current log levels:
 
 ## Jvm Info
@@ -324,7 +337,7 @@ install(Cohort) {
 }
 ```
 
-Here is an example output for the above**** datasources:
+Here is an example output for the above datasources:
 
 ```json
 [
