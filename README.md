@@ -37,7 +37,7 @@ requires `com.sksamuel.cohort:cohort-kafka:<version>`.
 
 Then to wire into Ktor, install the `Cohort` plugin, and enable whichever features / endpoints we want to expose.
 
-Here is an example with each feature enabled.
+Here is a sample configuration with each feature enabled.
 
 ```kotlin
 install(Cohort) {
@@ -73,8 +73,48 @@ install(Cohort) {
 
 ## Healthchecks
 
-Cohort provides health checks for a variety of JVM metrics such as memory and thread deadlocks as well as connectivity
+Cohort provides `HealthCheck`s for a variety of JVM metrics such as memory and thread deadlocks as well as connectivity
 to services such as Kafka and Elasticsearch and databases.
+
+We use health checks by adding them to a `HealthCheckRegistry` instance, along with an interval of how often to run the
+checks. A registry requires a _coroutine dispatcher_ to execute the checks on. Healthchecks can take advantage of
+coroutines to suspend if they need to do something IO based. Cohort will periodically run these healthchecks based on
+the passed schedule and record if they are healthy or unhealthy.
+
+For example:
+
+```kotlin
+val checks = HealthCheckRegistry(Dispatchers.Default) {
+
+  // detects if threads are mutually blocked on each others locks
+  register(ThreadDeadlockHealthCheck(), 1.minutes)
+
+// we should never have zero database connections
+  register("reader connections", HikariConnectionsHealthCheck(ds, 1), 5.seconds)
+}
+```
+
+With the registry created, we register it with Cohort by invoking the `healthcheck` method along with an endpoint url to
+expose it on.
+
+For example:
+
+```kotlin
+install(Cohort) {
+  healthcheck("/healthcheck", checks)
+}
+```
+
+Whenever the endpoint is accessed, a `200` is returned if all health checks are currently reporting healthy, and a `500`
+otherwise.
+
+Which healthchecks you use is entirely up to you, and you may want to use some healthchecks for startup probes, some for
+readiness checks and some for liveness checks. See the section on [kubernetes](#Kubernetes) for discussion on how to
+structure healthchecks in a kubernetes environment.
+
+### Available Healthchecks
+
+This table lists the available health checks and their uses.
 
 | Healthcheck                     | Details                                                                                                                                                                                                                                          |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -97,26 +137,37 @@ to services such as Kafka and Elasticsearch and databases.
 | HikariMinConnectionsHealthCheck | Confrms that the number of connections in a Hikari DataSource pool is equal or above a threshold. This is useful to ensure a required number of connections are open before accepting traffic.                                                   |
 | HikariPendingThreadsHealthCheck | Checks that the number of threads awaiting a connection from a Hikari DataSource is below a threshold. This is useful to detect when queries are running slowly and causing threads to back up waiting for a connection                          |
 
-### Kubernetes Integration
+### Kubernetes
 
-The kubelet uses liveness probes to know when to restart a container. For example, liveness probes could catch a
-deadlock, where an application is running, but unable to make progress. Restarting a container in such a state can help
-to make the application more available despite bugs.
+A Kubernetes kubelet offers three kinds of probes to know the status of a container.
 
-The kubelet uses readiness probes to know when a container is ready to start accepting traffic. A Pod is considered
-ready when all of its containers are ready. One use of this signal is to control which Pods are used as backends for
-Services. When a Pod is not ready, it is removed from Service load balancers.
+* _liveness_ - Indicates whether the container is running. If the liveness probe fails, the kubelet kills the
+  container (and restarts subject to the restart policy).
+* _readiness_ - Indicates whether the container is ready to respond to requests. If the readiness probe fails, the
+  kubelet removes the pod from receiving traffic.
+* _startup_ - Indicates whether the application within the container has started. All other probes are disabled if a
+  startup probe is provided, until it succeeds.
 
-The kubelet uses startup probes to know when a container application has started. If such a probe is configured, it
-disables liveness and readiness checks until it succeeds, making sure those probes don't interfere with the application
-startup. This can be used to adopt liveness checks on slow starting containers, avoiding them getting killed by the
-kubelet before they are up and running.
+The kubelet uses liveness probes to know when to restart a container. Liveness probes help catch a situation where an
+application is running but is no longer useful. One such example is if a thread has stopped and the application does not
+have code to detect and restart the thread. Restarting a container in such a state can make the application available
+again despite the presence of bugs.
 
-Sometimes, applications are temporarily unable to serve traffic. For example, an application might need to load large
-data or configuration files during startup, or depend on external services after startup. In such cases, you don't want
-to kill the application, but you don't want to send it requests either. Kubernetes provides readiness probes to detect
-and mitigate these situations. A pod with containers reporting that they are not ready does not receive traffic through
-Kubernetes Services.
+The kubelet uses readiness probes to know when a container should receive traffic. A pod is considered ready when all of
+its containers are ready. One use of this signal is to temporarily remove traffic from backends when they are unable to
+handle any more requests. For example, a service may have received more requests than it can handle, and so it's backlog
+of requests is growing. Taking that pod out of the load balancers while it catches up can avoid the service crashing or
+needing a restart. A pod with containers reporting that they are not ready does not receive traffic through Kubernetes
+Services.
+
+Readiness probes are not a substitute for proper scaling (either HPA or manually) but they can avoid a situation where
+all pods are killed, and a service is completely unavailable.
+
+The kubelet uses startup probes to know when a container application has fully started. If such a probe is configured,
+it disables liveness and readiness checks until it succeeds, making sure those probes don't interfere with the
+application startup. Startup probes are very useful if an application needs to perform slow initialization work and
+until that is complete, a liveness check would fail. This avoids situation where the failing liveness checks result in
+the kubelet killing the pod before it is ready.
 
 ### Healthcheck Endpoint Output
 
