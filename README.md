@@ -245,20 +245,73 @@ Here is an example of output from a health check with a series of configured hea
 
 Cohort allows you to view the current logging configuration and update log levels at runtime.
 
-To enable this, pass an instance of the logging manager suitable for the logging framework you are using to the
-logManager parameter in the Cohort plugin configuration. Cohort currently supports two logging frameworks:
+To enable this, pass an instance of the `LogManager` interface for the logging framework you are using to
+the `logManager`parameter in the Cohort plugin configuration.
 
-* Logback - add module `com.sksamuel.cohort:cohort-logback` and use LogbackManager
+Once enabled, the endpoint `GET /cohort/logging` can be used to show current log information
+and `PUT /cohort/logging/{name}/{level}` can be used to modify a log level at runtime.
 
-For example:
+Cohort currently supports two `LogManager` implementations:
+
+* `LogbackManager` - add module `com.sksamuel.cohort:cohort-logback:<version>`
+* `Log4j2Manager` - add module `com.sksamuel.cohort:cohort-log4j2:<version>`
+
+For example, for projects that use logback, you can configure like this:
 
 ```kotlin
 install(Cohort) {
-  logManager = Logback
+  logManager = LogbackManager
 }
 ```
 
-Here is the example output of `/cohort/logging` which shows the current log levels:
+Here is the example output of which shows the logging configuration:
+
+```json
+{
+  "levels": [
+    "DEBUG",
+    "TRACE",
+    "INFO",
+    "ERROR",
+    "OFF",
+    "WARN"
+  ],
+  "loggers": [
+    {
+      "name": "ROOT",
+      "level": "INFO"
+    },
+    {
+      "name": "com",
+      "level": "INFO"
+    },
+    {
+      "name": "com.sksamuel",
+      "level": "INFO"
+    },
+    {
+      "name": "ktor",
+      "level": "INFO"
+    },
+    {
+      "name": "ktor.application",
+      "level": "INFO"
+    },
+    {
+      "name": "org",
+      "level": "INFO"
+    },
+    {
+      "name": "org.apache",
+      "level": "INFO"
+    },
+    {
+      "name": "org.apache.kafka",
+      "level": "WARN"
+    }
+  ]
+}
+```
 
 ## Jvm Info
 
