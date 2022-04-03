@@ -3,6 +3,7 @@ package com.sksamuel.cohort.ktor
 import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
+import com.sksamuel.cohort.gc.gcinfo
 import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails
 import com.sksamuel.cohort.logging.LogManager
@@ -111,6 +112,15 @@ class Cohort private constructor(
           }
         }
 
+        if (config.gc) {
+          get("cohort/gc") {
+            gcinfo().fold(
+              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+              { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            )
+          }
+        }
+
         if (config.threadDump) {
           get("cohort/threaddump") {
             getThreadDump().fold(
@@ -193,6 +203,9 @@ class CohortConfiguration {
 
   // set to true to enable the /cohort/jvm endpoint which returns JVM information
   var jvmInfo: Boolean = false
+
+  // set to true to enable the /cohort/gc endpoint which returns garbage collector times and counts
+  var gc: Boolean = false
 
   // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
   var threadDump: Boolean = false
