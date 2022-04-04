@@ -1,6 +1,6 @@
 package com.sksamuel.cohort
 
-interface HealthCheck {
+fun interface HealthCheck {
   suspend fun check(): HealthCheckResult
 }
 
