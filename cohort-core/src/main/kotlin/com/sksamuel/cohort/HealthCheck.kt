@@ -2,6 +2,14 @@ package com.sksamuel.cohort
 
 fun interface HealthCheck {
   suspend fun check(): HealthCheckResult
+
+  companion object {
+    operator fun invoke(f: () -> Result<String>) = HealthCheck {
+      f().fold(
+        { HealthCheckResult.Healthy(it) },
+        { HealthCheckResult.Unhealthy(it.message ?: it::class.java.name, it) })
+    }
+  }
 }
 
 /**
