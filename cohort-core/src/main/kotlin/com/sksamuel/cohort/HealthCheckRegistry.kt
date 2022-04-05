@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -29,12 +30,14 @@ import kotlin.time.Duration
  */
 class HealthCheckRegistry(
   private val dispatcher: CoroutineDispatcher,
-  private val startUnhealthy: Boolean = true
+  private val startUnhealthy: Boolean = true,
+  private val logUnhealthy: Boolean = true,
 ) {
 
   private val scheduler = Executors.newScheduledThreadPool(1)
   private val names = mutableSetOf<String>()
   private val results = ConcurrentHashMap<String, CheckStatus>()
+  private val logger = KotlinLogging.logger {}
 
   companion object {
     operator fun invoke(
@@ -129,6 +132,8 @@ class HealthCheckRegistry(
 
     val previous = results[name]
     val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
+
+    logger.warn { "HealthCheck $name reported $failures failures $result" }
 
     results[name] = CheckStatus(
       consecutiveSuccesses = 0, // reset to 0 when we have a failure
