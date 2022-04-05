@@ -4,24 +4,13 @@ import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.future.await
 import org.apache.kafka.clients.admin.AdminClient
-import org.apache.kafka.clients.admin.AdminClientConfig
 import java.util.Properties
-
-data class KafkaClusterConfig(
-  val bootstrapServers: String,
-  val ssl: Boolean
-)
 
 /**
  * A [HealthCheck] that checks that a connection can be made to a kafka cluster, the controller
  * can be located, and at least one node is present.
  */
-class KafkaClusterHealthCheck(private val config: KafkaClusterConfig) : HealthCheck {
-
-  private val props = Properties().apply {
-    this[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = config.bootstrapServers
-    if (config.ssl) this[AdminClientConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
-  }
+class KafkaClusterHealthCheck(private val props: Properties) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
     return try {
@@ -36,7 +25,7 @@ class KafkaClusterHealthCheck(private val config: KafkaClusterConfig) : HealthCh
         else -> HealthCheckResult.Healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
       }
     } catch (t: Throwable) {
-      HealthCheckResult.Unhealthy("Could not connect to kafka cluster at ${config.bootstrapServers}", t)
+      HealthCheckResult.Unhealthy("Could not connect to kafka cluster", t)
     }
   }
 }
