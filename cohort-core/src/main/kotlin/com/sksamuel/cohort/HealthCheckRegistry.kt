@@ -80,7 +80,7 @@ class HealthCheckRegistry(
     if (names.contains(name)) error("Check $name already registered")
     names.add(name)
     if (startUnhealthy) {
-      results[name] = CheckStatus(0, 1, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+      results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
     }
     schedule(name, check, initialDelay, checkInterval)
     return this
