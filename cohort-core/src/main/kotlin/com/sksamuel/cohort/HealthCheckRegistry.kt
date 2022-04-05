@@ -23,8 +23,14 @@ import kotlin.time.Duration
  * This registry creates one additional thread for its own use, to run the scheduler. This thread remains
  * in [Thread.State.BLOCKED] while waiting to fire a scheduled event, and this thread is not used
  * for the actual execution of the scheduled events.
+ *
+ * @param dispatcher this dispatcher will be used for executing the checks
+ * @param startUnhealthy if true, then all checks will start in failed state until they pass.
  */
-class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
+class HealthCheckRegistry(
+  private val dispatcher: CoroutineDispatcher,
+  private val startUnhealthy: Boolean = true
+) {
 
   private val scheduler = Executors.newScheduledThreadPool(1)
   private val names = mutableSetOf<String>()
@@ -73,6 +79,9 @@ class HealthCheckRegistry(private val dispatcher: CoroutineDispatcher) {
   ): HealthCheckRegistry {
     if (names.contains(name)) error("Check $name already registered")
     names.add(name)
+    if (startUnhealthy) {
+      results[name] = CheckStatus(0, 1, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+    }
     schedule(name, check, initialDelay, checkInterval)
     return this
   }
