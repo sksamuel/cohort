@@ -1,9 +1,18 @@
 # Changelog
 
+### 1.2.0
+
+* Added support for Ktor2
+* Added invariant that healthcheck register is not empty
+
+### 1.1.7
+
+* Added `logUnhealthy` option (default true) to log unhealthy checks
+* Added `startUnhealthy` option (default true) to HealthCheckRegistry that starts up all checks in failed mode
+
 ### 1.1.6
 
 * Added `HttpHealthCheck` for testing connectivity to http endpoints.
-* Added `startUnhealthy` option (default true) to HealthCheckRegistry that starts up all checks in failed mode
 * Tweaked configuration settings for redis health checks
 
 ### 1.1.5
