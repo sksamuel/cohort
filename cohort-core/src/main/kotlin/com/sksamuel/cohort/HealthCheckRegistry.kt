@@ -11,6 +11,7 @@ import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
 /**
@@ -40,11 +41,21 @@ class HealthCheckRegistry(
   private val logger = KotlinLogging.logger {}
 
   companion object {
+
     operator fun invoke(
       dispatcher: CoroutineDispatcher,
       configure: HealthCheckRegistry.() -> Unit
     ): HealthCheckRegistry {
       val registry = HealthCheckRegistry(dispatcher)
+      registry.configure()
+      return registry
+    }
+
+    @ExperimentalStdlibApi
+    suspend operator fun invoke(
+      configure: HealthCheckRegistry.() -> Unit
+    ): HealthCheckRegistry {
+      val registry = HealthCheckRegistry(coroutineContext[CoroutineDispatcher]!!)
       registry.configure()
       return registry
     }
