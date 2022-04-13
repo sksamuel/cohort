@@ -214,6 +214,7 @@ class CohortConfiguration {
   var sysprops: Boolean = false
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+    if (registry.checks().isEmpty()) error("Registry contains no healthchecks")
     healthchecks[endpoint] = registry
   }
 

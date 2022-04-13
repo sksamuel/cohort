@@ -37,6 +37,7 @@ class HealthCheckRegistry(
 
   private val scheduler = Executors.newScheduledThreadPool(1)
   private val names = mutableSetOf<String>()
+  private val checks = ConcurrentHashMap<String, HealthCheck>()
   private val results = ConcurrentHashMap<String, CheckStatus>()
   private val logger = KotlinLogging.logger {}
 
@@ -91,20 +92,23 @@ class HealthCheckRegistry(
     initialDelay: Duration,
     checkInterval: Duration
   ): HealthCheckRegistry {
-    if (names.contains(name)) error("Check $name already registered")
-    names.add(name)
+
+    if (checks.contains(name)) error("Check $name already registered")
+    checks.putIfAbsent(name, check)
+
     if (startUnhealthy) {
       results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
     }
-    schedule(name, check, initialDelay, checkInterval)
+
+    schedule(name, initialDelay, checkInterval)
     return this
   }
 
-  private fun schedule(name: String, check: HealthCheck, thisDelay: Duration, nextDelay: Duration) {
+  private fun schedule(name: String, thisDelay: Duration, nextDelay: Duration) {
     scheduler.schedule(
       {
         GlobalScope.launch(dispatcher) {
-          run(name, check, nextDelay)
+          run(name, nextDelay)
         }
       },
       thisDelay.inWholeMilliseconds,
@@ -112,9 +116,9 @@ class HealthCheckRegistry(
     )
   }
 
-  private suspend fun run(name: String, check: HealthCheck, delay: Duration) {
+  private suspend fun run(name: String, delay: Duration) {
     try {
-      when (val result = check.check()) {
+      when (val result = checks[name]!!.check()) {
         is HealthCheckResult.Healthy -> success(name, result)
         is HealthCheckResult.Unhealthy -> failure(name, result)
       }
@@ -122,7 +126,7 @@ class HealthCheckRegistry(
       val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
       failure(name, result)
     }
-    schedule(name, check, delay, delay)
+    schedule(name, delay, delay)
   }
 
   private fun success(name: String, result: HealthCheckResult.Healthy) {
@@ -159,6 +163,8 @@ class HealthCheckRegistry(
     val unhealthy = results.values.any { !it.healthy }
     return Health(!unhealthy, results.toMap())
   }
+
+  fun checks(): Set<HealthCheck> = checks.values.toSet()
 }
 
 
