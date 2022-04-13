@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   api(project(":cohort-core"))
    implementation("io.ktor:ktor-server-core:2.0.0")
    implementation("com.fasterxml.jackson.core:jackson-core:2.13.2")
    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
