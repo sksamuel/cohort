@@ -17,10 +17,11 @@ class HikariConnectionsHealthCheck(
 ) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val conns = ds.hikariPoolMXBean.totalConnections
+    val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [$minConnections minConnections]"
     return if (conns >= minConnections) {
-      HealthCheckResult.Healthy("Database connections is equal or above threshold [$conns >= $minConnections]")
+      HealthCheckResult.Healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy("Database connections is below threshold [$conns < $minConnections]", null)
+      HealthCheckResult.Unhealthy(msg, null)
     }
   }
 }
