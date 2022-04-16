@@ -4,18 +4,16 @@ import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.future.await
 import org.apache.kafka.clients.admin.AdminClient
-import java.util.Properties
 
 /**
  * A [HealthCheck] that checks that a connection can be made to a kafka cluster, the controller
  * can be located, and at least one node is present.
  */
-class KafkaClusterHealthCheck(private val props: Properties) : HealthCheck {
+class KafkaClusterHealthCheck(private val adminClient: AdminClient) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
     return try {
-      val client = AdminClient.create(props)
-      val clusterResult = client.describeCluster()
+      val clusterResult = adminClient.describeCluster()
       val controller = clusterResult.controller().toCompletionStage().await()
       val nodes = clusterResult.nodes().toCompletionStage().await()
 
