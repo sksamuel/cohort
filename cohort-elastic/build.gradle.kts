@@ -1,6 +1,6 @@
 dependencies {
    implementation(project(":cohort-core"))
-   implementation("co.elastic.clients:elasticsearch-java:7.17.1")
+   api("org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.2")
    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.1")
 }
 
