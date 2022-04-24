@@ -38,6 +38,7 @@ class CohortConfiguration {
   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
   var sysprops: Boolean = false
 
+  fun shutdown(f: suspend () -> Unit) = shutdown(ShutdownHook(f))
   fun shutdown(hook: ShutdownHook) {
     hooks.add(hook)
   }
