@@ -16,6 +16,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.log
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -143,6 +144,7 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
 
       if (hooks.isNotEmpty()) {
         get("cohort/shutdown") {
+          this.context.application.log.info("Executing shutdown hooks...")
           hooks.forEach { it.run() }
           call.respond(HttpStatusCode.OK)
         }

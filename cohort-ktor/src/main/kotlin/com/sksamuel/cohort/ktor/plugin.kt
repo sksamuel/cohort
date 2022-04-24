@@ -18,6 +18,7 @@ import io.ktor.application.ApplicationFeature
 import io.ktor.application.call
 import io.ktor.application.featureOrNull
 import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
@@ -156,6 +157,7 @@ class Cohort private constructor(
 
         if (config.hooks.isNotEmpty()) {
           get("cohort/shutdown") {
+            this.context.application.log.info("Executing shutdown hooks...")
             config.hooks.forEach { it.run() }
             call.respond(HttpStatusCode.OK)
           }
