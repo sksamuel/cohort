@@ -1,5 +1,26 @@
 # Changelog
 
+### 1.3.0
+
+* Added new Kafka healthchecks:
+  * `KafkaConsumerRecordsConsumedRateHealthCheck`
+  * `KafkaProducerRecordSendRateHealthCheck`
+  * `KafkaConsumerLastPollTimeHealthCheck`
+* Added new `/cohort/memory` endpoint for reporting memory and buffer pool information
+* Added new database min idle connection healthchecks:
+  * `HikariMinIdleHealthCheck`
+  * `DbcpMinIdleHealthCheck`
+* Added `MaxFileDescriptorsHealthCheck`
+* Added `ProcessCpuHealthCheck`
+
+### 1.2.2
+
+* Updated Kakfa health checks to use `AdminClient` instead of props.
+
+### 1.2.1
+
+* Updated Elastic health checks to accept `RestHighLevelClient` instead of hostnames.
+*
 ### 1.2.0
 
 * Added support for Ktor2
