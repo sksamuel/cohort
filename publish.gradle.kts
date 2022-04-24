@@ -56,14 +56,14 @@ publishing {
     register("mavenJava", MavenPublication::class) {
       from(components["java"])
       pom {
-        name.set("healthcheck")
-        description.set("Healthchecks for JVM apps")
-        url.set("http://www.github.com/sksamuel/healthcheck")
+        name.set("cohort")
+        description.set("Ktor Actuator")
+        url.set("http://www.github.com/sksamuel/cohort")
 
         scm {
-          connection.set("scm:git:http://www.github.com/sksamuel/healthcheck/")
+          connection.set("scm:git:http://www.github.com/sksamuel/cohort/")
           developerConnection.set("scm:git:http://github.com/sksamuel/")
-          url.set("http://www.github.com/sksamuel/healthcheck/")
+          url.set("http://www.github.com/sksamuel/cohort/")
         }
 
         licenses {
