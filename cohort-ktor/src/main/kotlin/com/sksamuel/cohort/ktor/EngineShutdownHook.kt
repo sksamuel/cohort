@@ -16,6 +16,8 @@ class EngineShutdownHook(
   }
 
   override suspend fun run() {
+    engine?.application?.environment?.log?.info("Shutting down HTTP server...")
     engine?.stop(gracePeriod.inWholeMilliseconds, timeout.inWholeMilliseconds)
+    engine?.application?.environment?.log?.info("HTTP server shutdown!")
   }
 }
