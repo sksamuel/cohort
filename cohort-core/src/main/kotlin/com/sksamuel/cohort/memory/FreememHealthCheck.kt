@@ -2,6 +2,8 @@ package com.sksamuel.cohort.memory
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import java.lang.management.BufferPoolMXBean
+import java.lang.management.MemoryPoolMXBean
 
 /**
  * A Cohort [HealthCheck] that checks free memory in the system.
@@ -17,11 +19,14 @@ class FreememHealthCheck(private val minFreeBytes: Int) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
     val free = Runtime.getRuntime().freeMemory()
+    val msg = "Freemem $free bytes [min free $minFreeBytes]"
     return if (free < minFreeBytes) {
-      HealthCheckResult.Unhealthy("Freemem is below threshold [$free < $minFreeBytes]", null)
+      HealthCheckResult.Unhealthy(msg, null)
     } else {
-      HealthCheckResult.Healthy("Freemem is above threshold [$free >= $minFreeBytes]")
+      HealthCheckResult.Healthy(msg)
     }
   }
-
 }
+
+
+data class MemoryInfo(val memoryPools: List<MemoryPoolMXBean>, val bufferPools: List<BufferPoolMXBean>)

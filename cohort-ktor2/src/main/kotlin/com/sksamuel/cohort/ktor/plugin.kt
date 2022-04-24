@@ -1,13 +1,13 @@
 package com.sksamuel.cohort.ktor
 
-import com.sksamuel.cohort.HealthCheckRegistry
-import com.sksamuel.cohort.db.DataSourceManager
-import com.sksamuel.cohort.db.DatabaseMigrationManager
-import com.sksamuel.cohort.gc.gcinfo
+import com.sksamuel.cohort.endpoints.CohortConfiguration
+import com.sksamuel.cohort.endpoints.LogInfo
+import com.sksamuel.cohort.endpoints.ResultJson
+import com.sksamuel.cohort.endpoints.toJson
+import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails
-import com.sksamuel.cohort.logging.LogManager
-import com.sksamuel.cohort.logging.Logger
+import com.sksamuel.cohort.memory.getMemoryInfo
 import com.sksamuel.cohort.os.getOperatingSystem
 import com.sksamuel.cohort.system.getSysProps
 import com.sksamuel.cohort.threads.getThreadDump
@@ -38,11 +38,20 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
         }
       }
 
+      if (memory) {
+        get("cohort/memory") {
+          getMemoryInfo().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+          )
+        }
+      }
+
       dataSources.let { dsm ->
         if (dsm.isNotEmpty()) {
           get("cohort/datasources") {
             dsm.map { it.info() }.sequence().fold(
-              { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+              { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
               {
                 call.respondText(
                   it.stackTraceToString(),
@@ -58,7 +67,7 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
       migrations?.let { m ->
         get("cohort/dbmigration") {
           m.migrations().fold(
-            { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
           )
         }
@@ -66,13 +75,11 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
 
       logManager?.let { manager ->
 
-        data class LogInfo(val levels: List<String>, val loggers: List<Logger>)
-
         get("cohort/logging") {
           runCatching {
             val levels = manager.levels()
             val loggers = manager.loggers()
-            mapper.writeValueAsString(LogInfo(levels, loggers))
+            LogInfo(levels, loggers).toJson()
           }.fold(
             { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -92,7 +99,7 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
       if (jvmInfo) {
         get("cohort/jvm") {
           getJvmDetails().fold(
-            { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
           )
         }
@@ -100,8 +107,8 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
 
       if (gc) {
         get("cohort/gc") {
-          gcinfo().fold(
-            { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+          getGcInfo().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
           )
         }
@@ -119,7 +126,7 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
       if (sysprops) {
         get("cohort/sysprops") {
           getSysProps().fold(
-            { call.respondText(mapper.writeValueAsString(it), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
           )
         }
@@ -128,10 +135,7 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
       if (operatingSystem) {
         get("cohort/os") {
           getOperatingSystem().fold(
-            {
-              val json = mapper.writeValueAsString(it)
-              call.respondText(json, ContentType.Application.Json, HttpStatusCode.OK)
-            },
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
           )
         }
@@ -153,49 +157,15 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
               consecutiveFailures = it.value.consecutiveFailures,
             )
           }
-          val json = mapper.writeValueAsString(results)
 
           val httpStatusCode = when (status.healthy) {
             true -> HttpStatusCode.OK
             false -> HttpStatusCode.ServiceUnavailable
           }
 
-          call.respondText(json, ContentType.Application.Json, httpStatusCode)
+          call.respondText(results.toJson(), ContentType.Application.Json, httpStatusCode)
         }
       }
     }
-  }
-}
-
-class CohortConfiguration {
-
-  val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
-
-  // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
-  var heapDump: Boolean = false
-
-  // set to true to enable the /cohort/os endpoint which returns operating system information
-  var operatingSystem: Boolean = false
-
-  var logManager: LogManager? = null
-
-  var dataSources: List<DataSourceManager> = emptyList()
-
-  var migrations: DatabaseMigrationManager? = null
-
-  // set to true to enable the /cohort/jvm endpoint which returns JVM information
-  var jvmInfo: Boolean = false
-
-  // set to true to enable the /cohort/gc endpoint which returns garbage collector times and counts
-  var gc: Boolean = false
-
-  // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
-  var threadDump: Boolean = false
-
-  // set to true to enable the /cohort/sysprops endpoint which returns current system properties
-  var sysprops: Boolean = false
-
-  fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
-    healthchecks[endpoint] = registry
   }
 }
