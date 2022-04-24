@@ -141,6 +141,13 @@ val Cohort = createApplicationPlugin(name = "Cohort", createConfiguration = ::Co
         }
       }
 
+      if (hooks.isNotEmpty()) {
+        get("cohort/shutdown") {
+          hooks.forEach { it.run() }
+          call.respond(HttpStatusCode.OK)
+        }
+      }
+
       healthchecks.forEach { (endpoint, registry) ->
         get(endpoint) {
 
