@@ -4,10 +4,12 @@ import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.logging.LogManager
+import com.sksamuel.cohort.shutdown.ShutdownHook
 
 class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+  val hooks = mutableListOf<ShutdownHook>()
 
   // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
   var heapDump: Boolean = false
@@ -35,6 +37,10 @@ class CohortConfiguration {
 
   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
   var sysprops: Boolean = false
+
+  fun shutdown(hook: ShutdownHook) {
+    hooks.add(hook)
+  }
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
     healthchecks[endpoint] = registry

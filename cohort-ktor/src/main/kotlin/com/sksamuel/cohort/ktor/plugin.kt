@@ -154,6 +154,13 @@ class Cohort private constructor(
           }
         }
 
+        if (config.hooks.isNotEmpty()) {
+          get("cohort/shutdown") {
+            config.hooks.forEach { it.run() }
+            call.respond(HttpStatusCode.OK)
+          }
+        }
+
         config.healthchecks.forEach { (endpoint, registry) ->
           get(endpoint) {
 
