@@ -2,11 +2,15 @@ package com.sksamuel.cohort.shutdown
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ShutdownHook(private val f: suspend () -> Unit) {
+fun interface ShutdownHook {
+  suspend fun run()
+}
+
+class AtomicShutdownHook(private val hook: ShutdownHook) : ShutdownHook {
   private val invoked = AtomicBoolean(false)
-  suspend fun run() {
+  override suspend fun run() {
     if (invoked.compareAndSet(false, true)) {
-      f()
+      hook.run()
     }
   }
 }

@@ -4,6 +4,7 @@ import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.logging.LogManager
+import com.sksamuel.cohort.shutdown.AtomicShutdownHook
 import com.sksamuel.cohort.shutdown.ShutdownHook
 
 class CohortConfiguration {
@@ -38,9 +39,8 @@ class CohortConfiguration {
   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
   var sysprops: Boolean = false
 
-  fun shutdown(f: suspend () -> Unit) = shutdown(ShutdownHook(f))
-  fun shutdown(hook: ShutdownHook) {
-    hooks.add(hook)
+  fun shutdown(f: ShutdownHook) {
+    hooks.add(AtomicShutdownHook(f))
   }
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
