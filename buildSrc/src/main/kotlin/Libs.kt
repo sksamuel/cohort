@@ -15,4 +15,9 @@ object Libs {
     const val assertions = "io.kotest:kotest-assertions-core-jvm:$version"
     const val junit5 = "io.kotest:kotest-runner-junit5-jvm:$version"
   }
+
+  object Tabby {
+    private const val version = "2.0.17"
+    const val fp = "com.sksamuel.tabby:tabby-fp:$version"
+  }
 }
