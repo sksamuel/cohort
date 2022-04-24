@@ -7,7 +7,7 @@ import java.lang.management.ManagementFactory
 /**
  * A Cohort [HealthCheck] that the number of daemon threads does not exceed a value.
  *
- * The check is considered healthy if the peak thread count <= [maxDaemonThreads].
+ * The check is considered healthy if the daemon thread count <= [maxDaemonThreads].
  */
 class DaemonThreadsHealthCheck(private val maxDaemonThreads: Int) : HealthCheck {
 
@@ -15,10 +15,11 @@ class DaemonThreadsHealthCheck(private val maxDaemonThreads: Int) : HealthCheck 
 
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.daemonThreadCount
+    val msg = "Daemon threads count is $count [threshold is $maxDaemonThreads]"
     return if (count <= maxDaemonThreads) {
-      HealthCheckResult.Healthy("Daemon threads is below threshold [$count <= $maxDaemonThreads]")
+      HealthCheckResult.Healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy("Daemon threads is above threshold [$count > $maxDaemonThreads]", null)
+      HealthCheckResult.Unhealthy(msg, null)
     }
   }
 }

@@ -17,7 +17,7 @@ class HikariMinIdleHealthCheck(
 ) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val idleConnections = ds.hikariPoolMXBean.idleConnections
-    val msg = "Idle connections ${idleConnections} [min required is $minIdle]"
+    val msg = "Idle connections $idleConnections [min required is $minIdle]"
     return if (idleConnections >= minIdle) {
       HealthCheckResult.Healthy(msg)
     } else {
