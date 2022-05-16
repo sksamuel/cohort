@@ -4,14 +4,13 @@ package com.sksamuel.cohort
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
 /**
@@ -48,15 +47,6 @@ class HealthCheckRegistry(
       configure: HealthCheckRegistry.() -> Unit
     ): HealthCheckRegistry {
       val registry = HealthCheckRegistry(dispatcher)
-      registry.configure()
-      return registry
-    }
-
-    @ExperimentalStdlibApi
-    suspend operator fun invoke(
-      configure: HealthCheckRegistry.() -> Unit
-    ): HealthCheckRegistry {
-      val registry = HealthCheckRegistry(coroutineContext[CoroutineDispatcher]!!)
       registry.configure()
       return registry
     }
@@ -100,23 +90,23 @@ class HealthCheckRegistry(
       results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
     }
 
-    schedule(name, initialDelay, checkInterval)
+    scheduler.scheduleWithFixedDelay(
+      {
+        // we block the thread used by the scheduler, as we execute inside the provided coroutine dispatcher
+        runBlocking {
+          launch(dispatcher) {
+            run(name)
+          }
+        }
+      },
+      initialDelay.inWholeMilliseconds,
+      checkInterval.inWholeMilliseconds,
+      TimeUnit.MILLISECONDS,
+    )
     return this
   }
 
-  private fun schedule(name: String, thisDelay: Duration, nextDelay: Duration) {
-    scheduler.schedule(
-      {
-        GlobalScope.launch(dispatcher) {
-          run(name, nextDelay)
-        }
-      },
-      thisDelay.inWholeMilliseconds,
-      TimeUnit.MILLISECONDS
-    )
-  }
-
-  private suspend fun run(name: String, delay: Duration) {
+  private suspend fun run(name: String) {
     try {
       when (val result = checks[name]!!.check()) {
         is HealthCheckResult.Healthy -> success(name, result)
@@ -126,7 +116,6 @@ class HealthCheckRegistry(
       val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
       failure(name, result)
     }
-    schedule(name, delay, delay)
   }
 
   private fun success(name: String, result: HealthCheckResult.Healthy) {
@@ -160,8 +149,8 @@ class HealthCheckRegistry(
   }
 
   fun status(): Health {
-    val unhealthy = results.values.any { !it.healthy }
-    return Health(!unhealthy, results.toMap())
+    val healthy = results.values.all { it.healthy }
+    return Health(healthy, results.toMap())
   }
 
   fun checks(): Set<HealthCheck> = checks.values.toSet()
@@ -171,7 +160,7 @@ class HealthCheckRegistry(
 data class CheckStatus(
   val consecutiveSuccesses: Int,
   val consecutiveFailures: Int,
-  val healthy: Boolean, // overall health status
+  val healthy: Boolean, // overall health status, true if all checks are healthy
   val timestamp: Instant,
   val result: HealthCheckResult,
 )
