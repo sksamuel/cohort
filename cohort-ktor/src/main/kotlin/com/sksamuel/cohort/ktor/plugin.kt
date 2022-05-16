@@ -25,8 +25,10 @@ class Cohort private constructor(
   fun interceptor(pipeline: Application) {
     pipeline.intercept(ApplicationCallPipeline.Monitoring) {
       this.application.attributes.put(CohortConfigAttributeKey, config)
-      val routing: Routing.() -> Unit = { cohort() }
-      pipeline.featureOrNull(Routing)?.apply(routing) ?: pipeline.install(Routing, routing)
+      if (config.autoEndpoints) {
+        val routing: Routing.() -> Unit = { cohort() }
+        pipeline.featureOrNull(Routing)?.apply(routing) ?: pipeline.install(Routing, routing)
+      }
       proceed()
     }
   }
