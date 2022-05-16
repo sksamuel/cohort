@@ -28,7 +28,7 @@ fun Route.cohort() {
   val config = this.application.attributes[CohortConfigAttributeKey]
 
   if (config.heapDump) {
-    get("cohort/heapdump") {
+    get("${config.endpointPrefix}/heapdump") {
       getHeapDump().fold(
         { call.respond(HttpStatusCode.OK, it) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -37,7 +37,7 @@ fun Route.cohort() {
   }
 
   if (config.memory) {
-    get("cohort/memory") {
+    get("${config.endpointPrefix}/memory") {
       getMemoryInfo().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -47,7 +47,7 @@ fun Route.cohort() {
 
   config.dataSources.let { dsm ->
     if (dsm.isNotEmpty()) {
-      get("cohort/datasources") {
+      get("${config.endpointPrefix}/datasources") {
         dsm.map { it.info() }.sequence().fold(
           { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
           {
@@ -63,7 +63,7 @@ fun Route.cohort() {
   }
 
   config.migrations?.let { m ->
-    get("cohort/dbmigration") {
+    get("${config.endpointPrefix}/dbmigration") {
       m.migrations().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -72,7 +72,7 @@ fun Route.cohort() {
   }
 
   config.logManager?.let { manager ->
-    get("cohort/logging") {
+    get("${config.endpointPrefix}/logging") {
       runCatching {
         val levels = manager.levels()
         val loggers = manager.loggers()
@@ -83,7 +83,7 @@ fun Route.cohort() {
       )
     }
 
-    put("cohort/logging/{name}/{level}") {
+    put("${config.endpointPrefix}/logging/{name}/{level}") {
       val name = call.parameters.getOrFail("name")
       val level = call.parameters.getOrFail("level")
       manager.set(name, level).fold(
@@ -94,7 +94,7 @@ fun Route.cohort() {
   }
 
   if (config.jvmInfo) {
-    get("cohort/jvm") {
+    get("${config.endpointPrefix}/jvm") {
       getJvmDetails().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -103,7 +103,7 @@ fun Route.cohort() {
   }
 
   if (config.gc) {
-    get("cohort/gc") {
+    get("${config.endpointPrefix}/gc") {
       getGcInfo().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -112,7 +112,7 @@ fun Route.cohort() {
   }
 
   if (config.threadDump) {
-    get("cohort/threaddump") {
+    get("${config.endpointPrefix}/threaddump") {
       getThreadDump().fold(
         { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -121,7 +121,7 @@ fun Route.cohort() {
   }
 
   if (config.sysprops) {
-    get("cohort/sysprops") {
+    get("${config.endpointPrefix}/sysprops") {
       getSysProps().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -130,7 +130,7 @@ fun Route.cohort() {
   }
 
   if (config.operatingSystem) {
-    get("cohort/os") {
+    get("${config.endpointPrefix}/os") {
       getOperatingSystem().fold(
         { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
         { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
@@ -139,7 +139,7 @@ fun Route.cohort() {
   }
 
   if (config.shutdownHooks.isNotEmpty()) {
-    get("cohort/shutdown") {
+    get("${config.endpointPrefix}/shutdown") {
       this.context.application.log.info("Executing shutdown hooks...")
       config.shutdownHooks.forEach { it.run() }
       call.respond(HttpStatusCode.OK)
