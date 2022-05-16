@@ -20,6 +20,7 @@ import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.application
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.put
 import io.ktor.util.getOrFail
 
@@ -47,6 +48,7 @@ fun Route.cohort() {
 
   config.dataSources.let { dsm ->
     if (dsm.isNotEmpty()) {
+
       get("${config.endpointPrefix}/datasources") {
         dsm.map { it.info() }.sequence().fold(
           { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
@@ -58,6 +60,17 @@ fun Route.cohort() {
             )
           }
         )
+      }
+
+      post("${config.endpointPrefix}/datasources/{name}/evict") {
+        val name = call.parameters.getOrFail("name")
+        val result = dsm.find { it.name() == name }?.evict()
+        if (result == null) call.respond(HttpStatusCode.BadRequest) else {
+          result.fold(
+            { call.respond(HttpStatusCode.Accepted) },
+            { call.respond(HttpStatusCode.InternalServerError) }
+          )
+        }
       }
     }
   }

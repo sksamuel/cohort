@@ -5,6 +5,14 @@ import com.sksamuel.cohort.db.DataSourceManager
 import org.apache.commons.dbcp2.BasicDataSource
 
 class ApacheDBCPDataSourceManager(private val ds: BasicDataSource) : DataSourceManager {
+
+  override fun name(): String = ds.jmxName
+
+  override fun evict(): Result<Boolean> = runCatching {
+    ds.evict()
+    true
+  }
+
   override fun info(): Result<DataSourceInfo> {
     return runCatching {
       DataSourceInfo(
@@ -28,4 +36,5 @@ class ApacheDBCPDataSourceManager(private val ds: BasicDataSource) : DataSourceM
       )
     }
   }
+
 }

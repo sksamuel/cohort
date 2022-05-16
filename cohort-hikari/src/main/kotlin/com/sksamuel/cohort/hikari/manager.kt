@@ -5,6 +5,14 @@ import com.sksamuel.cohort.db.DataSourceManager
 import com.zaxxer.hikari.HikariDataSource
 
 class HikariDataSourceManager(private val ds: HikariDataSource) : DataSourceManager {
+
+  override fun name(): String = ds.hikariConfigMXBean.poolName
+
+  override fun evict(): Result<Boolean> = runCatching {
+    ds.hikariPoolMXBean.softEvictConnections()
+    true
+  }
+
   override fun info(): Result<DataSourceInfo> {
     return runCatching {
       DataSourceInfo(

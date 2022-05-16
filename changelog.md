@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.4.0
+
+* Added shutdown hooks
+  * `EngineShutdownHook` used for graceful shutdown of the ktor server
+* Added `endpointsPrefix` setting to config, to allow adjusting the namespace under which endpoints are registered
+* Added `autoEndpoints` option to allow installing the endpoints inside your own routing space - in order to support authentication, or other around advice.
+
 ### 1.3.0
 
 * Added new Kafka healthchecks:

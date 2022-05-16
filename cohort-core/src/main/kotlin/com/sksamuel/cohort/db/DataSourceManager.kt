@@ -1,7 +1,20 @@
 package com.sksamuel.cohort.db
 
 interface DataSourceManager {
+
+  fun name(): String
+
+  /**
+   * Returns info about the current datasource
+   */
   fun info(): Result<DataSourceInfo>
+
+  /**
+   * If supported by the datasource, will evict idle connections.
+   *
+   * @return true if this datasource supports evictions
+   */
+  fun evict(): Result<Boolean>
 }
 
 data class DataSourceInfo(
