@@ -10,7 +10,7 @@ import com.sksamuel.cohort.shutdown.ShutdownHook
 class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
-  val hooks = mutableListOf<ShutdownHook>()
+  val shutdownHooks = mutableListOf<ShutdownHook>()
 
   // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
   var heapDump: Boolean = false
@@ -39,8 +39,16 @@ class CohortConfiguration {
   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
   var sysprops: Boolean = false
 
+  var endpointPrefix = "cohort"
+
+  // if set to true, then the endpoints will be installed automatically under the endpointPrefix,
+  // except for the health checks which will be placed top level under the path given when they
+  // are registered
+  var autoEndpoints = false
+
+  // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
   fun shutdown(f: ShutdownHook) {
-    hooks.add(AtomicShutdownHook(f))
+    shutdownHooks.add(AtomicShutdownHook(f))
   }
 
   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {

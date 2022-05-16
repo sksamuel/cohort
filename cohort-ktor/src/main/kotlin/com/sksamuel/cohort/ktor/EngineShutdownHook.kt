@@ -10,7 +10,10 @@ import kotlin.time.Duration
  *
  * @param prewait a duration to wait before beginning the stop process. During this time, requests will continue
  * to be accepted. This setting is useful to allow time for the container to be removed from the load balancer.
- * @param gracePeriod a duration during which already inflight requests are allowed to continue.
+ *
+ * @param gracePeriod a duration during which already inflight requests are allowed to continue before the
+ * shutdown process begins.
+ *
  * @param timeout a duration after which the server will be forceably shutdown.
  */
 class EngineShutdownHook(
