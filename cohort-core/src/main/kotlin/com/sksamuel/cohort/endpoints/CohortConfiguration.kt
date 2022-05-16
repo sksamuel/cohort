@@ -47,7 +47,7 @@ class CohortConfiguration {
   var autoEndpoints = true
 
   // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
-  fun shutdown(f: ShutdownHook) {
+  fun onShutdown(f: ShutdownHook) {
     shutdownHooks.add(AtomicShutdownHook(f))
   }
 
