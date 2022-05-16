@@ -6,6 +6,7 @@
   * `EngineShutdownHook` used for graceful shutdown of the ktor server
 * Added `endpointsPrefix` setting to config, to allow adjusting the namespace under which endpoints are registered
 * Added `autoEndpoints` option to allow installing the endpoints inside your own routing space - in order to support authentication, or other around advice.
+* Added eviction endpoint for datasources to evict idle connections
 
 ### 1.3.0
 
