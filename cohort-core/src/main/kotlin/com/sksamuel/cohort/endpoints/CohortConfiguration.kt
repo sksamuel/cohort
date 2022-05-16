@@ -44,7 +44,7 @@ class CohortConfiguration {
   // if set to true, then the endpoints will be installed automatically under the endpointPrefix,
   // except for the health checks which will be placed top level under the path given when they
   // are registered
-  var autoEndpoints = false
+  var autoEndpoints = true
 
   // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
   fun shutdown(f: ShutdownHook) {
