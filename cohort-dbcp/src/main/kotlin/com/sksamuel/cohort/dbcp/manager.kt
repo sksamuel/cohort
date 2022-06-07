@@ -1,4 +1,4 @@
-package com.sksamuel.cohort.hikari
+package com.sksamuel.cohort.dbcp
 
 import com.sksamuel.cohort.db.DataSourceInfo
 import com.sksamuel.cohort.db.DataSourceManager
