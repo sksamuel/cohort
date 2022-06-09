@@ -12,10 +12,8 @@ class DatabaseHealthCheck(
   private val ds: DataSource,
   private val query: String = "SELECT 1",
 ) : HealthCheck {
-  override suspend fun check(): HealthCheckResult {
-    val conn = ds.connection
+  override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
     conn.createStatement().executeQuery(query)
-    conn.close()
-    return HealthCheckResult.Healthy("Connected to database successfully")
+    HealthCheckResult.Healthy("Connected to database successfully")
   }
 }
