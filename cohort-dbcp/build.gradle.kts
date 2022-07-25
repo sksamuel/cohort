@@ -1,6 +1,6 @@
 dependencies {
    implementation(project(":cohort-core"))
-   implementation("org.apache.commons:commons-dbcp2:2.9.0")
+   implementation("org.apache.commons:commons-dbcp2:_")
 }
 
 apply("../publish.gradle.kts")

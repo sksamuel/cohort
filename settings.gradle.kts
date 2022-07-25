@@ -1,3 +1,11 @@
+plugins {
+   id("de.fayard.refreshVersions") version "0.40.2"
+}
+
+refreshVersions {
+   enableBuildSrcLibs()
+}
+
 include("cohort-core")
 include("cohort-dbcp")
 include("cohort-elastic")

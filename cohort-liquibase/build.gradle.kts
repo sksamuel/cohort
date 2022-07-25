@@ -1,6 +1,6 @@
 dependencies {
    implementation(project(":cohort-core"))
-   implementation("org.liquibase:liquibase-core:4.8.0")
+   implementation("org.liquibase:liquibase-core:_")
 }
 
 apply("../publish.gradle.kts")

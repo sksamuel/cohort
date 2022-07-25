@@ -13,8 +13,6 @@ buildscript {
 }
 
 plugins {
-   java
-   `java-library`
    signing
    `maven-publish`
    kotlin("jvm").version(Libs.kotlinVersion)
