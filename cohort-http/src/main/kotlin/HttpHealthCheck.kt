@@ -6,8 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.utils.EmptyContent
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 
 enum class Method {
@@ -44,9 +43,9 @@ class HttpHealthCheck(
 
   override suspend fun check(): HealthCheckResult {
 
-    val resp = client.request<HttpResponse>(url) {
+    val resp = client.request(url) {
       this.method = ktorMethod
-      this.body = this@HttpHealthCheck.body ?: EmptyContent
+      this@HttpHealthCheck.body?.let { setBody(it) }
       this@HttpHealthCheck.headers.forEach { (k, v) -> header(k, v) }
     }
 
