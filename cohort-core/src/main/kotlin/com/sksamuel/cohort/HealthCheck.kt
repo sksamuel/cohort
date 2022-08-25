@@ -28,5 +28,7 @@ sealed class HealthCheckResult {
     override val cause: Throwable? = null
   }
 
-  data class Unhealthy(override val message: String, override val cause: Throwable?) : HealthCheckResult()
+  data class Unhealthy(override val message: String, override val cause: Throwable?) : HealthCheckResult() {
+    constructor(message: String) : this(message, null)
+  }
 }

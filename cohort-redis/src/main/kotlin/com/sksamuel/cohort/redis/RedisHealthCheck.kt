@@ -19,7 +19,13 @@ class RedisConnectionHealthCheck(
   private val username: String?,
   private val password: String?,
   private val tls: Boolean,
-  private val command: (Connection) -> Boolean = { it.ping() },
+  private val command: (Connection) -> HealthCheckResult = {
+    if (it.ping()) {
+      HealthCheckResult.Healthy("Connected to redis cluster")
+    } else {
+      HealthCheckResult.Healthy("Ping to redis cluster failed")
+    }
+  },
 ) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
@@ -27,8 +33,7 @@ class RedisConnectionHealthCheck(
       runCatching {
         val config = DefaultJedisClientConfig.builder().password(password).user(username).ssl(tls).build()
         val jedis = Jedis(HostAndPort(hostAndPort.host, hostAndPort.port), config)
-        jedis.connection.use { if (!command(it)) error("Could not ping cluster") }
-        HealthCheckResult.Healthy("Connected to redis cluster")
+        jedis.connection.use { command(it) }
       }.getOrElse {
         HealthCheckResult.Unhealthy("Could not connect to redis at $hostAndPort", it)
       }
