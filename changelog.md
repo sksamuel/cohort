@@ -1,5 +1,14 @@
 # Changelog
 
+### 1.5.0
+
+* Added `S3ReadBucketHealthCheck`
+* Deprecated Shutdown hooks in favour of built-in Ktor `onShutdown`.
+
+### 1.4.1
+
+* Fixed dbcp package names.
+
 ### 1.4.0
 
 * Added shutdown hooks

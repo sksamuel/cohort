@@ -12,12 +12,16 @@ data class HostPort(val host: String, val port: Int)
 
 /**
  * A [HealthCheck] that checks that a connection can be made to a redis cluster.
+ *
+ * @param command an optional command to execute against the redis cluster. Defaults to listing cluster nodes.
+ *                Must return true if the command was successful.
  */
 class RedisClusterHealthCheck(
   private val hostsAndPorts: Set<HostPort>,
   private val username: String?,
   private val password: String?,
   private val tls: Boolean,
+  private val command: (JedisCluster) -> Boolean = { it.clusterNodes.isNotEmpty() },
 ) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
@@ -25,14 +29,11 @@ class RedisClusterHealthCheck(
       runCatching {
         val config = DefaultJedisClientConfig.builder().password(password).user(username).ssl(tls).build()
         val jedis = JedisCluster(hostsAndPorts.map { HostAndPort(it.host, it.port) }.toSet(), config)
-        jedis.use {
-          when (val nodes = it.clusterNodes.size) {
-            0 -> HealthCheckResult.Unhealthy("Connected to redis cluster but 0 nodes are available", null)
-            else -> HealthCheckResult.Healthy("Connected to redis cluster and $nodes nodes are available")
-          }
-        }
+        val success = jedis.use { command(it) }
+        if (success) HealthCheckResult.Healthy("Connected to redis")
+        else HealthCheckResult.Unhealthy("Redis health check command failed", null)
       }.getOrElse {
-        HealthCheckResult.Unhealthy("Could not connect to redis cluster at ${hostsAndPorts.joinToString(", ")}", it)
+        HealthCheckResult.Unhealthy("Could not connect to redis cluster ${hostsAndPorts.joinToString(", ")}", it)
       }
     }
   }
