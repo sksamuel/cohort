@@ -10,6 +10,8 @@ import com.sksamuel.cohort.shutdown.ShutdownHook
 class CohortConfiguration {
 
   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+
+  @Deprecated("Can use shutdown hook on ktor directly")
   val shutdownHooks = mutableListOf<ShutdownHook>()
 
   // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
@@ -47,6 +49,7 @@ class CohortConfiguration {
   var autoEndpoints = true
 
   // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
+  @Deprecated("Can use shutdown hook on ktor directly")
   fun onShutdown(f: ShutdownHook) {
     shutdownHooks.add(AtomicShutdownHook(f))
   }

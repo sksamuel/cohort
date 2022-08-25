@@ -16,6 +16,7 @@ import kotlin.time.Duration
  *
  * @param timeout a duration after which the server will be forceably shutdown.
  */
+@Deprecated("Can use shutdown hook on ktor directly")
 class EngineShutdownHook(
   private val prewait: Duration,
   private val gracePeriod: Duration,
