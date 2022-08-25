@@ -5,11 +5,9 @@ import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.seconds
 
-@ExperimentalTime
 class TcpHealthCheck(
   private val host: String,
   private val port: Int,
@@ -19,9 +17,9 @@ class TcpHealthCheck(
   override suspend fun check(): HealthCheckResult {
     return runCatching {
       val socket = Socket()
-      val time = measureTime {
-        socket.connect(InetSocketAddress(host, port), connectionTimeout.inWholeMilliseconds.toInt())
-      }
+      val start = System.currentTimeMillis()
+      socket.connect(InetSocketAddress(host, port), connectionTimeout.inWholeMilliseconds.toInt())
+      val time = (System.currentTimeMillis() - start).milliseconds
       if (socket.isConnected) {
         withContext(Dispatchers.IO) {
           socket.close()
