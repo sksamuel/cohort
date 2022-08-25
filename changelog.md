@@ -4,6 +4,7 @@
 
 * Added `S3ReadBucketHealthCheck`
 * Deprecated Shutdown hooks in favour of built-in Ktor `onShutdown`.
+* Added arbitrary command support to redis health checks.
 
 ### 1.4.1
 
