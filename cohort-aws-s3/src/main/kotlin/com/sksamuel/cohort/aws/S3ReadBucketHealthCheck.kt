@@ -1,4 +1,4 @@
-package com.sksamuel.cohort.s3
+package com.sksamuel.cohort.aws
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.HeadBucketRequest
