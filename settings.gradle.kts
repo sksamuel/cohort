@@ -6,6 +6,13 @@ refreshVersions {
    enableBuildSrcLibs()
 }
 
+refreshVersions {
+   enableBuildSrcLibs()
+   rejectVersionIf {
+      candidate.stabilityLevel != de.fayard.refreshVersions.core.StabilityLevel.Stable
+   }
+}
+
 include("cohort-core")
 include("cohort-dbcp")
 include("cohort-elastic")
@@ -19,3 +26,4 @@ include("cohort-liquibase")
 include("cohort-log4j2")
 include("cohort-logback")
 include("cohort-redis")
+include("cohort-s3")
