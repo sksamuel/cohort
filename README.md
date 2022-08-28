@@ -18,6 +18,7 @@ See [changelog](changelog.md)
   disk space, cpu usage, garbage collection and more.
 * **Resource healthchecks:** Additional modules to monitor the health of Redis, Kafka, Elasticsearch, databases and
   other resources.
+* **Micrometer integration:** Send healthcheck metrics to a micrometer registry, so you can see which healthchecks are consistently failing or flakely.
 * **Database pools:** See runtime metrics such as active and idle connections in database pools such as Hikari
   Connection Pool.
 * **JVM Info:** Enable endpoints to export system properties, JVM arguments and version information, and O/S name / version.
