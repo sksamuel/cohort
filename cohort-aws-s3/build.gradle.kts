@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    implementation("com.amazonaws:aws-java-sdk-s3:_")
 }
 

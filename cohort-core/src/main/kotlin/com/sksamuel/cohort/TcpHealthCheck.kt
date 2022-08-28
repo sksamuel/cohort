@@ -6,7 +6,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.seconds
+import kotlin.time.Duration.Companion.seconds
 
 class TcpHealthCheck(
   private val host: String,

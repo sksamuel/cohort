@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    implementation("org.apache.kafka:kafka-clients:_")
    implementation("redis.clients:jedis:_")
 }

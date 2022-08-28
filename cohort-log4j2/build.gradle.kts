@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    implementation("org.apache.logging.log4j:log4j-api:_")
    implementation("org.apache.logging.log4j:log4j-core:_")
 }

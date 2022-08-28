@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    implementation("org.apache.commons:commons-dbcp2:_")
 }
 

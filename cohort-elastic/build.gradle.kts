@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    api("org.elasticsearch.client:elasticsearch-rest-high-level-client:_")
    implementation("com.fasterxml.jackson.core:jackson-databind:_")
 }

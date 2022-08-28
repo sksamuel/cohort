@@ -1,5 +1,5 @@
 dependencies {
-   implementation(project(":cohort-core"))
+   implementation(projects.cohortCore)
    implementation("ch.qos.logback:logback-classic:_")
    implementation("ch.qos.logback:logback-core:_")
 }
