@@ -15,6 +15,9 @@ class HikariConnectionsHealthCheck(
   private val ds: HikariDataSource,
   private val minConnections: Int,
 ) : HealthCheck {
+
+  override val name: String = "hikari_open_connections"
+
   override suspend fun check(): HealthCheckResult {
     val conns = ds.hikariPoolMXBean.totalConnections
     val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [$minConnections minConnections]"

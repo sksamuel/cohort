@@ -1,7 +1,11 @@
 package com.sksamuel.cohort
 
 fun interface HealthCheck {
+
   suspend fun check(): HealthCheckResult
+
+  val name: String
+    get() = this::class.java.name.removePrefix("com.sksamuel.")
 
   companion object {
     operator fun invoke(f: () -> Result<String>) = HealthCheck {

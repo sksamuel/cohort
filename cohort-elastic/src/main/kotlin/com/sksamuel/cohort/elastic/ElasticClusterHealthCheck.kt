@@ -22,6 +22,8 @@ class ElasticClusterHealthCheck(
   private val errorOnYellow: Boolean = false
 ) : HealthCheck {
 
+  override val name: String = "elastic_cluster_health"
+
   override suspend fun check(): HealthCheckResult {
     return runCatching {
 

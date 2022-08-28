@@ -13,6 +13,8 @@ class KafkaTopicHealthCheck(
   private val topic: String
 ) : HealthCheck {
 
+  override val name: String = "kafka_topic"
+
   override suspend fun check(): HealthCheckResult {
     val desc = adminClient.describeTopics(listOf(topic)).all().get(1, TimeUnit.MINUTES)[topic]
     return if (desc == null)

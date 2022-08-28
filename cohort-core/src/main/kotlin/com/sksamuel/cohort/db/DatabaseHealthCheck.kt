@@ -12,6 +12,9 @@ class DatabaseHealthCheck(
   private val ds: DataSource,
   private val query: String = "SELECT 1",
 ) : HealthCheck {
+
+  override val name: String = "database"
+
   override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
     conn.createStatement().executeQuery(query)
     HealthCheckResult.Healthy("Connected to database successfully")

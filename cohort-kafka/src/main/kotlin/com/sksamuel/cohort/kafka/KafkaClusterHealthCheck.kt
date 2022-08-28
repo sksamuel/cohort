@@ -11,6 +11,8 @@ import org.apache.kafka.clients.admin.AdminClient
  */
 class KafkaClusterHealthCheck(private val adminClient: AdminClient) : HealthCheck {
 
+  override val name: String = "kafka_cluster"
+
   override suspend fun check(): HealthCheckResult {
     return try {
       val clusterResult = adminClient.describeCluster()

@@ -13,6 +13,8 @@ class DaemonThreadsHealthCheck(private val maxDaemonThreads: Int) : HealthCheck 
 
   private val threadBean = ManagementFactory.getThreadMXBean()
 
+  override val name: String = "daemon_threads"
+
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.daemonThreadCount
     val msg = "Daemon threads count is $count [threshold is $maxDaemonThreads]"

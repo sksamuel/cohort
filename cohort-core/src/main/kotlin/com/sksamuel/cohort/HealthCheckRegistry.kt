@@ -60,7 +60,7 @@ class HealthCheckRegistry(
   fun register(
     check: HealthCheck,
     delay: Duration,
-  ): HealthCheckRegistry = register(check::class.java.name.removePrefix("com.sksamuel."), check, delay, delay)
+  ): HealthCheckRegistry = register(check.name, check, delay, delay)
 
   /**
    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.

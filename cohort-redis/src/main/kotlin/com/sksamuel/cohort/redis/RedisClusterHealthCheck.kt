@@ -31,6 +31,8 @@ class RedisClusterHealthCheck(
   },
 ) : HealthCheck {
 
+  override val name: String = "redis_cluster"
+
   override suspend fun check(): HealthCheckResult {
     return withContext(Dispatchers.IO) {
       runCatching {

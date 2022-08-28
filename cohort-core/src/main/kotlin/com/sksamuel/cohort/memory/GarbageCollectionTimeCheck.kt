@@ -22,6 +22,8 @@ class GarbageCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
   private val source = TimeSource.Monotonic
   private var lastMark: TimeMark? = null
 
+  override val name: String = "garbage_collection_time"
+
   override suspend fun check(): HealthCheckResult {
 
     // count all the time spent gc'ing since startup

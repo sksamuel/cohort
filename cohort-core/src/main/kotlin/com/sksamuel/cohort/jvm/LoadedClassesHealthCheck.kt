@@ -13,6 +13,8 @@ class LoadedClassesHealthCheck(private val maxLoadedClasses: Int) : HealthCheck 
 
   private val bean = ManagementFactory.getClassLoadingMXBean()
 
+  override val name: String = "loaded_classes"
+
   override suspend fun check(): HealthCheckResult {
     val count = bean.loadedClassCount
     return if (count <= maxLoadedClasses) {

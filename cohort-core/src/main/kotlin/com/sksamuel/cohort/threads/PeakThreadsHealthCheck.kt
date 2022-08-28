@@ -15,6 +15,8 @@ class PeakThreadsHealthCheck(
   private val threadBean: ThreadMXBean = ManagementFactory.getThreadMXBean(),
 ) : HealthCheck {
 
+  override val name: String = "peak_threads"
+
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.peakThreadCount
     val msg = "Peak threads is $count [threshold is $maxPeakThreads]"

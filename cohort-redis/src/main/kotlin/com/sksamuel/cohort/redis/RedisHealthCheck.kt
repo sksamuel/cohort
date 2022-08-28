@@ -28,6 +28,8 @@ class RedisConnectionHealthCheck(
   },
 ) : HealthCheck {
 
+  override val name: String = "redis"
+
   override suspend fun check(): HealthCheckResult {
     return withContext(Dispatchers.IO) {
       runCatching {

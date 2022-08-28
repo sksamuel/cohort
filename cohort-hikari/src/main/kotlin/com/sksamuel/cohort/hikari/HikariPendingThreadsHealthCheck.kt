@@ -17,6 +17,9 @@ class HikariPendingThreadsHealthCheck(
   private val ds: HikariDataSource,
   private val maxAwaiting: Int,
 ) : HealthCheck {
+
+  override val name: String = "hikari_pending_threads"
+
   override suspend fun check(): HealthCheckResult {
     val awaiting = ds.hikariPoolMXBean.threadsAwaitingConnection
     return if (awaiting <= maxAwaiting) {

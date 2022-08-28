@@ -13,6 +13,8 @@ class LiveThreadsHealthCheck(private val maxThreadCount: Int) : HealthCheck {
 
   private val threadBean = ManagementFactory.getThreadMXBean()
 
+  override val name: String = "live_threads"
+
   override suspend fun check(): HealthCheckResult {
     val count = threadBean.threadCount
     return if (count <= maxThreadCount) {

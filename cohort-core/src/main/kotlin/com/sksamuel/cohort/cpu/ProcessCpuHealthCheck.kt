@@ -15,6 +15,8 @@ class ProcessCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 
+  override val name: String = "process_cpu_load"
+
   override suspend fun check(): HealthCheckResult {
     val load = bean.processCpuLoad
     val msg = "Process CPU $load [max load $maxLoad]"

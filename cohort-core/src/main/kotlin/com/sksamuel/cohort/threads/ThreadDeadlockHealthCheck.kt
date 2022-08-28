@@ -15,6 +15,8 @@ class ThreadDeadlockHealthCheck(
   private val bean: ThreadMXBean = ManagementFactory.getThreadMXBean()
 ) : HealthCheck {
 
+  override val name: String = "thread_deadlocks"
+
   override suspend fun check(): HealthCheckResult {
     val deadlocked = bean.findDeadlockedThreads()?.size ?: 0
     val msg = "There are $deadlocked deadlocked threads"

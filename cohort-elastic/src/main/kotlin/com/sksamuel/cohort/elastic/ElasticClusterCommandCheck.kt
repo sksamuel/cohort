@@ -19,6 +19,8 @@ class ElasticClusterCommandCheck(
   private val command: (RestHighLevelClient) -> HealthCheckResult,
 ) : HealthCheck {
 
+  override val name: String = "elastic_cluster"
+
   override suspend fun check(): HealthCheckResult {
     return runCatching {
       withContext(Dispatchers.IO) {

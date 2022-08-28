@@ -13,6 +13,8 @@ class ThreadStateHealthCheck(
   private val maxCount: Int
 ) : HealthCheck {
 
+  override val name: String = "thread_state"
+
   override suspend fun check(): HealthCheckResult {
     val count = Thread.getAllStackTraces().keys.count { it.state == state }
     return if (count <= maxCount) {

@@ -18,6 +18,8 @@ class KafkaConsumerLastPollTimeHealthCheck(
 
   private val metricName = "last-poll-seconds-ago"
 
+  override val name: String = "kafka_consumer_last_poll"
+
   override suspend fun check(): HealthCheckResult {
     val metric = consumer.metrics().values.firstOrNull { it.metricName().name() == metricName }
       ?: return HealthCheckResult.Unhealthy("Could not locate kafka metric '${metricName}'", null)

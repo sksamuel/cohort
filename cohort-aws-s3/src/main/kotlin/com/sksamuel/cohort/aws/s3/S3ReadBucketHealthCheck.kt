@@ -12,6 +12,9 @@ class S3ReadBucketHealthCheck(
   private val bucketName: String,
   val createClient: () -> AmazonS3
 ) : HealthCheck {
+
+  override val name: String = "s3_bucket"
+
   override suspend fun check(): HealthCheckResult {
     return runCatching {
       createClient().headBucket(HeadBucketRequest(bucketName))
