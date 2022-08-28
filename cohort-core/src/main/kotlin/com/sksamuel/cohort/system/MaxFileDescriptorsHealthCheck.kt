@@ -14,6 +14,8 @@ class MaxFileDescriptorsHealthCheck(private val requiredMaxDescriptors: Int) : H
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as UnixOperatingSystemMXBean
 
+  override val name: String = "max_file_descriptors"
+
   override suspend fun check(): HealthCheckResult {
     val max = bean.maxFileDescriptorCount
     val msg = "Max file descriptors $max [required at least $requiredMaxDescriptors]"

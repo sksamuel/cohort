@@ -14,6 +14,8 @@ class OpenFileDescriptorsHealthCheck(private val maxOpenFileDescriptors: Int) : 
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as UnixOperatingSystemMXBean
 
+  override val name: String = "open_file_descriptors"
+
   override suspend fun check(): HealthCheckResult {
     val open = bean.openFileDescriptorCount
     return if (open < maxOpenFileDescriptors) {

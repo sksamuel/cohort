@@ -17,6 +17,8 @@ class FreememHealthCheck(private val minFreeBytes: Int) : HealthCheck {
     fun gb(gb: Int) = FreememHealthCheck(gb * 1024 * 1024 * 1024)
   }
 
+  override val name: String = "free_mem"
+
   override suspend fun check(): HealthCheckResult {
     val free = Runtime.getRuntime().freeMemory()
     val msg = "Freemem $free bytes [min free $minFreeBytes]"

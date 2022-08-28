@@ -17,6 +17,8 @@ class AvailableCoresHealthCheck(private val minCores: Int) : HealthCheck {
     val multiple = AvailableCoresHealthCheck(2)
   }
 
+  override val name: String = "available_cores"
+
   override suspend fun check(): HealthCheckResult {
     val cores = Runtime.getRuntime().availableProcessors()
     return if (cores < minCores) {

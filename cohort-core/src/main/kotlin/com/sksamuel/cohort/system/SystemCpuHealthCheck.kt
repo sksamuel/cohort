@@ -15,6 +15,8 @@ class SystemCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
 
   private val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 
+  override val name: String = "system_cpu_load"
+
   override suspend fun check(): HealthCheckResult {
     val load = bean.systemCpuLoad
     return if (load < maxLoad) {

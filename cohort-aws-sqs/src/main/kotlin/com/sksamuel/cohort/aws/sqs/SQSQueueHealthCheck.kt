@@ -11,6 +11,9 @@ class SQSQueueHealthCheck(
   private val queue: String,
   val createClient: () -> AmazonSQS,
 ) : HealthCheck {
+
+  override val name: String = "aws_sqs_queue"
+
   override suspend fun check(): HealthCheckResult {
     return runCatching {
       createClient().getQueueUrl(queue)
