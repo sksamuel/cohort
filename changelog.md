@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.6.2
+
+* Added better automatically generated health check names
+
 ### 1.6.1
 
 * Removed `com.sksamuel` prefix from automatically generated health check names when sending to micrometer.
