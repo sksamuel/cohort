@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.6.1
+
+* Removed `com.sksamuel` prefix from automatically generated health check names when sending to micrometer.
+* Fixed calculation bug in `GarbageCollectionTimeCheck`
+
 ### 1.6.0
 
 * Added `cohort-micrometer` module for sending healthcheck metrics to a micrometer registry.
