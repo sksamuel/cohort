@@ -39,6 +39,7 @@ class HealthCheckRegistry(
   private val checks = ConcurrentHashMap<String, HealthCheck>()
   private val results = ConcurrentHashMap<String, CheckStatus>()
   private val logger = KotlinLogging.logger {}
+  private val subscribers = mutableListOf<Subscriber>()
 
   companion object {
 
@@ -107,13 +108,17 @@ class HealthCheckRegistry(
   }
 
   private suspend fun run(name: String) {
+    val check = checks[name] ?: return
     try {
-      when (val result = checks[name]!!.check()) {
+      val result = check.check()
+      notifySubscribers(name, check, result)
+      when (result) {
         is HealthCheckResult.Healthy -> success(name, result)
         is HealthCheckResult.Unhealthy -> failure(name, result)
       }
     } catch (t: Throwable) {
       val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
+      notifySubscribers(name, check, result)
       failure(name, result)
     }
   }
@@ -154,8 +159,28 @@ class HealthCheckRegistry(
   }
 
   fun checks(): Set<HealthCheck> = checks.values.toSet()
+
+  /**
+   * Adds a [Subscriber] to this registry, which will be invoked each time a health check completes.
+   *
+   * Note: This method is not thread safe.
+   */
+  fun addSubscriber(subscriber: Subscriber) {
+    subscribers.add(subscriber)
+  }
+
+  private suspend fun notifySubscribers(name: String, check: HealthCheck, result: HealthCheckResult) {
+    subscribers.forEach {
+      runCatching {
+        it.invoke(name, check, result)
+      }.onFailure { logger.warn(it) { "Error notifying subscriber of health check $name" } }
+    }
+  }
 }
 
+fun interface Subscriber {
+  suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
+}
 
 data class CheckStatus(
   val consecutiveSuccesses: Int,
