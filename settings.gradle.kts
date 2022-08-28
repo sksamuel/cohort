@@ -2,6 +2,8 @@ plugins {
    id("de.fayard.refreshVersions") version "0.40.2"
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 refreshVersions {
    enableBuildSrcLibs()
 }
@@ -26,5 +28,6 @@ include("cohort-liquibase")
 include("cohort-log4j2")
 include("cohort-logback")
 include("cohort-redis")
+include("cohort-micrometer")
 include("cohort-aws-s3")
 include("cohort-aws-sqs")

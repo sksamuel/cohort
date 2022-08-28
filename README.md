@@ -264,6 +264,27 @@ Here is an example of output from a health check with a series of configured hea
 ]
 ```
 
+## Micrometer
+
+Cohort will send healthcheck metrics to micrometer if configured. Add the `cohort-micrometer` module and then bind an
+instance of `CohortMetrics` to both your healthcheck registry, and the micrometer registry.
+
+For example:
+
+```kotlin
+
+val micrometerRegistry = DatadogMeterRegistry(..) // or any other registry
+
+val healthcheckRegistry = HealthCheckRegistry(Dispatchers.Default) {
+  register("foo", FooHealthCheck, 5.seconds)
+  register("bar", BarHealthCheck, 3.seconds)
+}
+
+CohortMetrics(healthcheckRegistry).bindTo(micrometerRegistry)
+```
+
+Each health check will emit a metric under the key _cohort.healthcheck_ with a `name`, `type` and `healthy` tag.
+
 ## Logging
 
 Cohort allows you to view the current logging configuration and update log levels at runtime.
