@@ -1,3 +1,5 @@
+rootProject.name = "cohort"
+
 plugins {
    id("de.fayard.refreshVersions") version "0.40.2"
 }
@@ -27,6 +29,7 @@ include("cohort-ktor2")
 include("cohort-liquibase")
 include("cohort-log4j2")
 include("cohort-logback")
+include("cohort-mongo")
 include("cohort-redis")
 include("cohort-micrometer")
 include("cohort-aws-s3")
