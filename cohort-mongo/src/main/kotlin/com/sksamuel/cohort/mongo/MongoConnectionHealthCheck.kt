@@ -9,6 +9,9 @@ import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
 class MongoConnectionHealthCheck(private val client: MongoClient) : HealthCheck {
+
+  override val name: String = "mongo_connection"
+
   override suspend fun check(): HealthCheckResult {
     return runCatching {
       withTimeout(5.seconds) {
