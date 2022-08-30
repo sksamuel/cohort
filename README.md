@@ -73,7 +73,8 @@ install(Cohort) {
    threaddump = true
 
    // enable healthchecks for kubernetes
-   // each of these is optional and can map to any healthchecks/url you wish
+   // each of these is optional and can map to any healthcheck url you wish
+   // for example if you just want a single health endpoint, you could use /health
    healthcheck("/liveness", livechecks)
    healthcheck("/readiness", readychecks)
    healthcheck("/startup", startupchecks)
