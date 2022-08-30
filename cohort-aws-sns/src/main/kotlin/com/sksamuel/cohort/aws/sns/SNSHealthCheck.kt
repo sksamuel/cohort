@@ -7,7 +7,7 @@ import com.sksamuel.cohort.HealthCheckResult
 /**
  * A Cohort [HealthCheck] that checks for connectivity to an AWS SNS by listing topics.
  */
-class SNSTopicHealthCheck(
+class SNSHealthCheck(
   val createClient: () -> AmazonSNS,
 ) : HealthCheck {
 

@@ -2,9 +2,10 @@
 
 ### 1.7.0
 
-* Added RabbitMQ health check
-* Added MongoDB health check
-* Added AWS SNS health check
+* Added `RabbitConnectionHealthCheck` which checks for connectivity to a RabbitMQ instance.
+* Added `MongoConnectionHealthCheck` which checks for connectivity to a MongoDB instance.
+* Added `SNSHealthCheck` which checks for connectivity to an AWS SNS instance.
+* Added `ElasticIndexHealthCheck` which checks for presence of a topic, with option to fail if the topic is empty.
 * Allow custom tags to be set on Cohort micrometer integration.
 
 ### 1.6.2
@@ -36,7 +37,8 @@
 * Added shutdown hooks
 * `EngineShutdownHook` used for graceful shutdown of the ktor server
 * Added `endpointsPrefix` setting to config, to allow adjusting the namespace under which endpoints are registered
-* Added `autoEndpoints` option to allow installing the endpoints inside your own routing space - in order to support authentication, or other around advice.
+* Added `autoEndpoints` option to allow installing the endpoints inside your own routing space - in order to support
+  authentication, or other around advice.
 * Added eviction endpoint for datasources to evict idle connections
 
 ### 1.3.0
@@ -60,6 +62,7 @@
 
 * Updated Elastic health checks to accept `RestHighLevelClient` instead of hostnames.
 *
+
 ### 1.2.0
 
 * Added support for Ktor2

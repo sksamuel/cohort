@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("redis.clients:jedis:_")
+   api("redis.clients:jedis:_")
 }
 
 apply("../publish.gradle.kts")
