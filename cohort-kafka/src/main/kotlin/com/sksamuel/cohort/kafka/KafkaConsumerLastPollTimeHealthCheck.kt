@@ -6,12 +6,15 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
+@Deprecated("use KafkaLastPollHealthCheck")
+typealias KafkaConsumerLastPollTimeHealthCheck = KafkaLastPollHealthCheck
+
 /**
  * A [HealthCheck] that checks that a kafka consumer last poll at most [interval] ago.
  *
  * This check can be useful to detect stalled consumers.
  */
-class KafkaConsumerLastPollTimeHealthCheck(
+class KafkaLastPollHealthCheck(
   private val consumer: KafkaConsumer<*, *>,
   private val interval: Duration,
 ) : HealthCheck {

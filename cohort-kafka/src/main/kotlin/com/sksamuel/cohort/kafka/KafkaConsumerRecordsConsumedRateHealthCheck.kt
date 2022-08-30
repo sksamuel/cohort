@@ -5,6 +5,8 @@ import com.sksamuel.cohort.HealthCheckResult
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import kotlin.math.roundToInt
 
+typealias KafkaConsumerRateHealthCheck = KafkaConsumerRecordsConsumedRateHealthCheck
+
 /**
  * A [HealthCheck] that checks that a kafka consumer is consuming a minimum number of messages.
  *
@@ -12,6 +14,7 @@ import kotlin.math.roundToInt
  *
  * This check reports healthy if the records-consumed-rate is >= [minReceiveRate].
  */
+@Deprecated("use KafkaConsumerRateHealthCheck")
 class KafkaConsumerRecordsConsumedRateHealthCheck(
   private val consumer: KafkaConsumer<*, *>,
   private val minReceiveRate: Int,

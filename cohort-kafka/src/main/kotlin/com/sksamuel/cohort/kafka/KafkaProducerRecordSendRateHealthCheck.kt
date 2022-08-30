@@ -9,6 +9,8 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.Properties
 import kotlin.math.roundToInt
 
+typealias KafkaProducerRateHealthCheck = KafkaProducerRecordSendRateHealthCheck
+
 /**
  * A [HealthCheck] that checks that a kafka producer is sending a minimum number of messages.
  *
@@ -16,28 +18,29 @@ import kotlin.math.roundToInt
  *
  * This check reports healthy if the min send rate is >= [minSendRate].
  */
+@Deprecated("use KafkaProducerRateHealthCheck")
 class KafkaProducerRecordSendRateHealthCheck(
-  private val producer: KafkaProducer<*, *>,
-  private val minSendRate: Int,
+   private val producer: KafkaProducer<*, *>,
+   private val minSendRate: Int,
 ) : HealthCheck {
 
-  private val metricName = "record-send-rate"
+   private val metricName = "record-send-rate"
 
-  override suspend fun check(): HealthCheckResult {
-    val metric = producer.metrics().values.firstOrNull { it.metricName().name() == metricName }
-      ?: return HealthCheckResult.Unhealthy("Could not locate kafka metric '${metricName}'", null)
-    val sendRate = metric.metricValue().toString().toDoubleOrNull()?.roundToInt() ?: 0
-    val msg = "Kafka producer $metricName $sendRate [min threshold $minSendRate]"
-    return if (sendRate < minSendRate)
-      HealthCheckResult.Unhealthy(msg, null)
-    else
-      HealthCheckResult.Healthy(msg)
-  }
+   override suspend fun check(): HealthCheckResult {
+      val metric = producer.metrics().values.firstOrNull { it.metricName().name() == metricName }
+         ?: return HealthCheckResult.Unhealthy("Could not locate kafka metric '${metricName}'", null)
+      val sendRate = metric.metricValue().toString().toDoubleOrNull()?.roundToInt() ?: 0
+      val msg = "Kafka producer $metricName $sendRate [min threshold $minSendRate]"
+      return if (sendRate < minSendRate)
+         HealthCheckResult.Unhealthy(msg, null)
+      else
+         HealthCheckResult.Healthy(msg)
+   }
 }
 
 fun main() {
-  val props = Properties()
-  props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
-  val producer = KafkaConsumer(props, StringDeserializer(), StringDeserializer())
-  producer.metrics().toList().sortedBy { it.first.name() }.forEach { (a, metric) -> println(a) }
+   val props = Properties()
+   props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
+   val producer = KafkaConsumer(props, StringDeserializer(), StringDeserializer())
+   producer.metrics().toList().sortedBy { it.first.name() }.forEach { (a, metric) -> println(a) }
 }
