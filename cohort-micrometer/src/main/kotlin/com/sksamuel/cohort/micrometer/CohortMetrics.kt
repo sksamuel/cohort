@@ -25,6 +25,7 @@ class CohortMetrics(private val healthCheckRegistry: HealthCheckRegistry) : Mete
           .tag("name", name)
           .tag("type", check::class.java.name)
           .tag("healthy", result.isHealthy.toString())
+          .tags(tags)
           .register(registry)
       }
       counter.increment()
