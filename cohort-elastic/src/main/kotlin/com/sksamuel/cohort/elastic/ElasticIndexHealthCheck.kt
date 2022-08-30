@@ -1,9 +1,6 @@
-@file:Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-
 package com.sksamuel.cohort.elastic
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
-import co.elastic.clients.elasticsearch._types.ElasticsearchException
 import co.elastic.clients.elasticsearch.core.CountRequest
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
@@ -18,29 +15,29 @@ import kotlinx.coroutines.withContext
  * @param failIfEmpty if true, the health check will fail if the elastic index is empty.
  */
 class ElasticIndexHealthCheck(
-  private val client: ElasticsearchClient,
-  private val index: String,
-  private val failIfEmpty: Boolean = false,
+   private val client: ElasticsearchClient,
+   private val index: String,
+   private val failIfEmpty: Boolean = false,
 ) : HealthCheck {
 
-  override val name: String = "elastic_index"
+   override val name: String = "elastic_index"
 
-  override suspend fun check(): HealthCheckResult {
-    return runCatching {
-      withContext(Dispatchers.IO) {
-        val count = client.count(CountRequest.Builder().index(index).build())
-        if (count.count() == 0L && failIfEmpty) {
-          HealthCheckResult.Unhealthy("Elastic index '$index' is empty")
-        } else {
-          HealthCheckResult.Healthy("Detected elastic index '$index'")
-        }
+   override suspend fun check(): HealthCheckResult {
+      return runCatching {
+         withContext(Dispatchers.IO) {
+            val count = client.count(CountRequest.Builder().index(index).build())
+            if (count.count() == 0L && failIfEmpty) {
+               HealthCheckResult.Unhealthy("Elastic index '$index' is empty")
+            } else {
+               HealthCheckResult.Healthy("Detected elastic index '$index'")
+            }
+         }
+      }.getOrElse {
+         if (it.message?.contains("index_not_found_exception") == true) {
+            HealthCheckResult.Unhealthy("Elastic index '$index' was not found", it)
+         } else {
+            HealthCheckResult.Unhealthy("Error connecting to elastic cluster", it)
+         }
       }
-    }.getOrElse {
-      if (it.message?.contains("index_not_found_exception") == true) {
-        HealthCheckResult.Unhealthy("Elastic index '$index' was not found", it)
-      } else {
-        HealthCheckResult.Unhealthy("Error connecting to elastic cluster", it)
-      }
-    }
-  }
+   }
 }
