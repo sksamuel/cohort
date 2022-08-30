@@ -99,8 +99,8 @@ val checks = HealthCheckRegistry(Dispatchers.Default) {
    // detects if threads are mutually blocked on each others locks
    register(ThreadDeadlockHealthCheck(), 1.minutes)
 
-// we should never have zero database connections
-   register("reader connections", HikariConnectionsHealthCheck(ds, 1), 5.seconds)
+   // checks that we always have at least one database connection open
+   register(HikariConnectionsHealthCheck(ds, 1), 5.seconds)
 }
 ```
 
@@ -121,6 +121,8 @@ otherwise.
 Which healthchecks you use is entirely up to you, and you may want to use some healthchecks for startup probes, some for
 readiness checks and some for liveness checks. See the section on [kubernetes](#Kubernetes) for discussion on how to
 structure healthchecks in a kubernetes environment.
+
+If you wish to output the results of each metric scan, you can hook into [micrometer](#micrometer).
 
 ### Available Healthchecks
 
