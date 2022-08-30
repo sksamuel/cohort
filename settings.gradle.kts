@@ -17,21 +17,24 @@ refreshVersions {
    }
 }
 
-include("cohort-core")
-include("cohort-dbcp")
-include("cohort-elastic")
-include("cohort-flyway")
-include("cohort-hikari")
-include("cohort-http")
-include("cohort-kafka")
-include("cohort-ktor")
-include("cohort-ktor2")
-include("cohort-liquibase")
-include("cohort-log4j2")
-include("cohort-logback")
-include("cohort-mongo")
-include("cohort-redis")
-include("cohort-micrometer")
-include("cohort-aws-s3")
-include("cohort-aws-sqs")
-include("cohort-aws-sns")
+include(
+   "cohort-aws-s3",
+   "cohort-aws-sqs",
+   "cohort-aws-sns",
+   "cohort-core",
+   "cohort-dbcp",
+   "cohort-elastic",
+   "cohort-flyway",
+   "cohort-hikari",
+   "cohort-http",
+   "cohort-kafka",
+   "cohort-ktor",
+   "cohort-ktor2",
+   "cohort-liquibase",
+   "cohort-log4j2",
+   "cohort-logback",
+   "cohort-mongo",
+   "cohort-rabbit",
+   "cohort-redis",
+   "cohort-micrometer",
+)

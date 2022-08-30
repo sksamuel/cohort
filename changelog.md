@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.7.0
+
+* Added RabbitMQ health check
+* Added MongoDB health check
+* Added AWS SNS health check
+* Allow custom tags to be set on Cohort micrometer integration.
+
 ### 1.6.2
 
 * Added better automatically generated health check names
@@ -15,8 +22,8 @@
 
 ### 1.5.0
 
-* Added `S3ReadBucketHealthCheck`
-* Added `SQSQueueHealthCheck`
+* Added AWS `S3ReadBucketHealthCheck`
+* Added AWS `SQSQueueHealthCheck`
 * Deprecated Shutdown hooks in favour of built-in Ktor `onShutdown`.
 * Added arbitrary command support to redis health checks.
 
