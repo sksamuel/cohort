@@ -1,8 +1,8 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("org.mongodb:mongodb-driver-sync:4.7.1")
-   testImplementation("org.testcontainers:mongodb:1.17.3")
-   testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:1.3.4")
+   api("org.mongodb:mongodb-driver-sync:_")
+   testImplementation("org.testcontainers:mongodb:_")
+   testImplementation(Testing.kotestExtensions.testContainers)
 }
 
 apply("../publish.gradle.kts")
