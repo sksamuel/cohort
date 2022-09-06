@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.aws.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 
@@ -8,7 +9,7 @@ import com.sksamuel.cohort.HealthCheckResult
  * A Cohort [HealthCheck] that checks for connectivity to an AWS Dynamo DB instance.
  */
 class DynamoDBHealthCheck(
-   val createClient: () -> AmazonDynamoDB,
+   val createClient: () -> AmazonDynamoDB = { AmazonDynamoDBClient.builder().build() },
 ) : HealthCheck {
 
    override val name: String = "aws_dynamodb"

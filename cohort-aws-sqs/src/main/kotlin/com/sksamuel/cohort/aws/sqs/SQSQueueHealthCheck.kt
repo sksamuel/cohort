@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.aws.sqs
 
 import com.amazonaws.services.sqs.AmazonSQS
+import com.amazonaws.services.sqs.AmazonSQSClient
 import com.amazonaws.services.sqs.model.GetQueueUrlResult
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
@@ -11,7 +12,7 @@ import com.sksamuel.tabby.results.flatMap
  */
 class SQSQueueHealthCheck(
    private val queue: String,
-   val createClient: () -> AmazonSQS,
+   val createClient: () -> AmazonSQS = { AmazonSQSClient.builder().build() },
 ) : HealthCheck {
 
    override val name: String = "aws_sqs_queue"
