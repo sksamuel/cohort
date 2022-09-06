@@ -18,6 +18,7 @@ refreshVersions {
 }
 
 include(
+   "cohort-aws-dynamo",
    "cohort-aws-s3",
    "cohort-aws-sqs",
    "cohort-aws-sns",
