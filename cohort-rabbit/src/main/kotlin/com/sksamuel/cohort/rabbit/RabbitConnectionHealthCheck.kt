@@ -10,18 +10,18 @@ import kotlin.time.Duration.Companion.seconds
 
 class RabbitConnectionHealthCheck(private val factory: ConnectionFactory) : HealthCheck {
 
-  override val name: String = "rabbit_connection"
+   override val name: String = "rabbit_connection"
 
-  override suspend fun check(): HealthCheckResult {
-    return runCatching {
-      withTimeout(5.seconds) {
-        runInterruptible(Dispatchers.IO) {
-          factory.newConnection()
-          HealthCheckResult.Healthy("Connected to rabbit instance")
-        }
+   override suspend fun check(): HealthCheckResult {
+      return runCatching {
+         withTimeout(5.seconds) {
+            runInterruptible(Dispatchers.IO) {
+               factory.newConnection()
+               HealthCheckResult.Healthy("Connected to rabbit instance")
+            }
+         }
+      }.getOrElse {
+         HealthCheckResult.Unhealthy("Could not connect to rabbit instance", it)
       }
-    }.getOrElse {
-      HealthCheckResult.Unhealthy("Could not connect to rabbit instance", it)
-    }
-  }
+   }
 }
