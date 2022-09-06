@@ -9,7 +9,8 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.Properties
 import kotlin.math.roundToInt
 
-typealias KafkaProducerRateHealthCheck = KafkaProducerRecordSendRateHealthCheck
+@Deprecated("use KafkaProducerRateHealthCheck")
+typealias KafkaProducerRecordSendRateHealthCheck = KafkaProducerRateHealthCheck
 
 /**
  * A [HealthCheck] that checks that a kafka producer is sending a minimum number of messages.
@@ -18,13 +19,14 @@ typealias KafkaProducerRateHealthCheck = KafkaProducerRecordSendRateHealthCheck
  *
  * This check reports healthy if the min send rate is >= [minSendRate].
  */
-@Deprecated("use KafkaProducerRateHealthCheck")
-class KafkaProducerRecordSendRateHealthCheck(
+class KafkaProducerRateHealthCheck(
    private val producer: KafkaProducer<*, *>,
    private val minSendRate: Int,
 ) : HealthCheck {
 
    private val metricName = "record-send-rate"
+
+   override val name: String = "kafka_producer_rate"
 
    override suspend fun check(): HealthCheckResult {
       val metric = producer.metrics().values.firstOrNull { it.metricName().name() == metricName }
