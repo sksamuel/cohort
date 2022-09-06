@@ -5,6 +5,10 @@
 * Added `PulsarHealthCheck` for Apache Pulsar clusters.
 * Added `DynamoDBHealthCheck` for AWS Dynamo DB instances.
 
+### 1.7.2
+
+* Fixed S3 and SQS checks to close client correctly.
+
 ### 1.7.1
 
 * Added `DatabaseConnectionHealthCheck` as a long term replacement for `DatabaseHealthCheck` (which is now deprecated) for checking that a `DataSource` can provide a connection and that the connection is valid. This variant uses the JDBC4 `isValid` method rather than executing an arbitrary query.
