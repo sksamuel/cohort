@@ -34,6 +34,7 @@ include(
    "cohort-log4j2",
    "cohort-logback",
    "cohort-mongo",
+   "cohort-pulsar",
    "cohort-rabbit",
    "cohort-redis",
    "cohort-micrometer",
