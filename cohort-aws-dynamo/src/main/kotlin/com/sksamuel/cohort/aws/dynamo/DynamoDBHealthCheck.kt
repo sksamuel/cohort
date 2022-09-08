@@ -4,6 +4,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 
 /**
  * A Cohort [HealthCheck] that checks for connectivity to an AWS Dynamo DB instance.
@@ -21,8 +23,10 @@ class DynamoDBHealthCheck(
    }
 
    override suspend fun check(): HealthCheckResult {
-      return createClient().use {
-         it.listTables()
+      return runInterruptible(Dispatchers.IO) {
+         createClient().use {
+            it.listTables()
+         }
       }.fold(
          { HealthCheckResult.Healthy("DynamoDB access successful") },
          { HealthCheckResult.Unhealthy("Could not connect to DynamoDB", it) }

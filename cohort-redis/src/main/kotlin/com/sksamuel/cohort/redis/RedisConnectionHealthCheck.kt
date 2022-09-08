@@ -3,7 +3,7 @@ package com.sksamuel.cohort.redis
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 import redis.clients.jedis.Connection
 import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.HostAndPort
@@ -31,7 +31,7 @@ class RedisConnectionHealthCheck(
   override val name: String = "redis"
 
   override suspend fun check(): HealthCheckResult {
-    return withContext(Dispatchers.IO) {
+    return runInterruptible(Dispatchers.IO) {
       runCatching {
         val config = DefaultJedisClientConfig.builder().password(password).user(username).ssl(tls).build()
         val jedis = Jedis(HostAndPort(hostAndPort.host, hostAndPort.port), config)

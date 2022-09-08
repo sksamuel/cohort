@@ -7,6 +7,8 @@ import com.amazonaws.services.s3.model.HeadBucketResult
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import com.sksamuel.tabby.results.flatMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 
 /**
  * A Cohort [HealthCheck] that checks for connectivity and read permissions to an S3 bucket.
@@ -18,8 +20,12 @@ class S3ReadBucketHealthCheck(
 
    override val name: String = "aws_s3_bucket"
 
-   private fun use(client: AmazonS3): Result<HeadBucketResult> {
-      return runCatching { client.headBucket(HeadBucketRequest(bucketName)) }.also { client.shutdown() }
+   private suspend fun use(client: AmazonS3): Result<HeadBucketResult> {
+      return runInterruptible(Dispatchers.IO) {
+         runCatching {
+            client.headBucket(HeadBucketRequest(bucketName))
+         }
+      }.also { client.shutdown() }
    }
 
    override suspend fun check(): HealthCheckResult {
