@@ -5,6 +5,10 @@
 * Added `PulsarHealthCheck` for Apache Pulsar clusters.
 * Added `DynamoDBHealthCheck` for AWS Dynamo DB instances.
 
+### 1.7.3
+
+* Fix logic with `errorOnYellow` in elastic cluster checks.
+
 ### 1.7.2
 
 * Fixed S3 and SQS checks to close client correctly.
