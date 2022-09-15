@@ -37,8 +37,8 @@ class ElasticClusterHealthCheck(
         ClusterHealthStatus.RED -> HealthCheckResult.Unhealthy(msg, null)
         ClusterHealthStatus.GREEN -> HealthCheckResult.Healthy(msg)
         ClusterHealthStatus.YELLOW -> when (errorOnYellow) {
-          true -> HealthCheckResult.Healthy(msg)
-          false -> HealthCheckResult.Unhealthy(msg, null)
+          false -> HealthCheckResult.Healthy(msg)
+          true -> HealthCheckResult.Unhealthy(msg, null)
         }
       }
 
