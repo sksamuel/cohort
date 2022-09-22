@@ -193,7 +193,7 @@ class HealthCheckRegistry(
    }
 
    fun status(): Health {
-      val healthy = checkResults.values.all { it.healthy }
+      val healthy = checkResults.values.all { it.healthy } && warmupResults.values.all { it.iterations == it.completed }
       return Health(healthy, warmupResults.toMap(), checkResults.toMap())
    }
 
