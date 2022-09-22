@@ -9,52 +9,54 @@ import com.sksamuel.cohort.shutdown.ShutdownHook
 
 class CohortConfiguration {
 
-  val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
 
-  @Deprecated("Can use shutdown hook on ktor directly")
-  val shutdownHooks = mutableListOf<ShutdownHook>()
+   @Deprecated("Can use shutdown hook on ktor directly")
+   val shutdownHooks = mutableListOf<ShutdownHook>()
 
-  // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
-  var heapDump: Boolean = false
+   // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
+   var heapDump: Boolean = false
 
-  // set to true to enable the /cohort/os endpoint which returns operating system information
-  var operatingSystem: Boolean = false
+   // set to true to enable the /cohort/os endpoint which returns operating system information
+   var operatingSystem: Boolean = false
 
-  // set to true to enable the /cohort/memory endpoint which returns memory pool information
-  var memory: Boolean = false
+   var warrmup: Boolean = false
 
-  var logManager: LogManager? = null
+   // set to true to enable the /cohort/memory endpoint which returns memory pool information
+   var memory: Boolean = false
 
-  var dataSources: List<DataSourceManager> = emptyList()
+   var logManager: LogManager? = null
 
-  var migrations: DatabaseMigrationManager? = null
+   var dataSources: List<DataSourceManager> = emptyList()
 
-  // set to true to enable the /cohort/jvm endpoint which returns JVM information
-  var jvmInfo: Boolean = false
+   var migrations: DatabaseMigrationManager? = null
 
-  // set to true to enable the /cohort/gc endpoint which returns garbage collector times and counts
-  var gc: Boolean = false
+   // set to true to enable the /cohort/jvm endpoint which returns JVM information
+   var jvmInfo: Boolean = false
 
-  // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
-  var threadDump: Boolean = false
+   // set to true to enable the /cohort/gc endpoint which returns garbage collector times and counts
+   var gc: Boolean = false
 
-  // set to true to enable the /cohort/sysprops endpoint which returns current system properties
-  var sysprops: Boolean = false
+   // set to true to enable the /cohort/threaddump endpoint which returns a thread dump
+   var threadDump: Boolean = false
 
-  var endpointPrefix = "cohort"
+   // set to true to enable the /cohort/sysprops endpoint which returns current system properties
+   var sysprops: Boolean = false
 
-  // if set to true, then the endpoints will be installed automatically under the endpointPrefix,
-  // except for the health checks which will be placed top level under the path given when they
-  // are registered
-  var autoEndpoints = true
+   var endpointPrefix = "cohort"
 
-  // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
-  @Deprecated("Can use shutdown hook on ktor directly")
-  fun onShutdown(f: ShutdownHook) {
-    shutdownHooks.add(AtomicShutdownHook(f))
-  }
+   // if set to true, then the endpoints will be installed automatically under the endpointPrefix,
+   // except for the health checks which will be placed top level under the path given when they
+   // are registered
+   var autoEndpoints = true
 
-  fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
-    healthchecks[endpoint] = registry
-  }
+   // adds a shutdown hook that will be fired when the shutdown endpoint is triggered
+   @Deprecated("Can use shutdown hook on ktor directly")
+   fun onShutdown(f: ShutdownHook) {
+      shutdownHooks.add(AtomicShutdownHook(f))
+   }
+
+   fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+      healthchecks[endpoint] = registry
+   }
 }

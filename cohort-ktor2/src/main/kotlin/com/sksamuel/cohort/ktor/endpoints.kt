@@ -26,151 +26,157 @@ import java.time.ZoneOffset
 
 fun Route.cohort() {
 
-  val config = this.application.attributes[CohortConfigAttributeKey]
+   val config = this.application.attributes[CohortConfigAttributeKey]
 
-  if (config.heapDump) {
-    get("${config.endpointPrefix}/heapdump") {
-      getHeapDump().fold(
-        { call.respond(HttpStatusCode.OK, it) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
+   if (config.heapDump) {
+      get("${config.endpointPrefix}/heapdump") {
+         getHeapDump().fold(
+            { call.respond(HttpStatusCode.OK, it) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
 
-  if (config.memory) {
-    get("${config.endpointPrefix}/memory") {
-      getMemoryInfo().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
+   if (config.memory) {
+      get("${config.endpointPrefix}/memory") {
+         getMemoryInfo().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
 
-  config.dataSources.let { dsm ->
-    if (dsm.isNotEmpty()) {
-      get("${config.endpointPrefix}/datasources") {
-        dsm.map { it.info() }.sequence().fold(
-          { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-          {
-            call.respondText(
-              it.stackTraceToString(),
-              ContentType.Text.Plain,
-              HttpStatusCode.InternalServerError
+   config.dataSources.let { dsm ->
+      if (dsm.isNotEmpty()) {
+         get("${config.endpointPrefix}/datasources") {
+            dsm.map { it.info() }.sequence().fold(
+               { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+               {
+                  call.respondText(
+                     it.stackTraceToString(),
+                     ContentType.Text.Plain,
+                     HttpStatusCode.InternalServerError
+                  )
+               }
             )
-          }
-        )
+         }
       }
-    }
-  }
+   }
 
-  config.migrations?.let { m ->
-    get("${config.endpointPrefix}/dbmigration") {
-      m.migrations().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
+   config.migrations?.let { m ->
+      get("${config.endpointPrefix}/dbmigration") {
+         m.migrations().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
 
-  config.logManager?.let { manager ->
+   config.logManager?.let { manager ->
 
-    get("${config.endpointPrefix}/logging") {
-      runCatching {
-        val levels = manager.levels()
-        val loggers = manager.loggers()
-        LogInfo(levels, loggers).toJson()
-      }.fold(
-        { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-
-    put("${config.endpointPrefix}/logging/{name}/{level}") {
-      val name = call.parameters.getOrFail("name")
-      val level = call.parameters.getOrFail("level")
-      manager.set(name, level).fold(
-        { call.respond(HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.jvmInfo) {
-    get("${config.endpointPrefix}/jvm") {
-      getJvmDetails().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.gc) {
-    get("${config.endpointPrefix}/gc") {
-      getGcInfo().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.threadDump) {
-    get("${config.endpointPrefix}/threaddump") {
-      getThreadDump().fold(
-        { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.sysprops) {
-    get("${config.endpointPrefix}/sysprops") {
-      getSysProps().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.operatingSystem) {
-    get("${config.endpointPrefix}/os") {
-      getOperatingSystem().fold(
-        { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-        { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
-      )
-    }
-  }
-
-  if (config.shutdownHooks.isNotEmpty()) {
-    get("${config.endpointPrefix}/shutdown") {
-      this.context.application.log.info("Executing shutdown hooks...")
-      config.shutdownHooks.forEach { it.run() }
-      call.respond(HttpStatusCode.OK)
-    }
-  }
-
-  config.healthchecks.forEach { (endpoint, registry) ->
-    get(endpoint) {
-
-      val status = registry.status()
-
-      val results = status.results.map {
-        ResultJson(
-          name = it.key,
-          healthy = it.value.healthy,
-          lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
-          message = it.value.result.message,
-          cause = it.value.result.cause?.stackTraceToString(),
-          consecutiveSuccesses = it.value.consecutiveSuccesses,
-          consecutiveFailures = it.value.consecutiveFailures,
-        )
+      get("${config.endpointPrefix}/logging") {
+         runCatching {
+            val levels = manager.levels()
+            val loggers = manager.loggers()
+            LogInfo(levels, loggers).toJson()
+         }.fold(
+            { call.respondText(it, ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
       }
 
-      val httpStatusCode = when (status.healthy) {
-        true -> HttpStatusCode.OK
-        false -> HttpStatusCode.ServiceUnavailable
+      put("${config.endpointPrefix}/logging/{name}/{level}") {
+         val name = call.parameters.getOrFail("name")
+         val level = call.parameters.getOrFail("level")
+         manager.set(name, level).fold(
+            { call.respond(HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
       }
+   }
 
-      call.respondText(results.toJson(), ContentType.Application.Json, httpStatusCode)
-    }
-  }
+   if (config.jvmInfo) {
+      get("${config.endpointPrefix}/jvm") {
+         getJvmDetails().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
+
+   if (config.gc) {
+      get("${config.endpointPrefix}/gc") {
+         getGcInfo().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
+
+   if (config.threadDump) {
+      get("${config.endpointPrefix}/threaddump") {
+         getThreadDump().fold(
+            { call.respondText(it, ContentType.Text.Plain, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
+
+   if (config.sysprops) {
+      get("${config.endpointPrefix}/sysprops") {
+         getSysProps().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
+
+   if (config.operatingSystem) {
+      get("${config.endpointPrefix}/os") {
+         getOperatingSystem().fold(
+            { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
+            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+         )
+      }
+   }
+
+   if (config.shutdownHooks.isNotEmpty()) {
+      get("${config.endpointPrefix}/shutdown") {
+         this.context.application.log.info("Executing shutdown hooks...")
+         config.shutdownHooks.forEach { it.run() }
+         call.respond(HttpStatusCode.OK)
+      }
+   }
+
+   if (config.warrmup) {
+      get("${config.endpointPrefix}/warmup") {
+         call.respond(HttpStatusCode.allStatusCodes.random())
+      }
+   }
+
+   config.healthchecks.forEach { (endpoint, registry) ->
+      get(endpoint) {
+
+         val status = registry.status()
+
+         val results = status.results.map {
+            ResultJson(
+               name = it.key,
+               healthy = it.value.healthy,
+               lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
+               message = it.value.result.message,
+               cause = it.value.result.cause?.stackTraceToString(),
+               consecutiveSuccesses = it.value.consecutiveSuccesses,
+               consecutiveFailures = it.value.consecutiveFailures,
+            )
+         }
+
+         val httpStatusCode = when (status.healthy) {
+            true -> HttpStatusCode.OK
+            false -> HttpStatusCode.ServiceUnavailable
+         }
+
+         call.respondText(results.toJson(), ContentType.Application.Json, httpStatusCode)
+      }
+   }
 }
