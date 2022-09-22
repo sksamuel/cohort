@@ -8,7 +8,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class HttpWarmup(
-   override val iterations: Int = 1000,
+   override val iterations: Int = 250,
    override val interval: Duration = 10.milliseconds,
    private val command: suspend (HttpClient) -> Unit,
 ) : Warmup() {
