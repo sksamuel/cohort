@@ -22,9 +22,7 @@ class HttpWarmup(
    }
 
    override suspend fun warmup() {
-      runCatching {
-         command(client)
-      }.onFailure { logger.warn(it) { "Error executing HTTP warmup call" } }
+      command(client)
    }
 
    override fun close() {
