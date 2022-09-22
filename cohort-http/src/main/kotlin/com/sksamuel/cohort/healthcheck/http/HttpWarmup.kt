@@ -15,6 +15,8 @@ class HttpWarmup(
 
    private val logger = KotlinLogging.logger {}
 
+   override val name: String = "http_warmup"
+
    private val client = HttpClient(Apache) {
       expectSuccess = false
    }
