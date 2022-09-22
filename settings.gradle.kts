@@ -28,6 +28,7 @@ include(
    "cohort-flyway",
    "cohort-hikari",
    "cohort-http",
+   "cohort-jackson",
    "cohort-kafka",
    "cohort-ktor",
    "cohort-ktor2",
