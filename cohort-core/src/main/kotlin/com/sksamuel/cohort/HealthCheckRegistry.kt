@@ -84,6 +84,7 @@ class HealthCheckRegistry(
             delay(warmup.interval)
          }
       }.invokeOnCompletion {
+         logger.warn { "Warmup $name has completed" }
          warmup.close()
          warmups.remove(name)
       }
