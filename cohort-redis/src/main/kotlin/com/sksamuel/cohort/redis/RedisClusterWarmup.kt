@@ -10,8 +10,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class RedisClusterWarmup(
    private val jedis: JedisCluster,
-   override val iterations: Int = 2500,
-   override val interval: Duration = 2.milliseconds,
+   override val iterations: Int = 1000,
+   override val interval: Duration = 10.milliseconds,
    private val command: (JedisCluster) -> Unit = { it.get(Random.nextInt().toString()) }
 ) : WarmupHealthCheck() {
 

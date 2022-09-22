@@ -9,8 +9,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class RedisConnectionWarmup(
    client: RedisClient,
-   override val iterations: Int = 2500,
-   override val interval: Duration = 2.milliseconds,
+   override val iterations: Int = 1000,
+   override val interval: Duration = 10.milliseconds,
    private val command: suspend (StatefulRedisConnection<String, String>) -> Unit = {
       it.sync().get(Random.nextInt().toString())
    }
