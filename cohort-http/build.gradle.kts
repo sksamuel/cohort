@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation(Ktor.client.cio)
+   implementation(Ktor.client.apache)
 }
 
 apply("../publish.gradle.kts")
