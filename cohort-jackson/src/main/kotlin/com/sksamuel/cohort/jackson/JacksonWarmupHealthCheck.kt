@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * A [WarmupHealthCheck] that will marshall and unmarshall JSON.
  */
 class JacksonWarmupHealthCheck(
-   override val iterations: Int = 2500,
+   override val iterations: Int = 5000,
    override val interval: Duration = 2.milliseconds,
 ) : WarmupHealthCheck() {
 
