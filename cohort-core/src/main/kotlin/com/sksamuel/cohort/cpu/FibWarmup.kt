@@ -5,7 +5,7 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class FibWarmupHealthCheck(
+class FibWarmup(
    override val iterations: Int = 10000,
    override val interval: Duration = 1.milliseconds,
 ) : WarmupHealthCheck() {

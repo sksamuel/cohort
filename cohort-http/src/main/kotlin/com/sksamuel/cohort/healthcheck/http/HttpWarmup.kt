@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.healthcheck.http
 
 import com.sksamuel.cohort.WarmupHealthCheck
-import com.sksamuel.cohort.cpu.FibWarmupHealthCheck
+import com.sksamuel.cohort.cpu.FibWarmup
 import com.sksamuel.cohort.cpu.HotSpotCompilationTimeHealthCheck
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
@@ -14,7 +14,7 @@ import java.lang.management.ManagementFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class HttpWarmupHealthCheck(
+class HttpWarmup(
    override val iterations: Int = 100,
    override val interval: Duration = 10.milliseconds,
    private val command: suspend (HttpClient) -> Unit,
@@ -39,9 +39,9 @@ class HttpWarmupHealthCheck(
 
 suspend fun main() {
    ManagementFactory.getClassLoadingMXBean().isVerbose = true
-   val jackson = HttpWarmupHealthCheck() { it.get("https://www.google.com") }
+   val jackson = HttpWarmup() { it.get("https://www.google.com") }
    val hotspot = HotSpotCompilationTimeHealthCheck(2000)
-   val fib = FibWarmupHealthCheck()
+   val fib = FibWarmup()
    val scope = CoroutineScope(Dispatchers.IO)
    jackson.start(scope)
    fib.start(scope)

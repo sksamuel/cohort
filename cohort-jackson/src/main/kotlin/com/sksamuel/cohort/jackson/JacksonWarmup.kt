@@ -2,7 +2,7 @@ package com.sksamuel.cohort.jackson
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.sksamuel.cohort.cpu.FibWarmupHealthCheck
+import com.sksamuel.cohort.cpu.FibWarmup
 import com.sksamuel.cohort.WarmupHealthCheck
 import com.sksamuel.cohort.cpu.HotSpotCompilationTimeHealthCheck
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * A [WarmupHealthCheck] that will marshall and unmarshall JSON.
  */
-class JacksonWarmupHealthCheck(
+class JacksonWarmup(
    override val iterations: Int = 5000,
    override val interval: Duration = 2.milliseconds,
 ) : WarmupHealthCheck() {
@@ -60,9 +60,9 @@ private fun json() = """{
 
 suspend fun main() {
    ManagementFactory.getClassLoadingMXBean().isVerbose = true
-   val jackson = JacksonWarmupHealthCheck()
+   val jackson = JacksonWarmup()
    val hotspot = HotSpotCompilationTimeHealthCheck(2000)
-   val fib = FibWarmupHealthCheck()
+   val fib = FibWarmup()
    val scope = CoroutineScope(Dispatchers.IO)
    jackson.start(scope)
    fib.start(scope)

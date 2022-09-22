@@ -2,12 +2,15 @@
 
 ### 1.8.0 (Unreleased)
 
-* Added `HttpWarmupHealthCheck`, `RedisClusterWarmupHealthCheck`, `RedisConnectionWarmupHealthCheck`
-  , `FibWarmupHealthCheck`, `JacksonWarmupHealthCheck`, `DataSourceWarmupHealthCheck` warm up health checks which will
+* Added `HttpWarmup`, `RedisClusterWarmup`, `RedisConnectionWarmup`, `FibWarmup`, `JacksonWarmup`
+  , `DataSourceWarmup`, `KafkaClusterWarmup`,
+  warm up health checks which will
   execute for a period of time to warm the JVM / connections before reporting as healthy. These are intended to be used
   by startup probes in K8.
 * Added `HotSpotCompilationTimeHealthCheck` which will report healthy once Hotspot has performed a given amount of
   compilation.
+* Added `cohort-lettuce` module which contains Redis health and warmup checks using the Lettuce client, in contrast to
+  the `cohort-redis` module which uses the Jedis client.
 * Added `PulsarHealthCheck` for Apache Pulsar clusters.
 * Added `DynamoDBHealthCheck` for AWS Dynamo DB instances.
 

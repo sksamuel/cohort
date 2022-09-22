@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
  * Uses the JDBC4 method isValid(timeout) with the given [timeout] to check that the connection
  * returned is open and usable.
  */
-class DataSourceWarmupHealthCheck(
+class DataSourceWarmup(
    private val ds: DataSource,
    private val timeout: Duration = 1.seconds,
    override val iterations: Int = 5000,

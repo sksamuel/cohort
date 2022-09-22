@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * A [HealthCheck] that checks that a connection can be made to a kafka cluster, the controller
  * can be located, and at least one node is present.
  */
-class KafkaClusterWarmupHealthCheck(
+class KafkaClusterWarmup(
    private val adminClient: AdminClient,
    override val iterations: Int = 1000,
    override val interval: Duration = 10.milliseconds

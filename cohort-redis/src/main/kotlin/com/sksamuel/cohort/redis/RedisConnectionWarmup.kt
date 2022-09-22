@@ -8,7 +8,7 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class RedisConnectionWarmupHealthCheck(
+class RedisConnectionWarmup(
    private val jedis: Jedis,
    override val iterations: Int = 2500,
    override val interval: Duration = 2.milliseconds,
