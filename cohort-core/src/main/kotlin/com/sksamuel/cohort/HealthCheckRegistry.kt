@@ -74,6 +74,7 @@ class HealthCheckRegistry(
       warmups.putIfAbsent(name, warmup)
 
       var completed = 0
+      logger.warn { "Beginning warmup $name for ${warmup.iterations} iterations" }
 
       warmupScope.launch {
          repeat(warmup.iterations) {
