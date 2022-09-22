@@ -51,7 +51,7 @@ abstract class WarmupHealthCheck : HealthCheck {
       return if (completed.get() == iterations)
          Healthy("Warmup iterations completed: ${completed.get()}")
       else
-         Unhealthy("Warmup iterations completed: ${completed.get()}")
+         Unhealthy("Warmup iterations in flight: ${completed.get()} / $iterations")
    }
 }
 
