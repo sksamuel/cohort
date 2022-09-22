@@ -2,6 +2,12 @@
 
 ### 1.8.0 (Unreleased)
 
+* Added `HttpWarmupHealthCheck`, `RedisClusterWarmupHealthCheck`, `RedisConnectionWarmupHealthCheck`
+  , `FibWarmupHealthCheck`, `JacksonWarmupHealthCheck`, `DataSourceWarmupHealthCheck` warm up health checks which will
+  execute for a period of time to warm the JVM / connections before reporting as healthy. These are intended to be used
+  by startup probes in K8.
+* Added `HotSpotCompilationTimeHealthCheck` which will report healthy once Hotspot has performed a given amount of
+  compilation.
 * Added `PulsarHealthCheck` for Apache Pulsar clusters.
 * Added `DynamoDBHealthCheck` for AWS Dynamo DB instances.
 
@@ -15,7 +21,9 @@
 
 ### 1.7.1
 
-* Added `DatabaseConnectionHealthCheck` as a long term replacement for `DatabaseHealthCheck` (which is now deprecated) for checking that a `DataSource` can provide a connection and that the connection is valid. This variant uses the JDBC4 `isValid` method rather than executing an arbitrary query.
+* Added `DatabaseConnectionHealthCheck` as a long term replacement for `DatabaseHealthCheck` (which is now deprecated)
+  for checking that a `DataSource` can provide a connection and that the connection is valid. This variant uses the
+  JDBC4 `isValid` method rather than executing an arbitrary query.
 
 ### 1.7.0
 
@@ -61,13 +69,13 @@
 ### 1.3.0
 
 * Added new Kafka healthchecks:
-  * `KafkaConsumerRecordsConsumedRateHealthCheck`
-  * `KafkaProducerRecordSendRateHealthCheck`
-  * `KafkaConsumerLastPollTimeHealthCheck`
+   * `KafkaConsumerRecordsConsumedRateHealthCheck`
+   * `KafkaProducerRecordSendRateHealthCheck`
+   * `KafkaConsumerLastPollTimeHealthCheck`
 * Added new `/cohort/memory` endpoint for reporting memory and buffer pool information
 * Added new database min idle connection healthchecks:
-  * `HikariMinIdleHealthCheck`
-  * `DbcpMinIdleHealthCheck`
+   * `HikariMinIdleHealthCheck`
+   * `DbcpMinIdleHealthCheck`
 * Added `MaxFileDescriptorsHealthCheck`
 * Added `ProcessCpuHealthCheck`
 
