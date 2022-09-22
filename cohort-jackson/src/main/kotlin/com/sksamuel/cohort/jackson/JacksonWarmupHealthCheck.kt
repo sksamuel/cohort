@@ -2,11 +2,11 @@ package com.sksamuel.cohort.jackson
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.sksamuel.cohort.cpu.FibWarmupHealthCheck
 import com.sksamuel.cohort.WarmupHealthCheck
 import com.sksamuel.cohort.cpu.HotSpotCompilationTimeHealthCheck
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import java.lang.management.ManagementFactory
 import java.math.BigDecimal
@@ -24,6 +24,7 @@ class JacksonWarmupHealthCheck(
 ) : WarmupHealthCheck() {
 
    private val mapper = jacksonObjectMapper()
+   override val name: String = "jackson_warmup"
 
    override suspend fun warmup() {
       val fake = mapper.readValue<Fake>(json())
@@ -61,13 +62,16 @@ suspend fun main() {
    ManagementFactory.getClassLoadingMXBean().isVerbose = true
    val jackson = JacksonWarmupHealthCheck()
    val hotspot = HotSpotCompilationTimeHealthCheck(2000)
+   val fib = FibWarmupHealthCheck()
    val scope = CoroutineScope(Dispatchers.IO)
    jackson.start(scope)
+   fib.start(scope)
    while (true) {
-      delay(250)
+      delay(500)
       println(ManagementFactory.getCompilationMXBean().totalCompilationTime)
       println(ManagementFactory.getClassLoadingMXBean().loadedClassCount)
       println(jackson.check())
       println(hotspot.check())
+      println(fib.check())
    }
 }

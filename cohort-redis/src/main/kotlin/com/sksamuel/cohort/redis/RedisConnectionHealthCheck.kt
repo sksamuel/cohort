@@ -15,30 +15,45 @@ import redis.clients.jedis.Jedis
  * @param command an optional command to execute against the redis instance. Defaults to ping.
  */
 class RedisConnectionHealthCheck(
-  private val hostAndPort: HostPort,
-  private val username: String?,
-  private val password: String?,
-  private val tls: Boolean,
-  private val command: (Connection) -> HealthCheckResult = {
-    if (it.ping()) {
-      HealthCheckResult.Healthy("Connected to redis cluster")
-    } else {
-      HealthCheckResult.Healthy("Ping to redis cluster failed")
-    }
-  },
+   private val jedis: Jedis,
+   private val command: (Connection) -> HealthCheckResult = {
+      if (it.ping()) {
+         HealthCheckResult.Healthy("Connected to redis cluster")
+      } else {
+         HealthCheckResult.Healthy("Ping to redis cluster failed")
+      }
+   },
 ) : HealthCheck {
 
-  override val name: String = "redis"
-
-  override suspend fun check(): HealthCheckResult {
-    return runInterruptible(Dispatchers.IO) {
-      runCatching {
-        val config = DefaultJedisClientConfig.builder().password(password).user(username).ssl(tls).build()
-        val jedis = Jedis(HostAndPort(hostAndPort.host, hostAndPort.port), config)
-        jedis.connection.use { command(it) }
-      }.getOrElse {
-        HealthCheckResult.Unhealthy("Could not connect to redis at $hostAndPort", it)
+   companion object {
+      operator fun invoke(
+         hostAndPort: HostPort,
+         username: String?,
+         password: String?,
+         tls: Boolean,
+         command: (Connection) -> HealthCheckResult = {
+            if (it.ping()) {
+               HealthCheckResult.Healthy("Connected to redis cluster")
+            } else {
+               HealthCheckResult.Healthy("Ping to redis cluster failed")
+            }
+         }
+      ): RedisConnectionHealthCheck {
+         val config = DefaultJedisClientConfig.builder().password(password).user(username).ssl(tls).build()
+         val jedis = Jedis(HostAndPort(hostAndPort.host, hostAndPort.port), config)
+         return RedisConnectionHealthCheck(jedis, command)
       }
-    }
-  }
+   }
+
+   override val name: String = "redis"
+
+   override suspend fun check(): HealthCheckResult {
+      return runInterruptible(Dispatchers.IO) {
+         runCatching {
+            jedis.connection.use { command(it) }
+         }.getOrElse {
+            HealthCheckResult.Unhealthy("Could not connect to Redis", it)
+         }
+      }
+   }
 }

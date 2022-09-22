@@ -33,6 +33,7 @@ abstract class WarmupHealthCheck : HealthCheck {
    abstract val interval: Duration
 
    abstract suspend fun warmup()
+   open fun close() {}
 
    private val completed = AtomicInteger(0)
 
@@ -43,7 +44,7 @@ abstract class WarmupHealthCheck : HealthCheck {
             completed.incrementAndGet()
             delay(interval)
          }
-      }
+      }.invokeOnCompletion { close() }
    }
 
    override suspend fun check(): HealthCheckResult {
