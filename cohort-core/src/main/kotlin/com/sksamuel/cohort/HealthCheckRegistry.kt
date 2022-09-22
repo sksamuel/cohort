@@ -78,8 +78,11 @@ class HealthCheckRegistry(
       val start = System.currentTimeMillis()
 
       warmupScope.launch {
+         warmup.start()
          repeat(warmup.iterations) {
-            warmup.warmup()
+            runCatching {
+               warmup.warmup()
+            }.onFailure { logger.warn(it) { "Warmup task error" } }
             completed++
             warmupResults[name] = WarmupStatus(completed, warmup.iterations)
             delay(warmup.interval)

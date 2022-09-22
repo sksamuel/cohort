@@ -6,7 +6,7 @@ import kotlin.time.Duration
  * Interface for startup procedures that are designed to warm up the JVM.
  * A warmup contains state, so an instance should not be reused.
  */
-abstract class Warmup {
+abstract class Warmup : AutoCloseable {
 
    abstract val iterations: Int
 
@@ -18,7 +18,7 @@ abstract class Warmup {
    /**
     * Invoked before the first iteration.
     */
-   open fun start() {}
+   open suspend fun start() {}
 
    /**
     * Invoked on each iteration.
@@ -28,5 +28,5 @@ abstract class Warmup {
    /**
     * Invoked after the last iteration.
     */
-   open fun close() {}
+   override fun close() {}
 }
