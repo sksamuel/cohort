@@ -35,7 +35,7 @@ abstract class Warmup : AutoCloseable {
 class FunctionWarmup(
    override val iterations: Int = 10000,
    override val interval: Duration = 1.milliseconds,
-   private val fn: () -> Unit
+   private val fn: suspend () -> Unit
 ) : Warmup() {
    override suspend fun warmup() {
       fn()
