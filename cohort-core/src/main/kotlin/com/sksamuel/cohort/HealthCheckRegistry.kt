@@ -3,6 +3,7 @@
 package com.sksamuel.cohort
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,175 +30,180 @@ import kotlin.time.Duration
  * @param startUnhealthy if true, then all checks will start in failed state until they pass.
  */
 class HealthCheckRegistry(
-  private val dispatcher: CoroutineDispatcher,
-  private val startUnhealthy: Boolean = true,
-  private val logUnhealthy: Boolean = true,
+   private val dispatcher: CoroutineDispatcher,
+   private val startUnhealthy: Boolean = true,
+   private val logUnhealthy: Boolean = true,
 ) {
 
-  private val scheduler = Executors.newScheduledThreadPool(1)
-  private val names = mutableSetOf<String>()
-  private val checks = ConcurrentHashMap<String, HealthCheck>()
-  private val results = ConcurrentHashMap<String, CheckStatus>()
-  private val logger = KotlinLogging.logger {}
-  private val subscribers = mutableListOf<Subscriber>()
+   private val scheduler = Executors.newScheduledThreadPool(1)
+   private val names = mutableSetOf<String>()
+   private val checks = ConcurrentHashMap<String, HealthCheck>()
+   private val results = ConcurrentHashMap<String, CheckStatus>()
+   private val logger = KotlinLogging.logger {}
+   private val subscribers = mutableListOf<Subscriber>()
+   private val warmupScope = CoroutineScope(Dispatchers.Default)
 
-  companion object {
+   companion object {
 
-    operator fun invoke(
-      dispatcher: CoroutineDispatcher,
-      configure: HealthCheckRegistry.() -> Unit
-    ): HealthCheckRegistry {
-      val registry = HealthCheckRegistry(dispatcher)
-      registry.configure()
-      return registry
-    }
-  }
-
-  /**
-   * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
-   * The name is derived from the check class.
-   */
-  fun register(
-    check: HealthCheck,
-    delay: Duration,
-  ): HealthCheckRegistry = register(check.name, check, delay, delay)
-
-  /**
-   * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
-   */
-  fun register(
-    name: String,
-    check: HealthCheck,
-    delay: Duration,
-  ): HealthCheckRegistry = register(name, check, delay, delay)
-
-  /**
-   * Adds a new [HealthCheck] to this registry with the given schedule.
-   *
-   * @param name the name is associated with the result in the output json.
-   * This is useful to allow the same check to be registered multiple times against different configurations.
-   */
-  fun register(
-    name: String,
-    check: HealthCheck,
-    initialDelay: Duration,
-    checkInterval: Duration
-  ): HealthCheckRegistry {
-
-    if (checks.contains(name)) error("Check $name already registered")
-    checks.putIfAbsent(name, check)
-
-    if (startUnhealthy) {
-      results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
-    }
-
-    scheduler.scheduleWithFixedDelay(
-      {
-        // we block the thread used by the scheduler, as we execute inside the provided coroutine dispatcher
-        runBlocking {
-          launch(dispatcher) {
-            run(name)
-          }
-        }
-      },
-      initialDelay.inWholeMilliseconds,
-      checkInterval.inWholeMilliseconds,
-      TimeUnit.MILLISECONDS,
-    )
-    return this
-  }
-
-  private suspend fun run(name: String) {
-    val check = checks[name] ?: return
-    try {
-      val result = check.check()
-      notifySubscribers(name, check, result)
-      when (result) {
-        is HealthCheckResult.Healthy -> success(name, result)
-        is HealthCheckResult.Unhealthy -> failure(name, result)
+      operator fun invoke(
+         dispatcher: CoroutineDispatcher,
+         configure: HealthCheckRegistry.() -> Unit
+      ): HealthCheckRegistry {
+         val registry = HealthCheckRegistry(dispatcher)
+         registry.configure()
+         return registry
       }
-    } catch (t: Throwable) {
-      val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
-      notifySubscribers(name, check, result)
-      failure(name, result)
-    }
-  }
+   }
 
-  private fun success(name: String, result: HealthCheckResult.Healthy) {
+   /**
+    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
+    * The name is derived from the check class.
+    */
+   fun register(
+      check: HealthCheck,
+      delay: Duration,
+   ): HealthCheckRegistry = register(check.name, check, delay, delay)
 
-    val previous = results[name]
-    val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
+   /**
+    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
+    */
+   fun register(
+      name: String,
+      check: HealthCheck,
+      delay: Duration,
+   ): HealthCheckRegistry = register(name, check, delay, delay)
 
-    results[name] = CheckStatus(
-      consecutiveSuccesses = successes,
-      consecutiveFailures = 0, // reset to 0 when we have a success
-      healthy = true,
-      timestamp = Instant.now(),
-      result = result
-    )
-  }
+   /**
+    * Adds a new [HealthCheck] to this registry with the given schedule.
+    *
+    * @param name the name is associated with the result in the output json.
+    * This is useful to allow the same check to be registered multiple times against different configurations.
+    */
+   fun register(
+      name: String,
+      check: HealthCheck,
+      initialDelay: Duration,
+      checkInterval: Duration
+   ): HealthCheckRegistry {
 
-  private fun failure(name: String, result: HealthCheckResult.Unhealthy) {
+      if (checks.contains(name)) error("Check $name already registered")
+      checks.putIfAbsent(name, check)
 
-    val previous = results[name]
-    val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
+      if (startUnhealthy) {
+         results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+      }
 
-    logger.warn { "HealthCheck $name reported $failures failures $result" }
+      // if a warmup check, we start it using the warmup scope
+      if (check is WarmupHealthCheck) check.start(warmupScope)
 
-    results[name] = CheckStatus(
-      consecutiveSuccesses = 0, // reset to 0 when we have a failure
-      consecutiveFailures = failures,
-      healthy = false,
-      timestamp = Instant.now(),
-      result = result
-    )
-  }
+      scheduler.scheduleWithFixedDelay(
+         {
+            // we block the thread used by the scheduler, as we execute inside the provided coroutine dispatcher
+            runBlocking {
+               launch(dispatcher) {
+                  run(name)
+               }
+            }
+         },
+         initialDelay.inWholeMilliseconds,
+         checkInterval.inWholeMilliseconds,
+         TimeUnit.MILLISECONDS,
+      )
 
-  fun status(): Health {
-    val healthy = results.values.all { it.healthy }
-    return Health(healthy, results.toMap())
-  }
+      return this
+   }
 
-  fun checks(): Set<HealthCheck> = checks.values.toSet()
+   private suspend fun run(name: String) {
+      val check = checks[name] ?: return
+      try {
+         val result = check.check()
+         notifySubscribers(name, check, result)
+         when (result) {
+            is HealthCheckResult.Healthy -> success(name, result)
+            is HealthCheckResult.Unhealthy -> failure(name, result)
+         }
+      } catch (t: Throwable) {
+         val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
+         notifySubscribers(name, check, result)
+         failure(name, result)
+      }
+   }
 
-  /**
-   * Adds a [Subscriber] to this registry, which will be invoked each time a health check completes.
-   *
-   * Note: This method is not thread safe.
-   */
-  fun addSubscriber(subscriber: Subscriber) {
-    subscribers.add(subscriber)
-  }
+   private fun success(name: String, result: HealthCheckResult.Healthy) {
 
-  private suspend fun notifySubscribers(name: String, check: HealthCheck, result: HealthCheckResult) {
-    subscribers.forEach {
-      runCatching {
-        it.invoke(name, check, result)
-      }.onFailure { logger.warn(it) { "Error notifying subscriber of health check $name" } }
-    }
-  }
+      val previous = results[name]
+      val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
+
+      results[name] = CheckStatus(
+         consecutiveSuccesses = successes,
+         consecutiveFailures = 0, // reset to 0 when we have a success
+         healthy = true,
+         timestamp = Instant.now(),
+         result = result
+      )
+   }
+
+   private fun failure(name: String, result: HealthCheckResult.Unhealthy) {
+
+      val previous = results[name]
+      val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
+
+      logger.warn { "HealthCheck $name reported $failures failures $result" }
+
+      results[name] = CheckStatus(
+         consecutiveSuccesses = 0, // reset to 0 when we have a failure
+         consecutiveFailures = failures,
+         healthy = false,
+         timestamp = Instant.now(),
+         result = result
+      )
+   }
+
+   fun status(): Health {
+      val healthy = results.values.all { it.healthy }
+      return Health(healthy, results.toMap())
+   }
+
+   fun checks(): Set<HealthCheck> = checks.values.toSet()
+
+   /**
+    * Adds a [Subscriber] to this registry, which will be invoked each time a health check completes.
+    *
+    * Note: This method is not thread safe.
+    */
+   fun addSubscriber(subscriber: Subscriber) {
+      subscribers.add(subscriber)
+   }
+
+   private suspend fun notifySubscribers(name: String, check: HealthCheck, result: HealthCheckResult) {
+      subscribers.forEach {
+         runCatching {
+            it.invoke(name, check, result)
+         }.onFailure { logger.warn(it) { "Error notifying subscriber of health check $name" } }
+      }
+   }
 }
 
 fun interface Subscriber {
-  suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
+   suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
 }
 
 data class CheckStatus(
-  val consecutiveSuccesses: Int,
-  val consecutiveFailures: Int,
-  val healthy: Boolean, // overall health status, true if all checks are healthy
-  val timestamp: Instant,
-  val result: HealthCheckResult,
+   val consecutiveSuccesses: Int,
+   val consecutiveFailures: Int,
+   val healthy: Boolean, // overall health status, true if all checks are healthy
+   val timestamp: Instant,
+   val result: HealthCheckResult,
 )
 
 data class Health(val healthy: Boolean, val results: Map<String, CheckStatus>)
 
 fun <A> Health.fold(
-  ifUnhealthy: (Map<String, CheckStatus>) -> A,
-  ifHealthy: (Map<String, CheckStatus>) -> A
+   ifUnhealthy: (Map<String, CheckStatus>) -> A,
+   ifHealthy: (Map<String, CheckStatus>) -> A
 ): A {
-  return when (healthy) {
-    true -> ifHealthy(results)
-    false -> ifUnhealthy(results)
-  }
+   return when (healthy) {
+      true -> ifHealthy(results)
+      false -> ifUnhealthy(results)
+   }
 }
