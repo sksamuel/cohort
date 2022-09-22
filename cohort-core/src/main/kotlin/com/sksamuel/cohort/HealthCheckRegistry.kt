@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A [HealthCheckRegistry] executes [HealthCheck]s based on provided schedules.
@@ -64,7 +65,7 @@ class HealthCheckRegistry(
     *
     * @param delay how long to wait before starting the warmups
     */
-   fun warm(warmup: Warmup, delay: Duration) = warm(warmup.name, warmup, delay)
+   fun warm(warmup: Warmup, delay: Duration = 1.seconds) = warm(warmup.name, warmup, delay)
 
    /**
     * Adds a new [Warmup] to this registry, which is started immediately.
@@ -72,7 +73,7 @@ class HealthCheckRegistry(
     *
     * @param delay how long to wait before starting the warmups
     */
-   fun warm(name: String, warmup: Warmup, delay: Duration) {
+   fun warm(name: String, warmup: Warmup, delay: Duration = 1.seconds) {
 
       if (warmups.contains(name)) error("Warmup '$name' already registered")
       warmups.putIfAbsent(name, warmup)
