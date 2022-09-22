@@ -1,6 +1,6 @@
 package com.sksamuel.cohort.cpu
 
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class FibWarmup(
    override val iterations: Int = 10000,
    override val interval: Duration = 1.milliseconds,
-) : WarmupHealthCheck() {
+) : Warmup() {
 
    override val name: String = "fib_warmup"
 

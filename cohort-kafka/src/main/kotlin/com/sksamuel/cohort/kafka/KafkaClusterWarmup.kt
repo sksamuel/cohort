@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import kotlinx.coroutines.future.await
 import org.apache.kafka.clients.admin.AdminClient
 import kotlin.time.Duration
@@ -15,7 +15,7 @@ class KafkaClusterWarmup(
    private val adminClient: AdminClient,
    override val iterations: Int = 1000,
    override val interval: Duration = 10.milliseconds
-) : WarmupHealthCheck() {
+) : Warmup() {
 
    override val name: String = "kafka_warmup"
 

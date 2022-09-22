@@ -1,6 +1,6 @@
 package com.sksamuel.cohort.redis
 
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import redis.clients.jedis.JedisCluster
@@ -13,7 +13,7 @@ class RedisClusterWarmup(
    override val iterations: Int = 1000,
    override val interval: Duration = 10.milliseconds,
    private val command: (JedisCluster) -> Unit = { it.get(Random.nextInt().toString()) }
-) : WarmupHealthCheck() {
+) : Warmup() {
 
    override val name: String = "redis_warmup"
 

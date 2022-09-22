@@ -5,6 +5,7 @@ package com.sksamuel.cohort
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -38,7 +39,9 @@ class HealthCheckRegistry(
    private val scheduler = Executors.newScheduledThreadPool(1)
    private val names = mutableSetOf<String>()
    private val checks = ConcurrentHashMap<String, HealthCheck>()
-   private val results = ConcurrentHashMap<String, CheckStatus>()
+   private val warmups = ConcurrentHashMap<String, Warmup>()
+   private val checkResults = ConcurrentHashMap<String, CheckStatus>()
+   private val warmupResults = ConcurrentHashMap<String, WarmupStatus>()
    private val logger = KotlinLogging.logger {}
    private val subscribers = mutableListOf<Subscriber>()
    private val warmupScope = CoroutineScope(Dispatchers.Default)
@@ -52,6 +55,36 @@ class HealthCheckRegistry(
          val registry = HealthCheckRegistry(dispatcher)
          registry.configure()
          return registry
+      }
+   }
+
+   /**
+    * Adds a new [Warmup] to this registry, which is started immediately.
+    * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    */
+   fun warm(warmup: Warmup) = warm(warmup.name, warmup)
+
+   /**
+    * Adds a new [Warmup] to this registry, which is started immediately.
+    * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    */
+   fun warm(name: String, warmup: Warmup) {
+
+      if (warmups.contains(name)) error("Warmup $name already registered")
+      warmups.putIfAbsent(name, warmup)
+
+      var completed = 0
+
+      warmupScope.launch {
+         repeat(warmup.iterations) {
+            warmup.warmup()
+            completed++
+            warmupResults[name] = WarmupStatus(completed, warmup.iterations)
+            delay(warmup.interval)
+         }
+      }.invokeOnCompletion {
+         warmup.close()
+         warmups.remove(name)
       }
    }
 
@@ -85,16 +118,15 @@ class HealthCheckRegistry(
       initialDelay: Duration,
       checkInterval: Duration
    ): HealthCheckRegistry {
+      require(check !is Warmup) { "Register Warmups using warm(check)" }
 
       if (checks.contains(name)) error("Check $name already registered")
       checks.putIfAbsent(name, check)
 
       if (startUnhealthy) {
-         results[name] = CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+         checkResults[name] =
+            CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
       }
-
-      // if a warmup check, we start it using the warmup scope
-      if (check is WarmupHealthCheck) check.start(warmupScope)
 
       scheduler.scheduleWithFixedDelay(
          {
@@ -131,10 +163,10 @@ class HealthCheckRegistry(
 
    private fun success(name: String, result: HealthCheckResult.Healthy) {
 
-      val previous = results[name]
+      val previous = checkResults[name]
       val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
 
-      results[name] = CheckStatus(
+      checkResults[name] = CheckStatus(
          consecutiveSuccesses = successes,
          consecutiveFailures = 0, // reset to 0 when we have a success
          healthy = true,
@@ -145,12 +177,12 @@ class HealthCheckRegistry(
 
    private fun failure(name: String, result: HealthCheckResult.Unhealthy) {
 
-      val previous = results[name]
+      val previous = checkResults[name]
       val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
 
       logger.warn { "HealthCheck $name reported $failures failures $result" }
 
-      results[name] = CheckStatus(
+      checkResults[name] = CheckStatus(
          consecutiveSuccesses = 0, // reset to 0 when we have a failure
          consecutiveFailures = failures,
          healthy = false,
@@ -160,8 +192,8 @@ class HealthCheckRegistry(
    }
 
    fun status(): Health {
-      val healthy = results.values.all { it.healthy }
-      return Health(healthy, results.toMap())
+      val healthy = checkResults.values.all { it.healthy }
+      return Health(healthy, warmupResults.toMap(), checkResults.toMap())
    }
 
    fun checks(): Set<HealthCheck> = checks.values.toSet()
@@ -196,7 +228,13 @@ data class CheckStatus(
    val result: HealthCheckResult,
 )
 
-data class Health(val healthy: Boolean, val results: Map<String, CheckStatus>)
+data class WarmupStatus(val completed: Int, val iterations: Int)
+
+data class Health(
+   val healthy: Boolean,
+   val warmups: Map<String, WarmupStatus>,
+   val results: Map<String, CheckStatus>
+)
 
 fun <A> Health.fold(
    ifUnhealthy: (Map<String, CheckStatus>) -> A,

@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.db
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import javax.sql.DataSource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -18,7 +18,7 @@ class DataSourceWarmup(
    private val timeout: Duration = 1.seconds,
    override val iterations: Int = 5000,
    override val interval: Duration = 2.milliseconds,
-) : WarmupHealthCheck() {
+) : Warmup() {
 
    override val name: String = "datasource_warmup"
 

@@ -1,6 +1,6 @@
 package com.sksamuel.cohort.redis
 
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import io.lettuce.core.cluster.RedisClusterClient
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection
 import kotlinx.coroutines.future.await
@@ -15,7 +15,7 @@ class RedisClusterWarmup(
    private val command: suspend (StatefulRedisClusterConnection<String, String>) -> Unit = {
       it.async().get(Random.nextInt().toString()).await()
    },
-) : WarmupHealthCheck() {
+) : Warmup() {
 
    override val name: String = "redis_warmup"
 
