@@ -74,7 +74,8 @@ class HealthCheckRegistry(
       warmups.putIfAbsent(name, warmup)
 
       var completed = 0
-      logger.warn { "Beginning warmup $name for ${warmup.iterations} iterations" }
+      logger.warn { "Beginning warmup $name for ${warmup.iterations} iterations with ${warmup.interval} between iterations" }
+      val start = System.currentTimeMillis()
 
       warmupScope.launch {
          repeat(warmup.iterations) {
@@ -84,7 +85,8 @@ class HealthCheckRegistry(
             delay(warmup.interval)
          }
       }.invokeOnCompletion {
-         logger.warn { "Warmup $name has completed" }
+         val time = System.currentTimeMillis() - start
+         logger.warn { "Warmup $name has completed in ${time}ms" }
          warmup.close()
          warmups.remove(name)
       }
