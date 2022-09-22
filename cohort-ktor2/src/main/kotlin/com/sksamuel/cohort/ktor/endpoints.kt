@@ -148,7 +148,7 @@ fun Route.cohort() {
       }
    }
 
-   if (config.warrmup) {
+   if (config.warmup) {
       get("${config.endpointPrefix}/warmup") {
          call.respond(HttpStatusCode.allStatusCodes.random())
       }

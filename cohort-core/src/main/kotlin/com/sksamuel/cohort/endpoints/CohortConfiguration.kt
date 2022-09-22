@@ -20,7 +20,7 @@ class CohortConfiguration {
    // set to true to enable the /cohort/os endpoint which returns operating system information
    var operatingSystem: Boolean = false
 
-   var warrmup: Boolean = false
+   var warmup: Boolean = false
 
    // set to true to enable the /cohort/memory endpoint which returns memory pool information
    var memory: Boolean = false
