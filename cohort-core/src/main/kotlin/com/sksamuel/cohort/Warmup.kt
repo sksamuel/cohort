@@ -1,6 +1,7 @@
 package com.sksamuel.cohort
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Interface for startup procedures that are designed to warm up the JVM.
@@ -29,4 +30,14 @@ abstract class Warmup : AutoCloseable {
     * Invoked after the last iteration.
     */
    override fun close() {}
+}
+
+class FunctionWarmup(
+   override val iterations: Int = 10000,
+   override val interval: Duration = 1.milliseconds,
+   private val fn: () -> Unit
+) : Warmup() {
+   override suspend fun warmup() {
+      fn()
+   }
 }
