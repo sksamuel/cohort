@@ -74,11 +74,11 @@ class HealthCheckRegistry(
     */
    fun warm(name: String, warmup: Warmup, delay: Duration) {
 
-      if (warmups.contains(name)) error("Warmup $name already registered")
+      if (warmups.contains(name)) error("Warmup '$name' already registered")
       warmups.putIfAbsent(name, warmup)
 
       var completed = 0
-      logger.warn { "Beginning warmup $name for ${warmup.iterations} iterations with ${warmup.interval} between iterations" }
+      logger.warn { "Beginning warmup '$name' for ${warmup.iterations} iterations with ${warmup.interval} between iterations" }
       val start = System.currentTimeMillis()
 
       warmupScope.launch {
@@ -87,14 +87,14 @@ class HealthCheckRegistry(
          repeat(warmup.iterations) {
             runCatching {
                warmup.warmup()
-            }.onFailure { logger.warn(it) { "Warmup task error" } }
+            }.onFailure { logger.warn(it) { "Warmup '$name' error" } }
             completed++
             warmupResults[name] = WarmupStatus(completed, warmup.iterations)
             delay(warmup.interval)
          }
       }.invokeOnCompletion {
          val time = System.currentTimeMillis() - start
-         logger.warn { "Warmup $name has completed in ${time}ms" }
+         logger.warn { "Warmup '$name' has completed in ${time}ms" }
          warmup.close()
          warmups.remove(name)
       }
