@@ -20,8 +20,4 @@ class RedisConnectionWarmupHealthCheck(
    override suspend fun warmup() {
       withContext(Dispatchers.IO) { command(jedis) }
    }
-
-   override fun close() {
-      jedis.close()
-   }
 }
