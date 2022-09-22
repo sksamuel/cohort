@@ -61,14 +61,18 @@ class HealthCheckRegistry(
    /**
     * Adds a new [Warmup] to this registry, which is started immediately.
     * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    *
+    * @param delay how long to wait before starting the warmups
     */
-   fun warm(warmup: Warmup) = warm(warmup.name, warmup)
+   fun warm(warmup: Warmup, delay: Duration) = warm(warmup.name, warmup, delay)
 
    /**
     * Adds a new [Warmup] to this registry, which is started immediately.
     * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    *
+    * @param delay how long to wait before starting the warmups
     */
-   fun warm(name: String, warmup: Warmup) {
+   fun warm(name: String, warmup: Warmup, delay: Duration) {
 
       if (warmups.contains(name)) error("Warmup $name already registered")
       warmups.putIfAbsent(name, warmup)
@@ -78,6 +82,7 @@ class HealthCheckRegistry(
       val start = System.currentTimeMillis()
 
       warmupScope.launch {
+         delay(delay)
          warmup.start()
          repeat(warmup.iterations) {
             runCatching {
