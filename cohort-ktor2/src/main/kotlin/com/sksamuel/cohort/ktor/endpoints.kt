@@ -23,6 +23,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.util.getOrFail
 import java.time.ZoneOffset
+import kotlin.random.Random
 
 fun Route.cohort() {
 
@@ -150,7 +151,7 @@ fun Route.cohort() {
 
    if (config.warmup) {
       get("${config.endpointPrefix}/warmup") {
-         call.respond(HttpStatusCode.allStatusCodes.random())
+         call.respond(HttpStatusCode.OK, Random.nextInt().toString())
       }
    }
 
