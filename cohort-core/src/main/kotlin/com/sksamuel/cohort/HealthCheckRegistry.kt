@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -133,16 +132,9 @@ class HealthCheckRegistry(
          val start = System.currentTimeMillis()
 
          if (interval == null)
-            logger.warn { "Beginning warmup '$name' for $iterations iterations" }
+            logger.warn { "Registering warmup '$name' for $iterations iterations" }
          else
-            logger.warn { "Beginning warmup '$name' for $iterations iterations with $interval between iterations" }
-
-         val reportJob = launch {
-            while (isActive) {
-               delay(10.seconds)
-               logger.warn { "Warmup '$name' has completed $completed/$iterations iterations" }
-            }
-         }
+            logger.warn { "Registering warmup '$name' for $iterations iterations with $interval between iterations" }
 
          launch {
             warmup.start()
@@ -159,7 +151,11 @@ class HealthCheckRegistry(
             val time = System.currentTimeMillis() - start
             logger.warn { "Warmup '$name' has completed in ${time}ms" }
             warmups.remove(name)
-         }.invokeOnCompletion { reportJob.cancel() }
+
+            if (warmups.isEmpty()) {
+               logger.warn { "--All warmups have completed--" }
+            }
+         }
       }
    }
 
