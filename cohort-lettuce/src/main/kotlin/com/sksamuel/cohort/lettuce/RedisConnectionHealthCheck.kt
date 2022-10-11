@@ -18,12 +18,12 @@ class RedisConnectionHealthCheck<K, V>(
 
    companion object {
 
-      operator fun <K> invoke(conn: StatefulRedisConnection<K, *>, genkey: () -> K): RedisConnectionWarmup<K, *> {
-         return RedisConnectionWarmup(conn) { it.async().get(genkey()).await() }
+      operator fun <K> invoke(conn: StatefulRedisConnection<K, *>, genkey: () -> K): RedisConnectionHealthCheck<K, *> {
+         return RedisConnectionHealthCheck(conn) { it.async().get(genkey()).await() }
       }
 
-      operator fun invoke(conn: StatefulRedisConnection<String, *>): RedisConnectionWarmup<String, *> {
-         return RedisConnectionWarmup(conn) { it.async().get(Random.nextInt().toString()).await() }
+      operator fun invoke(conn: StatefulRedisConnection<String, *>): RedisConnectionHealthCheck<String, *> {
+         return RedisConnectionHealthCheck(conn) { it.async().get(Random.nextInt().toString()).await() }
       }
    }
 
