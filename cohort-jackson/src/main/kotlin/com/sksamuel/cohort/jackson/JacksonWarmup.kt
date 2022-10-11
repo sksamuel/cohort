@@ -1,5 +1,6 @@
 package com.sksamuel.cohort.jackson
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.sksamuel.cohort.Warmup
@@ -10,9 +11,8 @@ import kotlin.random.Random
 /**
  * A [Warmup] that will marshall and unmarshall JSON.
  */
-class JacksonWarmup() : Warmup {
+class JacksonWarmup(private val mapper: ObjectMapper = jacksonObjectMapper()) : Warmup {
 
-   private val mapper = jacksonObjectMapper()
    override val name: String = "jackson_warmup"
 
    override suspend fun warm(iteration: Int) {
