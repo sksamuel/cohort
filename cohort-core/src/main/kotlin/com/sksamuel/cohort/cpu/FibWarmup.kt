@@ -3,7 +3,7 @@ package com.sksamuel.cohort.cpu
 import com.sksamuel.cohort.Warmup
 import kotlin.random.Random
 
-class FibWarmup : Warmup {
+class FibWarmup(private val depth: Int = 32) : Warmup {
 
    override val name: String = "fib_warmup"
 
@@ -13,6 +13,14 @@ class FibWarmup : Warmup {
    }
 
    override suspend fun warm(iteration: Int) {
-      fib(Random.nextInt(0, 10))
+      fib(Random.nextInt(0, depth))
+   }
+}
+
+suspend fun main() {
+   val w = FibWarmup()
+   repeat(1000) {
+      w.warm(it)
+      println(it)
    }
 }
