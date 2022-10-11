@@ -5,9 +5,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
 
-class CryptoWarmup : Warmup {
-
-   private val algos = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512")
+class CryptoWarmup(private val algos: Set<String> = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512")) : Warmup {
 
    private fun randomAZ(size: Int): String {
       return List(size) { Random.nextInt(65, 90).toChar() }.toCharArray().concatToString()
@@ -23,7 +21,7 @@ class CryptoWarmup : Warmup {
          mac.init(SecretKeySpec(secret, algorithm))
          mac.update(str1.encodeToByteArray())
          mac.update(str2.encodeToByteArray())
-         val bytes = mac.doFinal(str3.encodeToByteArray())
+         mac.doFinal(str3.encodeToByteArray())
       }
    }
 }
