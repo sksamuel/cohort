@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.crypto.CryptoWarmup
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
@@ -15,9 +16,25 @@ class JacksonWarmup(private val mapper: ObjectMapper = jacksonObjectMapper()) : 
 
    override val name: String = "jackson_warmup"
 
+   private fun randomAZ(size: Int) = List(size) { Random.nextInt(65, 90).toChar() }.toCharArray().concatToString()
+
    override suspend fun warm(iteration: Int) {
-      val fake = mapper.readValue<Fake>(json())
-      mapper.writeValueAsBytes(fake)
+      val fake = Fake(
+         a = randomAZ(1024),
+         b = Random.nextInt(),
+         c = Random.nextLong(),
+         d = Random.nextBoolean(),
+         e = Random.nextDouble(),
+         f = Random.nextFloat(),
+         g = BigDecimal.valueOf(Random.nextDouble()),
+         h = BigInteger.valueOf(Random.nextLong()),
+         i = Random.nextBytes(1).first().toShort(),
+         j = Random.nextBytes(1).first(),
+         k = List(100) { randomAZ(128) },
+         l = List(100) { randomAZ(128) }.toSet(),
+      )
+      val json = mapper.writeValueAsString(fake)
+      mapper.readValue<Fake>(json)
    }
 }
 
@@ -32,17 +49,14 @@ data class Fake(
    val h: BigInteger,
    val i: Short,
    val j: Byte,
+   val k: List<String>,
+   val l: Set<String>,
 )
 
-private fun json() = """{
-   "a": "foo",
-   "b": ${Random.nextInt()},
-   "c": ${Random.nextLong()},
-   "d": ${Random.nextBoolean()},
-   "e": ${Random.nextDouble()},
-   "f": ${Random.nextFloat()},
-   "g": ${Random.nextDouble()},
-   "h": ${Random.nextInt()},
-   "i": ${Random.nextInt(0, 1023)},
-   "j": ${Random.nextInt(0, 255)}
-   }"""
+suspend fun main() {
+   val w = CryptoWarmup()
+   repeat(1000) {
+      w.warm(it)
+      println(it)
+   }
+}
