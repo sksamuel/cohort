@@ -123,8 +123,8 @@ class HealthCheckRegistry(
     */
    fun warm(name: String, warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) {
 
-      if (warmups.contains(name)) error("Warmup '$name' already registered. Try using a unique name.")
-      warmups.putIfAbsent(name, warmup)
+      val existing = warmups.put(name, warmup)
+      if (existing != null) error("Warmup '$name' already registered. Try using a unique name.")
 
       warmupScope.launch {
          delay(startupDelay)
