@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param startUnhealthy if true, then all checks will start in failed state until they pass.
  */
 class HealthCheckRegistry(
-   private val dispatcher: CoroutineDispatcher,
+   private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
    private val startUnhealthy: Boolean = true,
    private val logUnhealthy: Boolean = true,
 ) {
