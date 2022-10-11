@@ -11,19 +11,19 @@ import kotlin.random.Random
  *
  * @param command a command to execute against the redis instance. Defaults to retrieving a random key.
  */
-class RedisConnectionHealthCheck<K, V>(
+class RedisHealthCheck<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
    private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,
 ) : HealthCheck {
 
    companion object {
 
-      operator fun <K> invoke(conn: StatefulRedisConnection<K, *>, genkey: () -> K): RedisConnectionHealthCheck<K, *> {
-         return RedisConnectionHealthCheck(conn) { it.async().get(genkey()).await() }
+      operator fun <K> invoke(conn: StatefulRedisConnection<K, *>, genkey: () -> K): RedisHealthCheck<K, *> {
+         return RedisHealthCheck(conn) { it.async().get(genkey()).await() }
       }
 
-      operator fun invoke(conn: StatefulRedisConnection<String, *>): RedisConnectionHealthCheck<String, *> {
-         return RedisConnectionHealthCheck(conn) { it.async().get(Random.nextInt().toString()).await() }
+      operator fun invoke(conn: StatefulRedisConnection<String, *>): RedisHealthCheck<String, *> {
+         return RedisHealthCheck(conn) { it.async().get(Random.nextInt().toString()).await() }
       }
    }
 
