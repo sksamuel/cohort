@@ -67,6 +67,18 @@ class HealthCheckRegistry(
    }
 
    /**
+    * Adds a new [Warmup] to this registry, started immediately.
+    *
+    * Before the first loop, the [Warmup.start] method is invoked.
+    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
+    *
+    * @param iterations how many iterations to invoke
+    * @param interval how much time between iterations or null to execute without an interval duration
+    */
+   fun warm(warmup: Warmup, iterations: Int, interval: Duration? = null) =
+      warm(warmup.name, warmup, 0.seconds, iterations, interval)
+
+   /**
     * Adds a new [Warmup] to this registry, which is started once the provided [delay] expires.
     *
     * Before the first loop, the [Warmup.start] method is invoked.
@@ -78,6 +90,20 @@ class HealthCheckRegistry(
     */
    fun warm(warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) =
       warm(warmup.name, warmup, startupDelay, iterations, interval)
+
+   /**
+    * Adds a named [Warmup] to this registry, started immediately.
+    *
+    * Before the first loop, the [Warmup.start] method is invoked.
+    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
+    *
+    * @param name a unique name for this warmup, instead of the default name. This allows multiple
+    *             warmups of the same type to be registered.
+    * @param iterations how many iterations to invoke
+    * @param interval how much time between iterations or null to execute without an interval duration
+    */
+   fun warm(name: String, warmup: Warmup, iterations: Int, interval: Duration? = null) =
+      warm(name, warmup, 0.seconds, iterations, interval)
 
    /**
     * Adds a named [Warmup] to this registry, which is started once the provided [startupDelay] expires..
