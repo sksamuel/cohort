@@ -28,7 +28,7 @@ interface Warmup {
 /**
  * Returns a new [Warmup] with the implementation delegated to the given [fn].
  */
-fun warmup(fn: (Int) -> Unit) = object : Warmup {
+fun warmup(fn: suspend (Int) -> Unit) = object : Warmup {
    override suspend fun warm(iteration: Int) {
       fn(iteration)
    }
