@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -39,10 +40,16 @@ class HealthCheckRegistry(
 
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-scheduler"))
    private val names = mutableSetOf<String>()
+
+   // contains all the registered healthchecks
    private val checks = ConcurrentHashMap<String, HealthCheck>()
+
+   // contains all the registered warmups
    private val warmups = ConcurrentHashMap<String, Warmup>()
-   private val checkResults = ConcurrentHashMap<String, CheckStatus>()
+
+   private val checkResults = ConcurrentHashMap<String, HealthCheckStatus>()
    private val warmupResults = ConcurrentHashMap<String, WarmupStatus>()
+
    private val logger = KotlinLogging.logger {}
    private val subscribers = mutableListOf<Subscriber>()
    private val warmupScope = CoroutineScope(Dispatchers.Default)
@@ -60,44 +67,69 @@ class HealthCheckRegistry(
    }
 
    /**
-    * Adds a new [Warmup] to this registry, which is started immediately.
-    * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    * Adds a new [Warmup] to this registry, which is started once the provided [delay] expires.
     *
-    * @param delay how long to wait before starting the warmups
+    * Before the first loop, the [Warmup.start] method is invoked.
+    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
+    *
+    * @param startupDelay how long to wait before starting the warmups
+    * @param iterations how many iterations to invoke
+    * @param interval how much time between iterations or null to execute without an interval duration
     */
-   fun warm(warmup: Warmup, delay: Duration = 1.seconds) = warm(warmup.name, warmup, delay)
+   fun warm(warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) =
+      warm(warmup.name, warmup, startupDelay, iterations, interval)
 
    /**
-    * Adds a new [Warmup] to this registry, which is started immediately.
-    * Upon completion, the [Warmup.close] method is invoked and the healthcheck is removed.
+    * Adds a named [Warmup] to this registry, which is started once the provided [startupDelay] expires..
     *
-    * @param delay how long to wait before starting the warmups
+    * Before the first loop, the [Warmup.start] method is invoked.
+    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
+    *
+    * @param name a unique name for this warmup, instead of the default name. This allows multiple
+    *             warmups of the same type to be registered.
+    * @param startupDelay how long to wait before starting the warmups
+    * @param iterations how many iterations to invoke
+    * @param interval how much time between iterations or null to execute without an interval duration
     */
-   fun warm(name: String, warmup: Warmup, delay: Duration = 1.seconds) {
+   fun warm(name: String, warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) {
 
-      if (warmups.contains(name)) error("Warmup '$name' already registered")
+      if (warmups.contains(name)) error("Warmup '$name' already registered. Try using a unique name.")
       warmups.putIfAbsent(name, warmup)
 
-      var completed = 0
-      logger.warn { "Beginning warmup '$name' for ${warmup.iterations} iterations with ${warmup.interval} between iterations" }
-      val start = System.currentTimeMillis()
-
       warmupScope.launch {
-         delay(delay)
-         warmup.start()
-         repeat(warmup.iterations) {
-            runCatching {
-               warmup.warmup()
-            }.onFailure { logger.warn(it) { "Warmup '$name' error" } }
-            completed++
-            warmupResults[name] = WarmupStatus(completed, warmup.iterations)
-            delay(warmup.interval)
+         delay(startupDelay)
+
+         var completed = 0
+         val start = System.currentTimeMillis()
+
+         if (interval == null)
+            logger.warn { "Beginning warmup '$name' for $iterations iterations" }
+         else
+            logger.warn { "Beginning warmup '$name' for $iterations iterations with $interval between iterations" }
+
+         val reportJob = launch {
+            while (isActive) {
+               delay(10.seconds)
+               logger.warn { "Warmup '$name' has completed $completed/$iterations iterations" }
+            }
          }
-      }.invokeOnCompletion {
-         val time = System.currentTimeMillis() - start
-         logger.warn { "Warmup '$name' has completed in ${time}ms" }
-         warmup.close()
-         warmups.remove(name)
+
+         launch {
+            warmup.start()
+            repeat(iterations) { k ->
+               runCatching {
+                  warmup.warm(k)
+               }.onFailure { logger.warn(it) { "Warmup '$name' error" } }
+               completed++
+               warmupResults[name] = WarmupStatus(completed, iterations)
+               if (interval != null) delay(interval)
+            }
+
+            warmup.close()
+            val time = System.currentTimeMillis() - start
+            logger.warn { "Warmup '$name' has completed in ${time}ms" }
+            warmups.remove(name)
+         }.invokeOnCompletion { reportJob.cancel() }
       }
    }
 
@@ -131,14 +163,13 @@ class HealthCheckRegistry(
       initialDelay: Duration,
       checkInterval: Duration
    ): HealthCheckRegistry {
-      require(check !is Warmup) { "Register Warmups using warm(check)" }
 
       if (checks.contains(name)) error("Check $name already registered")
       checks.putIfAbsent(name, check)
 
       if (startUnhealthy) {
          checkResults[name] =
-            CheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+            HealthCheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
       }
 
       scheduler.scheduleWithFixedDelay(
@@ -179,7 +210,7 @@ class HealthCheckRegistry(
       val previous = checkResults[name]
       val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
 
-      checkResults[name] = CheckStatus(
+      checkResults[name] = HealthCheckStatus(
          consecutiveSuccesses = successes,
          consecutiveFailures = 0, // reset to 0 when we have a success
          healthy = true,
@@ -195,7 +226,7 @@ class HealthCheckRegistry(
 
       logger.warn { "HealthCheck $name reported $failures failures $result" }
 
-      checkResults[name] = CheckStatus(
+      checkResults[name] = HealthCheckStatus(
          consecutiveSuccesses = 0, // reset to 0 when we have a failure
          consecutiveFailures = failures,
          healthy = false,
@@ -204,6 +235,12 @@ class HealthCheckRegistry(
       )
    }
 
+   /**
+    * Returns the [Health] of the system.
+    *
+    * A system is considered healthy if all the healthchecks are in healthy state, and each warmup
+    * has completed all it's iterations.
+    */
    fun status(): Health {
       val healthy = checkResults.values.all { it.healthy } && warmupResults.values.all { it.iterations == it.completed }
       return Health(healthy, warmupResults.toMap(), checkResults.toMap())
@@ -233,7 +270,7 @@ fun interface Subscriber {
    suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
 }
 
-data class CheckStatus(
+data class HealthCheckStatus(
    val consecutiveSuccesses: Int,
    val consecutiveFailures: Int,
    val healthy: Boolean, // overall health status, true if all checks are healthy
@@ -243,18 +280,22 @@ data class CheckStatus(
 
 data class WarmupStatus(val completed: Int, val iterations: Int)
 
+/**
+ * A system is considered healthy if all the healthchecks are in healthy state, and each warmup
+ * has completed all it's iterations.
+ */
 data class Health(
    val healthy: Boolean,
    val warmups: Map<String, WarmupStatus>,
-   val results: Map<String, CheckStatus>
+   val healthchecks: Map<String, HealthCheckStatus>
 )
 
 fun <A> Health.fold(
-   ifUnhealthy: (Map<String, CheckStatus>) -> A,
-   ifHealthy: (Map<String, CheckStatus>) -> A
+   ifUnhealthy: (Map<String, HealthCheckStatus>) -> A,
+   ifHealthy: (Map<String, HealthCheckStatus>) -> A
 ): A {
    return when (healthy) {
-      true -> ifHealthy(results)
-      false -> ifUnhealthy(results)
+      true -> ifHealthy(healthchecks)
+      false -> ifUnhealthy(healthchecks)
    }
 }

@@ -3,14 +3,10 @@ package com.sksamuel.cohort.healthcheck.http
 import com.sksamuel.cohort.Warmup
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 class HttpWarmup(
-   override val iterations: Int = 250,
-   override val interval: Duration = 10.milliseconds,
    private val command: suspend (HttpClient) -> Unit,
-) : Warmup() {
+) : Warmup {
 
    override val name: String = "http_warmup"
 
@@ -18,11 +14,11 @@ class HttpWarmup(
       expectSuccess = false
    }
 
-   override suspend fun warmup() {
+   override suspend fun warm(iteration: Int) {
       command(client)
    }
 
-   override fun close() {
+   override suspend fun close() {
       client.close()
    }
 }

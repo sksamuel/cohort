@@ -160,7 +160,7 @@ fun Route.cohort() {
 
          val status = registry.status()
 
-         val results = status.results.map {
+         val results = status.healthchecks.map {
             ResultJson(
                name = it.key,
                healthy = it.value.healthy,

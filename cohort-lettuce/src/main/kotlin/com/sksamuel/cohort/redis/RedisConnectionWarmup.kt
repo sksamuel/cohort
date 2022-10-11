@@ -4,23 +4,19 @@ import com.sksamuel.cohort.Warmup
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import kotlin.random.Random
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 class RedisConnectionWarmup(
    client: RedisClient,
-   override val iterations: Int = 1000,
-   override val interval: Duration = 10.milliseconds,
    private val command: suspend (StatefulRedisConnection<String, String>) -> Unit = {
       it.sync().get(Random.nextInt().toString())
    }
-) : Warmup() {
+) : Warmup {
 
    override val name: String = "redis_warmup"
 
    private val conn = client.connect()
 
-   override suspend fun warmup() {
+   override suspend fun warm(iteration: Int) {
       command(conn)
    }
 }

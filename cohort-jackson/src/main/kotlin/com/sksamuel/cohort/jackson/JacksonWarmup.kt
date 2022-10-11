@@ -6,21 +6,16 @@ import com.sksamuel.cohort.Warmup
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A [Warmup] that will marshall and unmarshall JSON.
  */
-class JacksonWarmup(
-   override val iterations: Int = 5000,
-   override val interval: Duration = 2.milliseconds,
-) : Warmup() {
+class JacksonWarmup() : Warmup {
 
    private val mapper = jacksonObjectMapper()
    override val name: String = "jackson_warmup"
 
-   override suspend fun warmup() {
+   override suspend fun warm(iteration: Int) {
       val fake = mapper.readValue<Fake>(json())
       mapper.writeValueAsBytes(fake)
    }

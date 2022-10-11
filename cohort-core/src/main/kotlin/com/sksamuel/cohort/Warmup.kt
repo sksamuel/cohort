@@ -1,43 +1,34 @@
 package com.sksamuel.cohort
 
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-
 /**
- * Interface for startup procedures that are designed to warm up the JVM.
- * A warmup contains state, so an instance should not be reused.
+ * Interface for startup procedures that are designed to warm up a service.
  */
-abstract class Warmup : AutoCloseable {
+interface Warmup {
 
-   abstract val iterations: Int
-
-   // how many to wait between each iteration
-   abstract val interval: Duration
-
-   open val name: String = this::class.java.name.removePrefix("com.sksamuel.")
+   // the default name used in logs and metrics unless overridden when registering.
+   val name: String
+      get() = this::class.java.name.removePrefix("com.sksamuel.")
 
    /**
     * Invoked before the first iteration.
     */
-   open suspend fun start() {}
+   suspend fun start() {}
 
    /**
-    * Invoked on each iteration.
+    * Invoked on each iteration with the current [iteration] number.
     */
-   abstract suspend fun warmup()
+   suspend fun warm(iteration: Int)
 
    /**
     * Invoked after the last iteration.
     */
-   override fun close() {}
+   suspend fun close() {}
 }
 
 class FunctionWarmup(
-   override val iterations: Int = 10000,
-   override val interval: Duration = 1.milliseconds,
-   private val fn: suspend () -> Unit
-) : Warmup() {
-   override suspend fun warmup() {
-      fn()
+   private val fn: suspend (Int) -> Unit
+) : Warmup {
+   override suspend fun warm(iteration: Int) {
+      fn(iteration)
    }
 }
