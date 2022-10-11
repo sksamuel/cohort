@@ -37,7 +37,7 @@ class HealthCheckRegistry(
    private val logUnhealthy: Boolean = true,
 ) {
 
-   private val scheduler = Executors.newScheduledThreadPool(1)
+   private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-scheduler"))
    private val names = mutableSetOf<String>()
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val warmups = ConcurrentHashMap<String, Warmup>()
