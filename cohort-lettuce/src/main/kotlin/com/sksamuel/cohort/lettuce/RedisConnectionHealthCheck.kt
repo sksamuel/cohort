@@ -1,14 +1,20 @@
-package com.sksamuel.cohort.redis
+package com.sksamuel.cohort.lettuce
 
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.HealthCheck
+import com.sksamuel.cohort.HealthCheckResult
 import io.lettuce.core.api.StatefulRedisConnection
 import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
-class RedisConnectionWarmup<K, V>(
+/**
+ * A [HealthCheck] that checks that a connection can be made to a redis instance.
+ *
+ * @param command a command to execute against the redis instance. Defaults to retrieving a random key.
+ */
+class RedisConnectionHealthCheck<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
    private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,
-) : Warmup {
+) : HealthCheck {
 
    companion object {
 
@@ -21,9 +27,13 @@ class RedisConnectionWarmup<K, V>(
       }
    }
 
-   override val name: String = "redis_warmup"
 
-   override suspend fun warm(iteration: Int) {
-      command(conn)
+   override val name: String = "redis"
+
+   override suspend fun check(): HealthCheckResult {
+      return runCatching {
+         command(conn)
+         HealthCheckResult.Healthy("Redis command successful")
+      }.getOrElse { HealthCheckResult.Unhealthy("Redis command failure", it) }
    }
 }
