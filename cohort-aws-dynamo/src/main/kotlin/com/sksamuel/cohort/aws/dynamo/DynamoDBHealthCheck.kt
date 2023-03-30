@@ -8,7 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 
 /**
- * A Cohort [HealthCheck] that checks for connectivity to an AWS Dynamo DB instance.
+ * A Cohort [HealthCheck] that checks for connectivity to an AWS Dynamo DB instance
+ * by connecting and requesting to list the tables (limit of 1).
  */
 class DynamoDBHealthCheck(
    val createClient: () -> AmazonDynamoDB = { AmazonDynamoDBClient.builder().build() },
@@ -25,7 +26,7 @@ class DynamoDBHealthCheck(
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
          createClient().use {
-            it.listTables()
+            it.listTables(1)
          }
       }.fold(
          { HealthCheckResult.Healthy("DynamoDB access successful") },
