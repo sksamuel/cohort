@@ -30,8 +30,6 @@ include(
    "cohort-http",
    "cohort-jackson",
    "cohort-kafka",
-   "cohort-ktor",
-   "cohort-ktor2",
    "cohort-lettuce",
    "cohort-liquibase",
    "cohort-log4j2",

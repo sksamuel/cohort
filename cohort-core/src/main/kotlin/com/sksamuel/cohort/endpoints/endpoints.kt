@@ -1,8 +1,5 @@
-package com.sksamuel.cohort.ktor
+package com.sksamuel.cohort.endpoints
 
-import com.sksamuel.cohort.endpoints.LogInfo
-import com.sksamuel.cohort.endpoints.ResultJson
-import com.sksamuel.cohort.endpoints.toJson
 import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails

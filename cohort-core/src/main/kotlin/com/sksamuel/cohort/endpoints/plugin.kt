@@ -1,6 +1,5 @@
-package com.sksamuel.cohort.ktor
+package com.sksamuel.cohort.endpoints
 
-import com.sksamuel.cohort.endpoints.CohortConfiguration
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
