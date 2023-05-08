@@ -3,16 +3,19 @@ package com.sksamuel.cohort.jackson
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.WarmupHealthCheck
 import com.sksamuel.cohort.crypto.CryptoWarmup
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
 
 /**
- * A [Warmup] that will marshall and unmarshall JSON.
+ * A [WarmupHealthCheck] that will marshall and unmarshall JSON.
  */
-class JacksonWarmup(private val mapper: ObjectMapper = jacksonObjectMapper()) : Warmup {
+class JacksonWarmup(
+   private val mapper: ObjectMapper = jacksonObjectMapper(),
+   override val iterations: Int = 1000,
+) : WarmupHealthCheck() {
 
    override val name: String = "jackson_warmup"
 

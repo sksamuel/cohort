@@ -7,11 +7,11 @@ import io.kotest.core.spec.style.FunSpec
 
 class HealthCheckRegistryTest : FunSpec({
 
-   test("duplicate warmup name should throw error") {
+   test("duplicate name should throw error") {
       shouldThrowAny {
-         HealthCheckRegistry() {
-            warm(FibWarmup(), 1000)
-            warm(FibWarmup(), 1000)
+         HealthCheckRegistry {
+            register(FibWarmup())
+            register(FibWarmup())
          }
       }
    }

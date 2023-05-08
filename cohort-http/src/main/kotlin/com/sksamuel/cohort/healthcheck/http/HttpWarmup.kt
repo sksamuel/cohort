@@ -1,12 +1,13 @@
 package com.sksamuel.cohort.healthcheck.http
 
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.WarmupHealthCheck
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 
 class HttpWarmup(
    private val command: suspend (HttpClient) -> Unit,
-) : Warmup {
+   override val iterations: Int = 1000,
+) : WarmupHealthCheck() {
 
    override val name: String = "http_warmup"
 

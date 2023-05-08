@@ -1,11 +1,14 @@
 package com.sksamuel.cohort.crypto
 
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.WarmupHealthCheck
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
 
-class CryptoWarmup(private val algos: Set<String> = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512")) : Warmup {
+class CryptoWarmup(
+   private val algos: Set<String> = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512"),
+   override val iterations: Int = 1000,
+) : WarmupHealthCheck() {
 
    private fun randomAZ(size: Int): String {
       return List(size) { Random.nextInt(65, 90).toChar() }.toCharArray().concatToString()

@@ -1,14 +1,15 @@
 package com.sksamuel.cohort.lettuce
 
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.WarmupHealthCheck
 import io.lettuce.core.api.StatefulRedisConnection
 import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
 class RedisWarmup<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
+   override val iterations: Int = 1000,
    private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,
-) : Warmup {
+) : WarmupHealthCheck() {
 
    companion object {
 

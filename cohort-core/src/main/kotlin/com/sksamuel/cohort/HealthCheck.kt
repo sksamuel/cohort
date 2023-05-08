@@ -8,6 +8,7 @@ fun interface HealthCheck {
 
    suspend fun check(): HealthCheckResult
 
+   // the default name used in logs and metrics unless overridden when registering or subclassing.
    val name: String
       get() {
          val jvmName = this::class.java.name
@@ -43,7 +44,8 @@ data class HealthCheckResult(
    companion object {
       fun Healthy(message: String) = HealthCheckResult(HealthStatus.Healthy, message, null)
       fun Startup(message: String) = HealthCheckResult(HealthStatus.Startup, message, null)
-      fun Unhealthy(message: String, cause: Throwable? = null) = HealthCheckResult(HealthStatus.Unhealthy, message, cause)
+      fun Unhealthy(message: String, cause: Throwable? = null) =
+         HealthCheckResult(HealthStatus.Unhealthy, message, cause)
    }
 }
 

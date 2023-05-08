@@ -1,9 +1,12 @@
 package com.sksamuel.cohort.cpu
 
-import com.sksamuel.cohort.Warmup
+import com.sksamuel.cohort.WarmupHealthCheck
 import kotlin.random.Random
 
-class FibWarmup(private val depth: Int = 32) : Warmup {
+class FibWarmup(
+   private val depth: Int = 32,
+   override val iterations: Int = 1000,
+) : WarmupHealthCheck() {
 
    override val name: String = "fib_warmup"
 

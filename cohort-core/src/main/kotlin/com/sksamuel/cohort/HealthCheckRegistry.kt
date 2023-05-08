@@ -5,7 +5,6 @@ package com.sksamuel.cohort
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -44,7 +43,7 @@ class HealthCheckRegistry(
    private val checks = ConcurrentHashMap<String, HealthCheck>()
 
    // contains all the registered warmups
-   private val warmups = ConcurrentHashMap<String, Warmup>()
+   private val warmups = ConcurrentHashMap<String, WarmupHealthCheck>()
 
    private val checkResults = ConcurrentHashMap<String, HealthCheckStatus>()
    private val warmupResults = ConcurrentHashMap<String, WarmupStatus>()
@@ -54,6 +53,7 @@ class HealthCheckRegistry(
    private val warmupScope = CoroutineScope(Dispatchers.Default)
 
    companion object {
+      val DEFAULT_INTERVAL = 10.seconds
 
       operator fun invoke(
          configure: HealthCheckRegistry.() -> Unit
@@ -70,94 +70,12 @@ class HealthCheckRegistry(
    }
 
    /**
-    * Adds a new [Warmup] to this registry, started immediately.
-    *
-    * Before the first loop, the [Warmup.start] method is invoked.
-    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
-    *
-    * @param iterations how many iterations to invoke
-    * @param interval how much time between iterations or null to execute without an interval duration
+    * Adds a new [HealthCheck] to this registry using the [DEFAULT_INTERVAL] for both initial delay and intervals.
+    * The name is derived from the check class.
     */
-   fun warm(warmup: Warmup, iterations: Int, interval: Duration? = null) =
-      warm(warmup.name, warmup, 0.seconds, iterations, interval)
-
-   /**
-    * Adds a new [Warmup] to this registry, which is started once the provided [delay] expires.
-    *
-    * Before the first loop, the [Warmup.start] method is invoked.
-    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
-    *
-    * @param startupDelay how long to wait before starting the warmups
-    * @param iterations how many iterations to invoke
-    * @param interval how much time between iterations or null to execute without an interval duration
-    */
-   fun warm(warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) =
-      warm(warmup.name, warmup, startupDelay, iterations, interval)
-
-   /**
-    * Adds a named [Warmup] to this registry, started immediately.
-    *
-    * Before the first loop, the [Warmup.start] method is invoked.
-    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
-    *
-    * @param name a unique name for this warmup, instead of the default name. This allows multiple
-    *             warmups of the same type to be registered.
-    * @param iterations how many iterations to invoke
-    * @param interval how much time between iterations or null to execute without an interval duration
-    */
-   fun warm(name: String, warmup: Warmup, iterations: Int, interval: Duration? = null) =
-      warm(name, warmup, 0.seconds, iterations, interval)
-
-   /**
-    * Adds a named [Warmup] to this registry, which is started once the provided [startupDelay] expires..
-    *
-    * Before the first loop, the [Warmup.start] method is invoked.
-    * Upon completion, the [Warmup.close] method is invoked and the warmer is removed.
-    *
-    * @param name a unique name for this warmup, instead of the default name. This allows multiple
-    *             warmups of the same type to be registered.
-    * @param startupDelay how long to wait before starting the warmups
-    * @param iterations how many iterations to invoke
-    * @param interval how much time between iterations or null to execute without an interval duration
-    */
-   fun warm(name: String, warmup: Warmup, startupDelay: Duration, iterations: Int, interval: Duration? = null) {
-
-      val existing = warmups.put(name, warmup)
-      if (existing != null) error("Warmup '$name' already registered. Try using a unique name.")
-
-      warmupScope.launch {
-         delay(startupDelay)
-
-         var completed = 0
-         val start = System.currentTimeMillis()
-
-         if (interval == null)
-            logger.warn { "Registering warmup '$name' for $iterations iterations" }
-         else
-            logger.warn { "Registering warmup '$name' for $iterations iterations with $interval between iterations" }
-
-         launch {
-            warmup.start()
-            repeat(iterations) { k ->
-               runCatching {
-                  warmup.warm(k)
-               }.onFailure { logger.warn(it) { "Warmup '$name' error" } }
-               completed++
-               warmupResults[name] = WarmupStatus(completed, iterations)
-               if (interval != null) delay(interval)
-            }
-
-            warmup.close()
-            val time = System.currentTimeMillis() - start
-            logger.warn { "Warmup '$name' has completed in ${time}ms" }
-            warmups.remove(name)
-
-            if (warmups.isEmpty()) {
-               logger.warn { "--All warmups have completed--" }
-            }
-         }
-      }
-   }
+   fun register(
+      check: HealthCheck,
+   ): HealthCheckRegistry = register(check.name, check, DEFAULT_INTERVAL, DEFAULT_INTERVAL)
 
    /**
     * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
@@ -181,7 +99,8 @@ class HealthCheckRegistry(
     * Adds a new [HealthCheck] to this registry with the given schedule.
     *
     * @param name the name is associated with the result in the output json.
-    * This is useful to allow the same check to be registered multiple times against different configurations.
+    *             This is useful to allow the same check to be registered multiple times against different configurations.
+    *             No healthcheck can be registered twice with the same name.
     */
    fun register(
       name: String,
@@ -190,7 +109,7 @@ class HealthCheckRegistry(
       checkInterval: Duration
    ): HealthCheckRegistry {
 
-      if (checks.contains(name)) error("Check $name already registered")
+      if (checks.containsKey(name)) error("Check $name already registered")
       checks.putIfAbsent(name, check)
 
       if (startUnhealthy) {
@@ -221,7 +140,7 @@ class HealthCheckRegistry(
          val result = check.check()
          notifySubscribers(name, check, result)
          when (result.status) {
-            HealthStatus.Healthy ->  success(name, result)
+            HealthStatus.Healthy -> success(name, result)
             HealthStatus.Unhealthy -> failure(name, result)
             HealthStatus.Startup -> failure(name, result)
          }
@@ -265,12 +184,11 @@ class HealthCheckRegistry(
    /**
     * Returns the [Health] of the system.
     *
-    * A system is considered healthy if all the healthchecks are in healthy state, and each warmup
-    * has completed all it's iterations.
+    * A system is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): Health {
       val healthy = checkResults.values.all { it.healthy } && warmupResults.values.all { it.iterations == it.completed }
-      return Health(healthy, warmupResults.toMap(), checkResults.toMap())
+      return Health(healthy, checkResults.toMap())
    }
 
    fun checks(): Set<HealthCheck> = checks.values.toSet()
@@ -313,7 +231,6 @@ data class WarmupStatus(val completed: Int, val iterations: Int)
  */
 data class Health(
    val healthy: Boolean,
-   val warmups: Map<String, WarmupStatus>,
    val healthchecks: Map<String, HealthCheckStatus>
 )
 
