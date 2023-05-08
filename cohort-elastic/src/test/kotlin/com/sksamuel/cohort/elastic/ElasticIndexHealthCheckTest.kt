@@ -55,7 +55,7 @@ class ElasticIndexHealthCheckTest : FunSpec({
    test("ElasticIndexHealthCheck should fail if cannot connect") {
       val restClient = RestClient.builder(HttpHost("localhost", 11111)).build()
       val transport = RestClientTransport(restClient, JacksonJsonpMapper())
-      val client = ElasticsearchClient(transport)
-      ElasticIndexHealthCheck(client, "foo").check().status shouldBe HealthStatus.Unhealthy
+      val client2 = ElasticsearchClient(transport)
+      ElasticIndexHealthCheck(client2, "foo").check().status shouldBe HealthStatus.Unhealthy
    }
 })

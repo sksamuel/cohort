@@ -44,5 +44,5 @@ fun main() {
    val props = Properties()
    props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
    val producer = KafkaConsumer(props, StringDeserializer(), StringDeserializer())
-   producer.metrics().toList().sortedBy { it.first.name() }.forEach { (a, metric) -> println(a) }
+   producer.metrics().toList().sortedBy { it.first.name() }.forEach { (a, _) -> println(a) }
 }

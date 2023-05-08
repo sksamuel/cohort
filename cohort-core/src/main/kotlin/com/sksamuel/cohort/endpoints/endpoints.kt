@@ -151,7 +151,7 @@ fun Route.cohort() {
          val results = status.healthchecks.map {
             ResultJson(
                name = it.key,
-               healthy = it.value.healthy,
+               status = it.value.result.status,
                lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
                message = it.value.result.message,
                cause = it.value.result.cause?.stackTraceToString(),

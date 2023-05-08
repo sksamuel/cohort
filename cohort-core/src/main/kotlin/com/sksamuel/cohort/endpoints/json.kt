@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.endpoints
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.sksamuel.cohort.HealthStatus
 import com.sksamuel.cohort.db.DataSourceInfo
 import com.sksamuel.cohort.db.Migration
 import com.sksamuel.cohort.gc.GCInfo
@@ -12,7 +13,7 @@ import com.sksamuel.cohort.system.SysProps
 
 data class ResultJson(
   val name: String,
-  val healthy: Boolean,
+  val status: HealthStatus,
   val lastCheck: String,
   val message: String?,
   val cause: String?,
