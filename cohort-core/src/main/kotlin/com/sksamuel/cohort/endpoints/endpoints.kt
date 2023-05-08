@@ -1,5 +1,6 @@
 package com.sksamuel.cohort.endpoints
 
+import com.sksamuel.cohort.CohortConfigAttributeKey
 import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails
