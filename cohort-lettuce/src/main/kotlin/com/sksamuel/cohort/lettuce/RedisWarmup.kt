@@ -6,19 +6,23 @@ import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
 class RedisWarmup<K, V>(
+   override val iterations: Int,
    private val conn: StatefulRedisConnection<K, V>,
-   override val iterations: Int = 1000,
    private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,
 ) : WarmupHealthCheck() {
 
    companion object {
 
-      operator fun <K> invoke(conn: StatefulRedisConnection<K, *>, genkey: () -> K): RedisWarmup<K, *> {
-         return RedisWarmup(conn) { it.async().get(genkey()).await() }
+      operator fun <K> invoke(
+         iterations: Int,
+         conn: StatefulRedisConnection<K, *>,
+         genkey: () -> K
+      ): RedisWarmup<K, *> {
+         return RedisWarmup(iterations, conn) { it.async().get(genkey()).await() }
       }
 
-      operator fun invoke(conn: StatefulRedisConnection<String, *>): RedisWarmup<String, *> {
-         return RedisWarmup(conn) { it.async().get(Random.nextInt().toString()).await() }
+      operator fun invoke(iterations: Int, conn: StatefulRedisConnection<String, *>): RedisWarmup<String, *> {
+         return RedisWarmup(iterations, conn) { it.async().get(Random.nextInt().toString()).await() }
       }
    }
 

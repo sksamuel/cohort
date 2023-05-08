@@ -7,7 +7,7 @@ import kotlin.random.Random
 
 class RedisClusterWarmup<K, V>(
    private val conn: StatefulRedisClusterConnection<K, V>,
-   override val iterations: Int = 1000,
+   override val iterations: Int,
    private val command: suspend (StatefulRedisClusterConnection<K, V>) -> Unit,
 ) : WarmupHealthCheck() {
 
@@ -18,11 +18,14 @@ class RedisClusterWarmup<K, V>(
          conn: StatefulRedisClusterConnection<K, *>,
          genkey: () -> K
       ): RedisClusterWarmup<K, *> {
-         return RedisClusterWarmup(conn) { it.async().get(genkey()).await() }
+         return RedisClusterWarmup(conn, iterations) { it.async().get(genkey()).await() }
       }
 
-      operator fun invoke(conn: StatefulRedisClusterConnection<String, *>): RedisClusterWarmup<String, *> {
-         return RedisClusterWarmup(conn) { it.async().get(Random.nextInt().toString()).await() }
+      operator fun invoke(
+         iterations: Int,
+         conn: StatefulRedisClusterConnection<String, *>
+      ): RedisClusterWarmup<String, *> {
+         return RedisClusterWarmup(conn, iterations) { it.async().get(Random.nextInt().toString()).await() }
       }
    }
 
