@@ -45,15 +45,14 @@ class HealthCheckRegistry(
    // contains all the registered warmups
    private val warmups = ConcurrentHashMap<String, WarmupHealthCheck>()
 
-   private val checkResults = ConcurrentHashMap<String, HealthCheckStatus>()
-   private val warmupResults = ConcurrentHashMap<String, WarmupStatus>()
+   private val results = ConcurrentHashMap<String, HealthCheckStatus>()
 
    private val logger = KotlinLogging.logger {}
    private val subscribers = mutableListOf<Subscriber>()
    private val warmupScope = CoroutineScope(Dispatchers.Default)
 
    companion object {
-      val DEFAULT_INTERVAL = 10.seconds
+      val DEFAULT_INTERVAL = 5.seconds
 
       operator fun invoke(
          configure: HealthCheckRegistry.() -> Unit
@@ -113,7 +112,7 @@ class HealthCheckRegistry(
       checks.putIfAbsent(name, check)
 
       if (startUnhealthy) {
-         checkResults[name] =
+         results[name] =
             HealthCheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
       }
 
@@ -153,10 +152,10 @@ class HealthCheckRegistry(
 
    private fun success(name: String, result: HealthCheckResult) {
 
-      val previous = checkResults[name]
+      val previous = results[name]
       val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
 
-      checkResults[name] = HealthCheckStatus(
+      results[name] = HealthCheckStatus(
          consecutiveSuccesses = successes,
          consecutiveFailures = 0, // reset to 0 when we have a success
          healthy = true,
@@ -167,12 +166,12 @@ class HealthCheckRegistry(
 
    private fun failure(name: String, result: HealthCheckResult) {
 
-      val previous = checkResults[name]
+      val previous = results[name]
       val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
 
       logger.warn { "HealthCheck $name reported $failures failures $result" }
 
-      checkResults[name] = HealthCheckStatus(
+      results[name] = HealthCheckStatus(
          consecutiveSuccesses = 0, // reset to 0 when we have a failure
          consecutiveFailures = failures,
          healthy = false,
@@ -187,8 +186,8 @@ class HealthCheckRegistry(
     * A system is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): Health {
-      val healthy = checkResults.values.all { it.healthy } && warmupResults.values.all { it.iterations == it.completed }
-      return Health(healthy, checkResults.toMap())
+      val healthy = results.values.all { it.healthy }
+      return Health(healthy, results.toMap())
    }
 
    fun checks(): Set<HealthCheck> = checks.values.toSet()
@@ -215,6 +214,9 @@ fun interface Subscriber {
    suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
 }
 
+/**
+ * Tracks the health for a [HealthCheck].
+ */
 data class HealthCheckStatus(
    val consecutiveSuccesses: Int,
    val consecutiveFailures: Int,

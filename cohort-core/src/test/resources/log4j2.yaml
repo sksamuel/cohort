@@ -1,0 +1,17 @@
+Configuration:
+   name: Default
+   Appenders:
+      Console:
+         name: console
+         target: SYSTEM_OUT
+   Loggers:
+      Root:
+         level: info
+         AppenderRef:
+            -  ref: console
+      Logger:
+         -  name: org.apache.kafka
+            level: warn
+            AppenderRef:
+               -  ref: console
+                  level: error

@@ -39,6 +39,8 @@ allprojects {
       implementation(Libs.Tabby.fp)
       testImplementation(Libs.Kotest.assertions)
       testImplementation(Libs.Kotest.junit5)
+      api("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-22")
+      api("org.slf4j:slf4j-api:2.0.7")
    }
 
    tasks.named<Test>("test") {
