@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.micrometer
 
 import com.sksamuel.cohort.HealthCheckRegistry
+import com.sksamuel.cohort.HealthStatus
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
@@ -8,7 +9,7 @@ import io.micrometer.core.instrument.binder.MeterBinder
 
 class CohortMetrics(private val healthCheckRegistry: HealthCheckRegistry) : MeterBinder {
 
-   private val counters = mutableMapOf<Pair<String, Boolean>, Counter>()
+   private val counters = mutableMapOf<Pair<String, HealthStatus>, Counter>()
    private val tags = mutableSetOf<Tag>()
 
    /**
@@ -20,11 +21,11 @@ class CohortMetrics(private val healthCheckRegistry: HealthCheckRegistry) : Mete
 
    override fun bindTo(registry: MeterRegistry) {
       healthCheckRegistry.addSubscriber { name, check, result ->
-         val counter = counters.getOrPut(Pair(name, result.isHealthy)) {
+         val counter = counters.getOrPut(Pair(name, result.status)) {
             Counter.builder("cohort.healthcheck")
                .tag("name", name)
                .tag("type", check::class.java.name)
-               .tag("healthy", result.isHealthy.toString())
+               .tag("status", result.status.name)
                .tags(tags)
                .register(registry)
          }
