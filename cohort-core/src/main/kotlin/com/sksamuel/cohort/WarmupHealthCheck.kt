@@ -52,7 +52,7 @@ internal class WarmupRunner() {
    private val logger = KotlinLogging.logger { }
    private val scope = CoroutineScope(Dispatchers.Default)
    private var completed = 0
-   private var time = 0
+   private var time = 0L
    private val error = AtomicReference<Throwable>()
 
    suspend fun run(warmup: WarmupHealthCheck) {
@@ -73,7 +73,7 @@ internal class WarmupRunner() {
 
          warmup.close()
 
-         System.currentTimeMillis() - start
+         time = System.currentTimeMillis() - start
          logger.warn { "Warmup '${warmup.name}' has completed in ${time}ms" }
       }
    }
