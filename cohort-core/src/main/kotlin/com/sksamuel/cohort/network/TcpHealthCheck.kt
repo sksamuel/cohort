@@ -1,5 +1,7 @@
-package com.sksamuel.cohort
+package com.sksamuel.cohort.network
 
+import com.sksamuel.cohort.HealthCheck
+import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
@@ -24,9 +26,9 @@ class TcpHealthCheck(
         withContext(Dispatchers.IO) {
           socket.close()
         }
-        HealthCheckResult.Healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
+         HealthCheckResult.Healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
       } else {
-        HealthCheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
+         HealthCheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
       }
     }.getOrElse { HealthCheckResult.Unhealthy("Connection to $host:$port failed", it) }
   }
