@@ -1,8 +1,9 @@
 package com.sksamuel.cohort
 
-import com.sksamuel.cohort.HealthCheckResult.Healthy
-import com.sksamuel.cohort.HealthCheckResult.Unhealthy
-
+/**
+ * A [HealthCheck] is invoked periodically, and returns a [HealthCheckResult]
+ * which indicates the health of the system.
+ */
 fun interface HealthCheck {
 
    suspend fun check(): HealthCheckResult
@@ -16,33 +17,39 @@ fun interface HealthCheck {
       }
 
    companion object {
+
+      /**
+       * Creates a [HealthCheck] by using the [Result] of a function to indicate health.
+       */
       operator fun invoke(f: () -> Result<String>) = HealthCheck {
          f().fold(
-            { Healthy(it) },
-            { Unhealthy(it.message ?: it::class.java.name, it) })
+            { HealthCheckResult.Healthy(it) },
+            { HealthCheckResult.Unhealthy(it.message ?: it::class.java.name, it) })
       }
    }
 }
 
 /**
  * The result of a [HealthCheck].
- *
- * Can be either [Healthy] or [Unhealthy].
  */
-sealed class HealthCheckResult {
+data class HealthCheckResult(
+   val status: HealthStatus,
+   val message: String,
+   val cause: Throwable?,
+) {
 
-   abstract val isHealthy: Boolean
-   abstract val message: String?
-   abstract val cause: Throwable?
+   val isHealthy = status == HealthStatus.Healthy
 
-   data class Healthy(override val message: String?) : HealthCheckResult() {
-      override val cause: Throwable? = null
-      override val isHealthy: Boolean = true
+   companion object {
+      fun Healthy(message: String) = HealthCheckResult(HealthStatus.Healthy, message, null)
+      fun Startup(message: String) = HealthCheckResult(HealthStatus.Startup, message, null)
+      fun Unhealthy(message: String, cause: Throwable? = null) = HealthCheckResult(HealthStatus.Unhealthy, message, cause)
    }
+}
 
-   data class Unhealthy(override val message: String, override val cause: Throwable?) : HealthCheckResult() {
-      constructor(message: String) : this(message, null)
-
-      override val isHealthy: Boolean = false
-   }
+/**
+ * The result of a [HealthCheck].
+ */
+enum class HealthStatus {
+   Healthy, Unhealthy, Startup,
 }

@@ -220,9 +220,10 @@ class HealthCheckRegistry(
       try {
          val result = check.check()
          notifySubscribers(name, check, result)
-         when (result) {
-            is HealthCheckResult.Healthy -> success(name, result)
-            is HealthCheckResult.Unhealthy -> failure(name, result)
+         when (result.status) {
+            HealthStatus.Healthy ->  success(name, result)
+            HealthStatus.Unhealthy -> failure(name, result)
+            HealthStatus.Startup -> failure(name, result)
          }
       } catch (t: Throwable) {
          val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
@@ -231,7 +232,7 @@ class HealthCheckRegistry(
       }
    }
 
-   private fun success(name: String, result: HealthCheckResult.Healthy) {
+   private fun success(name: String, result: HealthCheckResult) {
 
       val previous = checkResults[name]
       val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
@@ -245,7 +246,7 @@ class HealthCheckRegistry(
       )
    }
 
-   private fun failure(name: String, result: HealthCheckResult.Unhealthy) {
+   private fun failure(name: String, result: HealthCheckResult) {
 
       val previous = checkResults[name]
       val failures = if (previous == null) 1 else previous.consecutiveFailures + 1

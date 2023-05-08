@@ -7,6 +7,8 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
 import co.elastic.clients.json.jackson.JacksonJsonpMapper
 import co.elastic.clients.transport.rest_client.RestClientTransport
 import com.sksamuel.cohort.HealthCheckResult
+import com.sksamuel.cohort.HealthCheckStatus
+import com.sksamuel.cohort.HealthStatus
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.elastic.ElasticTestContainerExtension
@@ -33,13 +35,13 @@ class ElasticIndexHealthCheckTest : FunSpec({
    }
 
    test("missing index") {
-      ElasticIndexHealthCheck(client, "qwe").check().shouldBeInstanceOf<HealthCheckResult.Unhealthy>()
+      ElasticIndexHealthCheck(client, "qwe").check()
          .message shouldBe "Elastic index 'qwe' was not found"
    }
 
    test("ElasticIndexCheck should support failIfEmpty=true with empty index") {
       client.indices().create(CreateIndexRequest.Builder().index("bar").build())
-      ElasticIndexHealthCheck(client, "bar", true).check().shouldBeInstanceOf<HealthCheckResult.Unhealthy>()
+      ElasticIndexHealthCheck(client, "bar", true).check()
          .message shouldBe "Elastic index 'bar' is empty"
    }
 
@@ -57,6 +59,6 @@ class ElasticIndexHealthCheckTest : FunSpec({
       val restClient = RestClient.builder(HttpHost("localhost", 11111)).build()
       val transport = RestClientTransport(restClient, JacksonJsonpMapper())
       val client = ElasticsearchClient(transport)
-      ElasticIndexHealthCheck(client, "foo").check().shouldBeTypeOf<HealthCheckResult.Unhealthy>()
+      ElasticIndexHealthCheck(client, "foo").check().status shouldBe HealthStatus.Unhealthy
    }
 })

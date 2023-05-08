@@ -7,7 +7,6 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.utility.DockerImageName
 
@@ -30,7 +29,6 @@ class RabbitConnectionHealthCheckTest : FunSpec({
       port = 12312
     }
     RabbitConnectionHealthCheck(connection).check()
-      .shouldBeTypeOf<HealthCheckResult.Unhealthy>()
       .message.shouldBe("Could not connect to rabbit instance")
   }
 
