@@ -61,14 +61,14 @@ internal class WarmupRunner() {
          val start = System.currentTimeMillis()
          warmup.start()
 
-         repeat(warmup.iterations) { k ->
-            runCatching {
+         runCatching {
+            repeat(warmup.iterations) { k ->
                warmup.warm(k)
-            }.onFailure {
-               error.set(it)
-               logger.warn(it) { "Warmup '${warmup.name}' error" }
+               completed++
             }
-            completed++
+         }.onFailure {
+            error.set(it)
+            logger.warn(it) { "Warmup '${warmup.name}' error" }
          }
 
          warmup.close()
