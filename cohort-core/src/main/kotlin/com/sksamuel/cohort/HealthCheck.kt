@@ -8,7 +8,12 @@ fun interface HealthCheck {
    suspend fun check(): HealthCheckResult
 
    val name: String
-      get() = this::class.java.name.removePrefix("com.sksamuel.")
+      get() {
+         val jvmName = this::class.java.name
+         return if (jvmName.startsWith("com.sksamuel.cohort"))
+            jvmName.removePrefix("com.sksamuel.")
+         else jvmName
+      }
 
    companion object {
       operator fun invoke(f: () -> Result<String>) = HealthCheck {
@@ -37,6 +42,7 @@ sealed class HealthCheckResult {
 
    data class Unhealthy(override val message: String, override val cause: Throwable?) : HealthCheckResult() {
       constructor(message: String) : this(message, null)
+
       override val isHealthy: Boolean = false
    }
 }
