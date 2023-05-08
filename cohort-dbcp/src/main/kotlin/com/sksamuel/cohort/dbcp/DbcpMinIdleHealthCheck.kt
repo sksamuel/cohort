@@ -17,6 +17,6 @@ class DbcpMinIdleHealthCheck(
 ) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val msg = "Idle connections ${ds.numIdle} [min required is $minIdle]"
-    return if (ds.numIdle >= minIdle) HealthCheckResult.Healthy(msg) else HealthCheckResult.Unhealthy(msg, null)
+    return if (ds.numIdle >= minIdle) HealthCheckResult.healthy(msg) else HealthCheckResult.unhealthy(msg, null)
   }
 }

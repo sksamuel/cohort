@@ -17,11 +17,11 @@ class MongoConnectionHealthCheck(private val client: MongoClient) : HealthCheck 
       withTimeout(5.seconds) {
         runInterruptible(Dispatchers.IO) {
           val dbs = client.listDatabaseNames().toList()
-          HealthCheckResult.Healthy("Connected to mongo instance (${dbs.size} databases)")
+          HealthCheckResult.healthy("Connected to mongo instance (${dbs.size} databases)")
         }
       }
     }.getOrElse {
-      HealthCheckResult.Unhealthy("Could not connect to mongo instance", it)
+      HealthCheckResult.unhealthy("Could not connect to mongo instance", it)
     }
   }
 }

@@ -18,9 +18,9 @@ class RedisConnectionHealthCheck(
    private val jedis: Jedis,
    private val command: (Connection) -> HealthCheckResult = {
       if (it.ping()) {
-         HealthCheckResult.Healthy("Connected to redis cluster")
+         HealthCheckResult.healthy("Connected to redis cluster")
       } else {
-         HealthCheckResult.Healthy("Ping to redis cluster failed")
+         HealthCheckResult.healthy("Ping to redis cluster failed")
       }
    },
 ) : HealthCheck {
@@ -33,9 +33,9 @@ class RedisConnectionHealthCheck(
          tls: Boolean,
          command: (Connection) -> HealthCheckResult = {
             if (it.ping()) {
-               HealthCheckResult.Healthy("Connected to redis cluster")
+               HealthCheckResult.healthy("Connected to redis cluster")
             } else {
-               HealthCheckResult.Healthy("Ping to redis cluster failed")
+               HealthCheckResult.healthy("Ping to redis cluster failed")
             }
          }
       ): RedisConnectionHealthCheck {
@@ -52,7 +52,7 @@ class RedisConnectionHealthCheck(
          runCatching {
             jedis.connection.use { command(it) }
          }.getOrElse {
-            HealthCheckResult.Unhealthy("Could not connect to Redis", it)
+            HealthCheckResult.unhealthy("Could not connect to Redis", it)
          }
       }
    }

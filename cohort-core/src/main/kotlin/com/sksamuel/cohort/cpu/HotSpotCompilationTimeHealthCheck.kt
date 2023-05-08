@@ -15,8 +15,8 @@ class HotSpotCompilationTimeHealthCheck(private val time: Long = 2000) : HealthC
    override suspend fun check(): HealthCheckResult {
       val compilationTime = ManagementFactory.getCompilationMXBean().totalCompilationTime
       return if (compilationTime >= time)
-         HealthCheckResult.Healthy("Compilation time: $compilationTime (required $time)")
+         HealthCheckResult.healthy("Compilation time: $compilationTime (required $time)")
       else
-         HealthCheckResult.Unhealthy("Compilation time: $compilationTime (required $time)")
+         HealthCheckResult.unhealthy("Compilation time: $compilationTime (required $time)")
    }
 }

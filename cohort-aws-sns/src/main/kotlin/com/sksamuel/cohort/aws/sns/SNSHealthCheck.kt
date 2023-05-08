@@ -24,8 +24,8 @@ class SNSHealthCheck(
       return runCatching { createClient() }
          .flatMap { use(it) }
          .fold(
-            { HealthCheckResult.Healthy("SNS access confirmed") },
-            { HealthCheckResult.Unhealthy("Could not connect to SNS", it) }
+            { HealthCheckResult.healthy("SNS access confirmed") },
+            { HealthCheckResult.unhealthy("Could not connect to SNS", it) }
          )
    }
 }

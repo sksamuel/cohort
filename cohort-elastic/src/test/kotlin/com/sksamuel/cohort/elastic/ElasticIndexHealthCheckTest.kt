@@ -7,14 +7,11 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
 import co.elastic.clients.json.jackson.JacksonJsonpMapper
 import co.elastic.clients.transport.rest_client.RestClientTransport
 import com.sksamuel.cohort.HealthCheckResult
-import com.sksamuel.cohort.HealthCheckStatus
 import com.sksamuel.cohort.HealthStatus
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.elastic.ElasticTestContainerExtension
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
-import io.kotest.matchers.types.shouldBeTypeOf
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.testcontainers.elasticsearch.ElasticsearchContainer
@@ -31,7 +28,7 @@ class ElasticIndexHealthCheckTest : FunSpec({
    test("ElasticIndexCheck should connect to elastic and check for topic") {
       client.indices().create(CreateIndexRequest.Builder().index("foo").build())
       ElasticIndexHealthCheck(client, "foo").check() shouldBe
-         HealthCheckResult.Healthy("Detected elastic index 'foo'")
+         HealthCheckResult.healthy("Detected elastic index 'foo'")
    }
 
    test("missing index") {
@@ -52,7 +49,7 @@ class ElasticIndexHealthCheckTest : FunSpec({
             .refresh(Refresh.True).build()
       )
       ElasticIndexHealthCheck(client, "baz", true).check() shouldBe
-         HealthCheckResult.Healthy("Detected elastic index 'baz'")
+         HealthCheckResult.healthy("Detected elastic index 'baz'")
    }
 
    test("ElasticIndexHealthCheck should fail if cannot connect") {

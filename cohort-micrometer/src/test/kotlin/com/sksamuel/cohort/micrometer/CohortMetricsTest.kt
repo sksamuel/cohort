@@ -11,11 +11,11 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 object FooHealthCheck : HealthCheck {
-  override suspend fun check(): HealthCheckResult = HealthCheckResult.Healthy("foo")
+  override suspend fun check(): HealthCheckResult = HealthCheckResult.healthy("foo")
 }
 
 object BarHealthCheck : HealthCheck {
-  override suspend fun check(): HealthCheckResult = HealthCheckResult.Unhealthy("bar")
+  override suspend fun check(): HealthCheckResult = HealthCheckResult.unhealthy("bar")
 }
 
 class CohortMetricsTest : FunSpec() {

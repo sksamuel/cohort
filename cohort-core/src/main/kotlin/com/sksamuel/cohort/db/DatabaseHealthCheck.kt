@@ -20,6 +20,6 @@ class DatabaseHealthCheck(
 
    override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
       conn.createStatement().executeQuery(query)
-      HealthCheckResult.Healthy("Connected to database successfully")
+      HealthCheckResult.healthy("Connected to database successfully")
    }
 }

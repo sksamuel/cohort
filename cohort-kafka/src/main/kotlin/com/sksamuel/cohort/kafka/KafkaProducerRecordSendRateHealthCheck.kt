@@ -30,13 +30,13 @@ class KafkaProducerRateHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       val metric = producer.metrics().values.firstOrNull { it.metricName().name() == metricName }
-         ?: return HealthCheckResult.Unhealthy("Could not locate kafka metric '${metricName}'", null)
+         ?: return HealthCheckResult.unhealthy("Could not locate kafka metric '${metricName}'", null)
       val sendRate = metric.metricValue().toString().toDoubleOrNull()?.roundToInt() ?: 0
       val msg = "Kafka producer $metricName $sendRate [min threshold $minSendRate]"
       return if (sendRate < minSendRate)
-         HealthCheckResult.Unhealthy(msg, null)
+         HealthCheckResult.unhealthy(msg, null)
       else
-         HealthCheckResult.Healthy(msg)
+         HealthCheckResult.healthy(msg)
    }
 }
 

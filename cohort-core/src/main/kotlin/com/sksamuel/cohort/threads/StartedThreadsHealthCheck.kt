@@ -20,9 +20,9 @@ class StartedThreadsHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val count = threadMXBean.totalStartedThreadCount
     return if (count <= maxStartedThreads) {
-      HealthCheckResult.Healthy("Started threads is below threshold [$count <= $maxStartedThreads]")
+      HealthCheckResult.healthy("Started threads is below threshold [$count <= $maxStartedThreads]")
     } else {
-      HealthCheckResult.Unhealthy("Started threads is above threshold [$count > $maxStartedThreads]", null)
+      HealthCheckResult.unhealthy("Started threads is above threshold [$count > $maxStartedThreads]", null)
     }
   }
 }

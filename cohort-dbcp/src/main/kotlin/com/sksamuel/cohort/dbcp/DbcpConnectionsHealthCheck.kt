@@ -18,6 +18,6 @@ class DbcpConnectionsHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val total = ds.numActive + ds.numIdle
     val msg = "Database connections is $total [min required is $minConnections]"
-    return if (total >= minConnections) HealthCheckResult.Healthy(msg) else HealthCheckResult.Unhealthy(msg, null)
+    return if (total >= minConnections) HealthCheckResult.healthy(msg) else HealthCheckResult.unhealthy(msg, null)
   }
 }

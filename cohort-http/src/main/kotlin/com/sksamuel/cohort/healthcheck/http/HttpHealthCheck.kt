@@ -52,8 +52,8 @@ class HttpHealthCheck(
       }
 
       return if (successCodes.contains(resp.status.value)) {
-         HealthCheckResult.Healthy("Url $url returned ${resp.status}")
+         HealthCheckResult.healthy("Url $url returned ${resp.status}")
       } else
-         HealthCheckResult.Unhealthy("Url $url returned ${resp.status}", null)
+         HealthCheckResult.unhealthy("Url $url returned ${resp.status}", null)
    }
 }

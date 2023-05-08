@@ -18,9 +18,9 @@ class ThreadStateHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val count = Thread.getAllStackTraces().keys.count { it.state == state }
     return if (count <= maxCount) {
-      HealthCheckResult.Healthy("Thread count for state $state is below threshold [$count < $maxCount]")
+      HealthCheckResult.healthy("Thread count for state $state is below threshold [$count < $maxCount]")
     } else {
-      HealthCheckResult.Unhealthy("Thread count for state $state is above threshold [$count < $maxCount]", null)
+      HealthCheckResult.unhealthy("Thread count for state $state is above threshold [$count < $maxCount]", null)
     }
   }
 }

@@ -22,9 +22,9 @@ class HikariMinIdleHealthCheck(
     val idleConnections = ds.hikariPoolMXBean.idleConnections
     val msg = "Idle connections $idleConnections [min required is $minIdle]"
     return if (idleConnections >= minIdle) {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     }
   }
 }

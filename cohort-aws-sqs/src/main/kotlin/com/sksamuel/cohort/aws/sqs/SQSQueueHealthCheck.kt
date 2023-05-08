@@ -25,8 +25,8 @@ class SQSQueueHealthCheck(
       return runCatching { createClient() }
          .flatMap { use(it) }
          .fold(
-            { HealthCheckResult.Healthy("SQS queue access confirmed $queue") },
-            { HealthCheckResult.Unhealthy("Could not connect to SQS queue $queue", it) }
+            { HealthCheckResult.healthy("SQS queue access confirmed $queue") },
+            { HealthCheckResult.unhealthy("Could not connect to SQS queue $queue", it) }
          )
    }
 }

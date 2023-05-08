@@ -17,11 +17,11 @@ class RabbitConnectionHealthCheck(private val factory: ConnectionFactory) : Heal
          withTimeout(5.seconds) {
             runInterruptible(Dispatchers.IO) {
                factory.newConnection()
-               HealthCheckResult.Healthy("Connected to rabbit instance")
+               HealthCheckResult.healthy("Connected to rabbit instance")
             }
          }
       }.getOrElse {
-         HealthCheckResult.Unhealthy("Could not connect to rabbit instance", it)
+         HealthCheckResult.unhealthy("Could not connect to rabbit instance", it)
       }
    }
 }

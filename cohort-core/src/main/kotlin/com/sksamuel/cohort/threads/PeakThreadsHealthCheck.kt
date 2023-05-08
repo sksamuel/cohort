@@ -21,9 +21,9 @@ class PeakThreadsHealthCheck(
     val count = threadBean.peakThreadCount
     val msg = "Peak threads is $count [threshold is $maxPeakThreads]"
     return if (count <= maxPeakThreads) {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     }
   }
 }

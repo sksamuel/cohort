@@ -30,11 +30,11 @@ class DiskSpaceHealthCheck(
     return try {
       val availablePercent = (fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100).roundToInt()
       if (availablePercent < minFreeSpacePercentage)
-        HealthCheckResult.Unhealthy("Available disk space is $availablePercent% on ${fileStore.name()}", null)
+        HealthCheckResult.unhealthy("Available disk space is $availablePercent% on ${fileStore.name()}", null)
       else
-        HealthCheckResult.Healthy("Available disk space is $availablePercent% on ${fileStore.name()}")
+        HealthCheckResult.healthy("Available disk space is $availablePercent% on ${fileStore.name()}")
     } catch (t: Throwable) {
-      HealthCheckResult.Unhealthy("Error querying disk space on ${fileStore.name()}", t)
+      HealthCheckResult.unhealthy("Error querying disk space on ${fileStore.name()}", t)
     }
   }
 

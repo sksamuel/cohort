@@ -19,9 +19,9 @@ class SystemLoadHealthCheck(private val maxLoad: Double) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val load = bean.systemLoadAverage
     return if (load < maxLoad) {
-      HealthCheckResult.Healthy("System load is below threshold [$load < $maxLoad]")
+      HealthCheckResult.healthy("System load is below threshold [$load < $maxLoad]")
     } else {
-      HealthCheckResult.Unhealthy("System load is above threshold [$load >= $maxLoad]", null)
+      HealthCheckResult.unhealthy("System load is above threshold [$load >= $maxLoad]", null)
     }
   }
 

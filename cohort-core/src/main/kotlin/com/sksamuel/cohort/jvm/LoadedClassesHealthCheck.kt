@@ -18,9 +18,9 @@ class LoadedClassesHealthCheck(private val maxLoadedClasses: Int) : HealthCheck 
   override suspend fun check(): HealthCheckResult {
     val count = bean.loadedClassCount
     return if (count <= maxLoadedClasses) {
-      HealthCheckResult.Healthy("Loaded classes are within threshold [$count <= $maxLoadedClasses]")
+      HealthCheckResult.healthy("Loaded classes are within threshold [$count <= $maxLoadedClasses]")
     } else {
-      HealthCheckResult.Unhealthy("Loaded classes are above threshold [$count > $maxLoadedClasses]", null)
+      HealthCheckResult.unhealthy("Loaded classes are above threshold [$count > $maxLoadedClasses]", null)
     }
   }
 

@@ -33,7 +33,7 @@ class RedisClusterHealthCheck<K, V>(
    override suspend fun check(): HealthCheckResult {
       return runCatching {
          command(conn)
-         HealthCheckResult.Healthy("Redis command successful")
-      }.getOrElse { HealthCheckResult.Unhealthy("Redis command failure", it) }
+         HealthCheckResult.healthy("Redis command successful")
+      }.getOrElse { HealthCheckResult.unhealthy("Redis command failure", it) }
    }
 }

@@ -83,9 +83,9 @@ internal class WarmupRunner {
    fun result(warmup: WarmupHealthCheck): HealthCheckResult {
       val t = error.get()
       return when {
-         t != null -> HealthCheckResult.Unhealthy("Warmup '${warmup.name}' error", t)
-         completed == warmup.iterations -> HealthCheckResult.Healthy("Warmup '${warmup.name}' has completed in ${time}ms")
-         else -> HealthCheckResult.Startup("Warmup '${warmup.name}' has completed $completed iterations")
+         t != null -> HealthCheckResult.unhealthy("Warmup '${warmup.name}' error", t)
+         completed == warmup.iterations -> HealthCheckResult.healthy("Warmup '${warmup.name}' has completed in ${time}ms")
+         else -> HealthCheckResult.startup("Warmup '${warmup.name}' has completed $completed iterations")
       }
    }
 }

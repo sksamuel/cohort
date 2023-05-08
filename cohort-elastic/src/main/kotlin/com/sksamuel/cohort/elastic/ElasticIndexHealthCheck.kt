@@ -27,16 +27,16 @@ class ElasticIndexHealthCheck(
          withContext(Dispatchers.IO) {
             val count = client.count(CountRequest.Builder().index(index).build())
             if (count.count() == 0L && failIfEmpty) {
-               HealthCheckResult.Unhealthy("Elastic index '$index' is empty")
+               HealthCheckResult.unhealthy("Elastic index '$index' is empty")
             } else {
-               HealthCheckResult.Healthy("Detected elastic index '$index'")
+               HealthCheckResult.healthy("Detected elastic index '$index'")
             }
          }
       }.getOrElse {
          if (it.message?.contains("index_not_found_exception") == true) {
-            HealthCheckResult.Unhealthy("Elastic index '$index' was not found", it)
+            HealthCheckResult.unhealthy("Elastic index '$index' was not found", it)
          } else {
-            HealthCheckResult.Unhealthy("Error connecting to elastic cluster", it)
+            HealthCheckResult.unhealthy("Error connecting to elastic cluster", it)
          }
       }
    }

@@ -21,6 +21,6 @@ class DatabaseConnectionHealthCheck(
 
    override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
       conn.isValid(timeout.inWholeSeconds.toInt())
-      HealthCheckResult.Healthy("Connected to database successfully")
+      HealthCheckResult.healthy("Connected to database successfully")
    }
 }

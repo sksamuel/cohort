@@ -19,9 +19,9 @@ class DaemonThreadsHealthCheck(private val maxDaemonThreads: Int) : HealthCheck 
     val count = threadBean.daemonThreadCount
     val msg = "Daemon threads count is $count [threshold is $maxDaemonThreads]"
     return if (count <= maxDaemonThreads) {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     }
   }
 }

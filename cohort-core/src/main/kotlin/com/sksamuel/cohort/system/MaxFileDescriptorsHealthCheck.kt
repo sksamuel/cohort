@@ -20,9 +20,9 @@ class MaxFileDescriptorsHealthCheck(private val requiredMaxDescriptors: Int) : H
     val max = bean.maxFileDescriptorCount
     val msg = "Max file descriptors $max [required at least $requiredMaxDescriptors]"
     return if (max < requiredMaxDescriptors) {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     }
   }
 }

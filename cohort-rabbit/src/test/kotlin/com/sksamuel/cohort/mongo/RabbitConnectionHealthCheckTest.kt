@@ -20,7 +20,7 @@ class RabbitConnectionHealthCheckTest : FunSpec({
       host = container.host
       port = container.amqpPort
     }
-    RabbitConnectionHealthCheck(connection).check() shouldBe HealthCheckResult.Healthy("Connected to rabbit instance")
+    RabbitConnectionHealthCheck(connection).check() shouldBe HealthCheckResult.healthy("Connected to rabbit instance")
   }
 
   test("RabbitConnectionHealthCheck should fail if cannot connect") {

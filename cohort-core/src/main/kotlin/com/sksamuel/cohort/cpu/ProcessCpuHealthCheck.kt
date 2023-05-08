@@ -21,9 +21,9 @@ class ProcessCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
       val load = bean.processCpuLoad
       val msg = "Process CPU $load [max load $maxLoad]"
       return if (load < maxLoad) {
-         HealthCheckResult.Healthy(msg)
+         HealthCheckResult.healthy(msg)
       } else {
-         HealthCheckResult.Unhealthy(msg, null)
+         HealthCheckResult.unhealthy(msg, null)
       }
    }
 }

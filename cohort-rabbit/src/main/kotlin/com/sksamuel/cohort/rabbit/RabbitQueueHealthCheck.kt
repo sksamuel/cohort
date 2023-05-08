@@ -28,11 +28,11 @@ class RabbitQueueHealthCheck(
                val conn = factory.newConnection()
                val channel = conn.createChannel()
                channel.queueDeclarePassive(queue)
-               HealthCheckResult.Healthy("Confirmed connection to RabbitMQ queue $queue")
+               HealthCheckResult.healthy("Confirmed connection to RabbitMQ queue $queue")
             }
          }
       }.getOrElse {
-         HealthCheckResult.Unhealthy("Could not connect to RabbitMQ, or queue does not exist $queue", it)
+         HealthCheckResult.unhealthy("Could not connect to RabbitMQ, or queue does not exist $queue", it)
       }
    }
 }

@@ -19,7 +19,7 @@ class PulsarHealthCheck(private val client: PulsarAdmin) : HealthCheck {
    override suspend fun check(): HealthCheckResult {
       return runCatching {
          client.bookies()
-         HealthCheckResult.Healthy("Connected to Pulsar")
-      }.getOrElse { HealthCheckResult.Unhealthy("Could not connect to Pulsar", it) }
+         HealthCheckResult.healthy("Connected to Pulsar")
+      }.getOrElse { HealthCheckResult.unhealthy("Could not connect to Pulsar", it) }
    }
 }

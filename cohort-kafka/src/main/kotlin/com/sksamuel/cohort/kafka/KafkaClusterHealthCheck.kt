@@ -20,12 +20,12 @@ class KafkaClusterHealthCheck(private val adminClient: AdminClient) : HealthChec
       val nodes = clusterResult.nodes().toCompletionStage().await()
 
       when {
-        nodes.isEmpty() -> HealthCheckResult.Unhealthy("Kafka cluster is showing no nodes", null)
-        controller == null -> HealthCheckResult.Unhealthy("Kafka cluster returned without controller", null)
-        else -> HealthCheckResult.Healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
+        nodes.isEmpty() -> HealthCheckResult.unhealthy("Kafka cluster is showing no nodes", null)
+        controller == null -> HealthCheckResult.unhealthy("Kafka cluster returned without controller", null)
+        else -> HealthCheckResult.healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
       }
     } catch (t: Throwable) {
-      HealthCheckResult.Unhealthy("Could not connect to kafka cluster", t)
+      HealthCheckResult.unhealthy("Could not connect to kafka cluster", t)
     }
   }
 }

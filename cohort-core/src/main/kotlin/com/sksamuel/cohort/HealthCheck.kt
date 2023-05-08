@@ -24,8 +24,8 @@ fun interface HealthCheck {
        */
       operator fun invoke(f: () -> Result<String>) = HealthCheck {
          f().fold(
-            { HealthCheckResult.Healthy(it) },
-            { HealthCheckResult.Unhealthy(it.message ?: it::class.java.name, it) })
+            { HealthCheckResult.healthy(it) },
+            { HealthCheckResult.unhealthy(it.message ?: it::class.java.name, it) })
       }
    }
 }
@@ -42,9 +42,9 @@ data class HealthCheckResult(
    val isHealthy = status == HealthStatus.Healthy
 
    companion object {
-      fun Healthy(message: String) = HealthCheckResult(HealthStatus.Healthy, message, null)
-      fun Startup(message: String) = HealthCheckResult(HealthStatus.Startup, message, null)
-      fun Unhealthy(message: String, cause: Throwable? = null) =
+      fun healthy(message: String) = HealthCheckResult(HealthStatus.Healthy, message, null)
+      fun startup(message: String) = HealthCheckResult(HealthStatus.Startup, message, null)
+      fun unhealthy(message: String, cause: Throwable? = null) =
          HealthCheckResult(HealthStatus.Unhealthy, message, cause)
    }
 }

@@ -18,8 +18,8 @@ class KafkaTopicHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val desc = adminClient.describeTopics(listOf(topic)).all().get(1, TimeUnit.MINUTES)[topic]
     return if (desc == null)
-      HealthCheckResult.Unhealthy("Topic $topic does not exist on kafka cluster", null)
+      HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", null)
     else
-      HealthCheckResult.Healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
+      HealthCheckResult.healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
   }
 }

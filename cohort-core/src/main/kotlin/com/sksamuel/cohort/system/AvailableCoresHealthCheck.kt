@@ -22,9 +22,9 @@ class AvailableCoresHealthCheck(private val minCores: Int) : HealthCheck {
   override suspend fun check(): HealthCheckResult {
     val cores = Runtime.getRuntime().availableProcessors()
     return if (cores < minCores) {
-      HealthCheckResult.Unhealthy("Available CPU cores are below threshold [$cores < $minCores]", null)
+      HealthCheckResult.unhealthy("Available CPU cores are below threshold [$cores < $minCores]", null)
     } else {
-      HealthCheckResult.Healthy("Available CPU cores are equal or above threshold [$cores >= $minCores]")
+      HealthCheckResult.healthy("Available CPU cores are equal or above threshold [$cores >= $minCores]")
     }
   }
 

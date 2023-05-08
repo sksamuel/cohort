@@ -21,9 +21,9 @@ class RedisClusterHealthCheck(
    private val command: (JedisCluster) -> HealthCheckResult = {
       val nodes = it.clusterNodes.size
       if (nodes > 0) {
-         HealthCheckResult.Healthy("Connected to redis cluster with $nodes nodes")
+         HealthCheckResult.healthy("Connected to redis cluster with $nodes nodes")
       } else {
-         HealthCheckResult.Unhealthy("Connected to redis cluster but zero nodes detected", null)
+         HealthCheckResult.unhealthy("Connected to redis cluster but zero nodes detected", null)
       }
    },
 ) : HealthCheck {
@@ -37,9 +37,9 @@ class RedisClusterHealthCheck(
          command: (JedisCluster) -> HealthCheckResult = {
             val nodes = it.clusterNodes.size
             if (nodes > 0) {
-               HealthCheckResult.Healthy("Connected to redis cluster with $nodes nodes")
+               HealthCheckResult.healthy("Connected to redis cluster with $nodes nodes")
             } else {
-               HealthCheckResult.Unhealthy("Connected to redis cluster but zero nodes detected", null)
+               HealthCheckResult.unhealthy("Connected to redis cluster but zero nodes detected", null)
             }
          }
       ): RedisClusterHealthCheck {
@@ -56,7 +56,7 @@ class RedisClusterHealthCheck(
          runCatching {
             jedis.use { command(it) }
          }.getOrElse {
-            HealthCheckResult.Unhealthy("Could not connect to redis cluster", it)
+            HealthCheckResult.unhealthy("Could not connect to redis cluster", it)
          }
       }
    }

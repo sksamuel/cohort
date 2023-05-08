@@ -27,7 +27,7 @@ class ElasticClusterCommandCheck(
         command(client)
       }
     }.getOrElse {
-      HealthCheckResult.Unhealthy("Error executing health check against elasticsearch", it)
+      HealthCheckResult.unhealthy("Error executing health check against elasticsearch", it)
     }
   }
 }

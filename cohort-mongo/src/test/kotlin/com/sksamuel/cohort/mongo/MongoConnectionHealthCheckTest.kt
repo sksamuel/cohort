@@ -16,7 +16,7 @@ class MongoConnectionHealthCheckTest : FunSpec({
 
   test("mongo health check should connect to mongo") {
     val client = MongoClients.create(container.connectionString)
-    MongoConnectionHealthCheck(client).check() shouldBe HealthCheckResult.Healthy("Connected to mongo instance (3 databases)")
+    MongoConnectionHealthCheck(client).check() shouldBe HealthCheckResult.healthy("Connected to mongo instance (3 databases)")
   }
 
   test("mongo health check should fail if cannot connect") {

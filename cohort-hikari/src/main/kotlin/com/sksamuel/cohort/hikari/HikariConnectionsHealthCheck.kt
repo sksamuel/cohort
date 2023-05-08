@@ -22,9 +22,9 @@ class HikariConnectionsHealthCheck(
     val conns = ds.hikariPoolMXBean.totalConnections
     val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [minConnections:$minConnections]"
     return if (conns >= minConnections) {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     } else {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     }
   }
 }

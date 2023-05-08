@@ -113,7 +113,7 @@ class HealthCheckRegistry(
 
       if (startUnhealthy) {
          results[name] =
-            HealthCheckStatus(0, 0, false, Instant.now(), HealthCheckResult.Unhealthy("Not yet executed", null))
+            HealthCheckStatus(0, 0, false, Instant.now(), HealthCheckResult.unhealthy("Not yet executed", null))
       }
 
       scheduler.scheduleWithFixedDelay(
@@ -144,7 +144,7 @@ class HealthCheckRegistry(
             HealthStatus.Startup -> failure(name, result)
          }
       } catch (t: Throwable) {
-         val result = HealthCheckResult.Unhealthy("$name failed due to ${t.javaClass.name}", t)
+         val result = HealthCheckResult.unhealthy("$name failed due to ${t.javaClass.name}", t)
          notifySubscribers(name, check, result)
          failure(name, result)
       }

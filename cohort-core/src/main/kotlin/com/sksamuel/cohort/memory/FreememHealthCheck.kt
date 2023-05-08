@@ -23,9 +23,9 @@ class FreememHealthCheck(private val minFreeBytes: Int) : HealthCheck {
     val free = Runtime.getRuntime().freeMemory()
     val msg = "Freemem $free bytes [min free $minFreeBytes]"
     return if (free < minFreeBytes) {
-      HealthCheckResult.Unhealthy(msg, null)
+      HealthCheckResult.unhealthy(msg, null)
     } else {
-      HealthCheckResult.Healthy(msg)
+      HealthCheckResult.healthy(msg)
     }
   }
 }

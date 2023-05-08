@@ -34,16 +34,16 @@ class ElasticClusterHealthCheck(
       val status = health.status
       val msg = "Elastic cluster is ${status.name}"
       when (status) {
-        ClusterHealthStatus.RED -> HealthCheckResult.Unhealthy(msg, null)
-        ClusterHealthStatus.GREEN -> HealthCheckResult.Healthy(msg)
+        ClusterHealthStatus.RED -> HealthCheckResult.unhealthy(msg, null)
+        ClusterHealthStatus.GREEN -> HealthCheckResult.healthy(msg)
         ClusterHealthStatus.YELLOW -> when (errorOnYellow) {
-          false -> HealthCheckResult.Healthy(msg)
-          true -> HealthCheckResult.Unhealthy(msg, null)
+          false -> HealthCheckResult.healthy(msg)
+          true -> HealthCheckResult.unhealthy(msg, null)
         }
       }
 
     }.getOrElse {
-      HealthCheckResult.Unhealthy("Error connecting to elastic", it)
+      HealthCheckResult.unhealthy("Error connecting to elastic", it)
     }
   }
 }

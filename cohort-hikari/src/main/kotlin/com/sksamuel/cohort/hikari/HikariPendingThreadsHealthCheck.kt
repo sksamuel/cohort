@@ -23,9 +23,9 @@ class HikariPendingThreadsHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val awaiting = ds.hikariPoolMXBean.threadsAwaitingConnection
     return if (awaiting <= maxAwaiting) {
-      HealthCheckResult.Healthy("Threads awaiting database connection is equal or above threshold [$awaiting <= $maxAwaiting]")
+      HealthCheckResult.healthy("Threads awaiting database connection is equal or above threshold [$awaiting <= $maxAwaiting]")
     } else {
-      HealthCheckResult.Unhealthy(
+      HealthCheckResult.unhealthy(
         "Threads awaiting database connection is below threshold [$awaiting > $maxAwaiting]",
         null
       )

@@ -32,8 +32,8 @@ class S3ReadBucketHealthCheck(
       return runCatching { createClient() }
          .flatMap { use(it) }
          .fold(
-            { HealthCheckResult.Healthy("Connected to bucket $bucketName") },
-            { HealthCheckResult.Unhealthy("Could not connect to bucket $bucketName", it) }
+            { HealthCheckResult.healthy("Connected to bucket $bucketName") },
+            { HealthCheckResult.unhealthy("Could not connect to bucket $bucketName", it) }
          )
    }
 }

@@ -20,6 +20,6 @@ class ThreadDeadlockHealthCheck(
   override suspend fun check(): HealthCheckResult {
     val deadlocked = bean.findDeadlockedThreads()?.size ?: 0
     val msg = "There are $deadlocked deadlocked threads"
-    return if (deadlocked < maxDeadlocks) HealthCheckResult.Healthy(msg) else HealthCheckResult.Unhealthy(msg, null)
+    return if (deadlocked < maxDeadlocks) HealthCheckResult.healthy(msg) else HealthCheckResult.unhealthy(msg, null)
   }
 }

@@ -26,10 +26,10 @@ class TcpHealthCheck(
         withContext(Dispatchers.IO) {
           socket.close()
         }
-         HealthCheckResult.Healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
+         HealthCheckResult.healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
       } else {
-         HealthCheckResult.Unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
+         HealthCheckResult.unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
       }
-    }.getOrElse { HealthCheckResult.Unhealthy("Connection to $host:$port failed", it) }
+    }.getOrElse { HealthCheckResult.unhealthy("Connection to $host:$port failed", it) }
   }
 }

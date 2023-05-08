@@ -29,8 +29,8 @@ class DynamoDBHealthCheck(
             it.listTables(1)
          }
       }.fold(
-         { HealthCheckResult.Healthy("DynamoDB access successful") },
-         { HealthCheckResult.Unhealthy("Could not connect to DynamoDB", it) }
+         { HealthCheckResult.healthy("DynamoDB access successful") },
+         { HealthCheckResult.unhealthy("Could not connect to DynamoDB", it) }
       )
    }
 }
