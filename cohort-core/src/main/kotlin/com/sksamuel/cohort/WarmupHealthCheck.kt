@@ -47,7 +47,7 @@ abstract class WarmupHealthCheck : HealthCheck {
 /**
  * Executes a [WarmupHealthCheck] until all iterations have completed.
  */
-internal class WarmupRunner() {
+internal class WarmupRunner {
 
    private val logger = KotlinLogging.logger { }
    private val scope = CoroutineScope(Dispatchers.Default)
@@ -61,14 +61,16 @@ internal class WarmupRunner() {
          val start = System.currentTimeMillis()
          warmup.start()
 
-         runCatching {
-            repeat(warmup.iterations) { k ->
+         repeat(warmup.iterations) { k ->
+            runCatching {
                warmup.warm(k)
                completed++
+            }.onFailure {
+               error.set(it)
+               logger.warn(it) { "Warmup '${warmup.name}' error" }
+            }.onSuccess {
+               error.set(null)
             }
-         }.onFailure {
-            error.set(it)
-            logger.warn(it) { "Warmup '${warmup.name}' error" }
          }
 
          warmup.close()
