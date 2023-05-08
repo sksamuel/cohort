@@ -30,9 +30,10 @@ class CohortMetricsTest : FunSpec() {
       CohortMetrics(registry).bindTo(mm)
       mm.metersAsString shouldBe ""
       delay(4.seconds)
-      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[healthy='false', name='bar', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=1.0"
+      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=1.0"
       delay(3.seconds)
-      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[healthy='false', name='bar', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=2.0\ncohort.healthcheck(COUNTER)[healthy='true', name='foo', type='com.sksamuel.cohort.micrometer.FooHealthCheck']; count=1.0"
+      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=2.0\n" +
+         "cohort.healthcheck(COUNTER)[name='foo', status='Healthy', type='com.sksamuel.cohort.micrometer.FooHealthCheck']; count=1.0"
     }
   }
 }
