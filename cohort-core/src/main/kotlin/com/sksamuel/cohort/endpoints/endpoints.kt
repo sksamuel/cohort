@@ -11,7 +11,6 @@ import com.sksamuel.tabby.results.sequence
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
-import io.ktor.server.application.log
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -135,14 +134,6 @@ fun Route.cohort() {
             { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
          )
-      }
-   }
-
-   if (config.shutdownHooks.isNotEmpty()) {
-      get("${config.endpointPrefix}/shutdown") {
-         this.context.application.log.info("Executing shutdown hooks...")
-         config.shutdownHooks.forEach { it.run() }
-         call.respond(HttpStatusCode.OK)
       }
    }
 
