@@ -26,16 +26,17 @@ fun interface HealthCheck {
  */
 sealed class HealthCheckResult {
 
-   val isHealthy: Boolean by lazy { this is Healthy }
-
+   abstract val isHealthy: Boolean
    abstract val message: String?
    abstract val cause: Throwable?
 
    data class Healthy(override val message: String?) : HealthCheckResult() {
       override val cause: Throwable? = null
+      override val isHealthy: Boolean = true
    }
 
    data class Unhealthy(override val message: String, override val cause: Throwable?) : HealthCheckResult() {
       constructor(message: String) : this(message, null)
+      override val isHealthy: Boolean = false
    }
 }

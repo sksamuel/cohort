@@ -9,7 +9,7 @@ import com.zaxxer.hikari.HikariDataSource
  *
  * This is useful to detect when connections are unable to be made.
  *
- * The check is considered healthy if the total connection count (sum of idle and active) is >= [minConnections].
+ * The check is considered healthy if the total connection count is >= [minConnections].
  */
 class HikariConnectionsHealthCheck(
   private val ds: HikariDataSource,
@@ -20,7 +20,7 @@ class HikariConnectionsHealthCheck(
 
   override suspend fun check(): HealthCheckResult {
     val conns = ds.hikariPoolMXBean.totalConnections
-    val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [$minConnections minConnections]"
+    val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [minConnections:$minConnections]"
     return if (conns >= minConnections) {
       HealthCheckResult.Healthy(msg)
     } else {
