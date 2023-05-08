@@ -71,7 +71,16 @@ class HealthCheckRegistry(
     */
    fun register(
       check: HealthCheck,
-   ): HealthCheckRegistry = register(check.name, check, DEFAULT_INTERVAL, DEFAULT_INTERVAL)
+   ): HealthCheckRegistry = register(check.name, check)
+
+   /**
+    * Adds a new [HealthCheck] to this registry, with the specified name, using the [DEFAULT_INTERVAL]
+    * for both initial delay and intervals.
+    */
+   fun register(
+      name: String,
+      check: HealthCheck,
+   ): HealthCheckRegistry = register(name, check, DEFAULT_INTERVAL, DEFAULT_INTERVAL)
 
    /**
     * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
