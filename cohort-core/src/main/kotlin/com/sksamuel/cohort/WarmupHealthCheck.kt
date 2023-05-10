@@ -17,7 +17,7 @@ abstract class WarmupHealthCheck : HealthCheck {
    private val started = AtomicBoolean(false)
 
    override suspend fun check(): HealthCheckResult {
-      if (started.compareAndExchange(false, true)) {
+      if (started.compareAndSet(false, true)) {
          runner.run(this)
       }
       return runner.result(this)
