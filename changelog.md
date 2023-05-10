@@ -1,9 +1,19 @@
 # Changelog
 
-### 1.8.0 (Unreleased)
+### 2.0.2
 
-* Added `HttpWarmup`, `RedisClusterWarmup`, `RedisConnectionWarmup`, `FibWarmup`, `JacksonWarmup`
-  , `DataSourceWarmup`, `KafkaClusterWarmup`,
+* Fixed race condition with 2.0.x warmup starts
+
+### 2.0.1
+
+* Fixed micrometer metrics tag name for status tag
+* Fixed Cohort plugin package name
+* Added overloaded registry method
+
+### 2.0.0
+
+* Removed Ktor 1.x module, and merged Ktor 2.x module into the `cohort-core` module.
+* Added `HttpWarmup`, `RedisConnectionWarmup`, `FibWarmup`, `JacksonWarmup`, `DataSourceWarmup`
   warm up health checks which will
   execute for a period of time to warm the JVM / connections before reporting as healthy. These are intended to be used
   by startup probes in K8.
@@ -13,6 +23,7 @@
   the `cohort-redis` module which uses the Jedis client.
 * Added `PulsarHealthCheck` for Apache Pulsar clusters.
 * Added `DynamoDBHealthCheck` for AWS Dynamo DB instances.
+* Changed TcpHealthCheck package name
 
 ### 1.7.3
 
