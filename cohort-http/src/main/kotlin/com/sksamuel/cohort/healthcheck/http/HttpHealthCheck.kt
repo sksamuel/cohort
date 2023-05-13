@@ -3,7 +3,7 @@ package com.sksamuel.cohort.healthcheck.http
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache5.Apache5
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -19,6 +19,7 @@ enum class Method {
    OPTIONS
 }
 
+@Deprecated("Use EndpointHealthCheck which offers more control over the request and response")
 class HttpHealthCheck(
    private val url: String,
    method: Method = Method.GET,
@@ -29,7 +30,7 @@ class HttpHealthCheck(
 
    override val name: String = "http_call"
 
-   private val client = HttpClient(Apache) {
+   private val client = HttpClient(Apache5) {
       expectSuccess = false
    }
 
@@ -57,3 +58,5 @@ class HttpHealthCheck(
          HealthCheckResult.unhealthy("Url $url returned ${resp.status}", null)
    }
 }
+
+
