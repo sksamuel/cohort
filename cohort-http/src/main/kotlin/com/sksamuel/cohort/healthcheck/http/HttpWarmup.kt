@@ -2,7 +2,7 @@ package com.sksamuel.cohort.healthcheck.http
 
 import com.sksamuel.cohort.WarmupHealthCheck
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache5.Apache5
 
 class HttpWarmup(
    private val command: suspend (HttpClient) -> Unit,
@@ -11,7 +11,7 @@ class HttpWarmup(
 
    override val name: String = "http_warmup"
 
-   private val client = HttpClient(Apache) {
+   private val client = HttpClient(Apache5) {
       expectSuccess = false
    }
 
