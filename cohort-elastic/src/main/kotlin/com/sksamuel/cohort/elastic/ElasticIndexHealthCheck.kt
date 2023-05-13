@@ -1,13 +1,11 @@
 package com.sksamuel.cohort.elastic
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch.core.CountRequest
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elasticsearch.action.search.SearchAction
-import org.elasticsearch.action.search.SearchRequest
-import org.elasticsearch.client.ElasticsearchClient
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * A cohort [HealthCheck] which checks that an elastic index exists, and optionally, that it is not empty.
@@ -27,11 +25,8 @@ class ElasticIndexHealthCheck(
    override suspend fun check(): HealthCheckResult {
       return runCatching {
          withContext(Dispatchers.IO) {
-            val result = client.execute(
-               SearchAction.INSTANCE,
-               SearchRequest(index)
-            ).actionGet(5.seconds.inWholeMilliseconds)
-            if (result.hits.totalHits.value == 0L && failIfEmpty) {
+            val count = client.count(CountRequest.Builder().index(index).build())
+            if (count.count() == 0L && failIfEmpty) {
                HealthCheckResult.unhealthy("Elastic index '$index' is empty")
             } else {
                HealthCheckResult.healthy("Detected elastic index '$index'")

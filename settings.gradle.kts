@@ -57,6 +57,8 @@ dependencyResolutionManagement {
             "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.9"
          )
 
+         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.6.2")
+
          val awssdk = "1.12.466"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
