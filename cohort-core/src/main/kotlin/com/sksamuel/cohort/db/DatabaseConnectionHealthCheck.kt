@@ -19,8 +19,10 @@ class DatabaseConnectionHealthCheck(
 
    override val name: String = "database_connection"
 
-   override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
-      conn.isValid(timeout.inWholeSeconds.toInt())
-      HealthCheckResult.healthy("Connected to database successfully")
-   }
+   override suspend fun check(): HealthCheckResult = runCatching {
+      ds.connection.use { conn ->
+         conn.isValid(timeout.inWholeSeconds.toInt())
+         HealthCheckResult.healthy("Connected to database successfully")
+      }
+   }.getOrElse { HealthCheckResult.unhealthy("Unable to connect to the database", it) }
 }
