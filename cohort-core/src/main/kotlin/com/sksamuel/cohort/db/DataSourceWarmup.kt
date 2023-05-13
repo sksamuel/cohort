@@ -6,20 +6,24 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * A Cohort [WarmupHealthCheck] that warms a [DataSource].
+ * A Cohort [WarmupHealthCheck] that warms a [DataSource] by executing a query.
  *
  * Uses the JDBC4 method isValid(timeout) with the given [timeout] to check that the connection
  * returned is open and usable.
  */
 class DataSourceWarmup(
+   override val iterations: Int,
    private val ds: DataSource,
+   private val query: String,
    private val timeout: Duration = 1.seconds,
-   override val iterations: Int = 100,
 ) : WarmupHealthCheck() {
 
    override val name: String = "datasource_warmup"
 
    override suspend fun warm(iteration: Int) {
-      ds.connection.use { it.isValid(timeout.inWholeSeconds.toInt()) }
+      ds.connection.use { conn ->
+         conn.isValid(timeout.inWholeSeconds.toInt())
+         conn.createStatement().use { it.execute(query) }
+      }
    }
 }

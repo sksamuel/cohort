@@ -11,10 +11,13 @@ import kotlin.time.Duration.Companion.seconds
  *
  * Uses the JDBC4 method isValid(timeout) with the given [timeout] to check that the connection
  * returned is open and usable.
+ *
+ * An optional query can be supplied that will be executed in addition to checking the connection is valid.
  */
 class DatabaseConnectionHealthCheck(
    private val ds: DataSource,
    private val timeout: Duration = 1.seconds,
+   private val query: String? = null,
 ) : HealthCheck {
 
    override val name: String = "database_connection"
@@ -22,6 +25,7 @@ class DatabaseConnectionHealthCheck(
    override suspend fun check(): HealthCheckResult = runCatching {
       ds.connection.use { conn ->
          conn.isValid(timeout.inWholeSeconds.toInt())
+         conn.createStatement().use { it.execute(query) }
          HealthCheckResult.healthy("Connected to database successfully")
       }
    }.getOrElse { HealthCheckResult.unhealthy("Unable to connect to the database", it) }
