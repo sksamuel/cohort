@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("org.flywaydb:flyway-core:_")
+   implementation(libs.flyway.core)
 }
 
 apply("../publish.gradle.kts")

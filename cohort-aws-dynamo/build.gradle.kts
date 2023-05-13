@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("com.amazonaws:aws-java-sdk-dynamodb:_")
+   api(libs.aws.java.sdk.dynamodb)
 }
 
 apply("../publish.gradle.kts")

@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("com.amazonaws:aws-java-sdk-s3:_")
+   api(libs.aws.java.sdk.s3)
 }
 
 apply("../publish.gradle.kts")

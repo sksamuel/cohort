@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("io.lettuce:lettuce-core:6.2.0.RELEASE")
+   api(libs.lettuce.core)
 }
 
 apply("../publish.gradle.kts")

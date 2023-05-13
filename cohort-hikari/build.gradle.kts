@@ -1,5 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("com.zaxxer:HikariCP:_")
+   implementation(libs.hikari)
 }
+
 apply("../publish.gradle.kts")

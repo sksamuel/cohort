@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("ch.qos.logback:logback-classic:_")
-   implementation("ch.qos.logback:logback-core:_")
+   implementation(libs.logback.core)
+   implementation(libs.logback.classic)
 }
 apply("../publish.gradle.kts")

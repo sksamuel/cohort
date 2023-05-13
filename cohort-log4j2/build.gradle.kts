@@ -1,7 +1,7 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("org.apache.logging.log4j:log4j-api:_")
-   implementation("org.apache.logging.log4j:log4j-core:_")
+   implementation(libs.log4j2.api)
+   implementation(libs.log4j2.core)
 }
 
 apply("../publish.gradle.kts")

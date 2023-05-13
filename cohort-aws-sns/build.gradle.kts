@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("com.amazonaws:aws-java-sdk-sns:_")
+   api(libs.aws.java.sdk.sns)
 }
 
 apply("../publish.gradle.kts")

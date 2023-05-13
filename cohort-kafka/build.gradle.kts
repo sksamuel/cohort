@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("org.apache.kafka:kafka-clients:_")
+   implementation(libs.kafka.client)
 }
 
 apply("../publish.gradle.kts")

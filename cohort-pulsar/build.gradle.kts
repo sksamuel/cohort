@@ -1,6 +1,6 @@
 dependencies {
    implementation(projects.cohortCore)
-   implementation("org.apache.pulsar:pulsar-client:_")
+   implementation(libs.pulsar.client)
 }
 
 apply("../publish.gradle.kts")

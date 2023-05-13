@@ -1,10 +1,11 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("org.elasticsearch.client:elasticsearch-rest-high-level-client:_")
-   api("co.elastic.clients:elasticsearch-java:_")
-   implementation("com.fasterxml.jackson.core:jackson-databind:_")
-   testImplementation("org.testcontainers:elasticsearch:_")
-   testImplementation("io.kotest.extensions:kotest-extensions-testcontainers-elastic:_")
+   api(libs.elasticsearch.rest.high.level.client)
+//   api("org.elasticsearch.client::7.17.9")
+//   api("co.elastic.clients:elasticsearch-java:8.6.2")
+//   implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+   testImplementation(libs.testcontainers.elasticsearch)
+   testImplementation(libs.kotest.extensions.testcontainers.elastic)
 }
 
 apply("../publish.gradle.kts")

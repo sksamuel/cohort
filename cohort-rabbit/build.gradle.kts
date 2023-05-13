@@ -1,8 +1,7 @@
 dependencies {
    implementation(projects.cohortCore)
-   api("com.rabbitmq:amqp-client:_")
-   testImplementation("org.testcontainers:rabbitmq:_")
-   testImplementation(Testing.kotestExtensions.testContainers)
+   api(libs.rabbitmq)
+   testImplementation(libs.testcontainers.rabbitmq)
 }
 
 apply("../publish.gradle.kts")

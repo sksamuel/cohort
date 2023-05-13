@@ -12,6 +12,8 @@
 
 ### 2.0.0
 
+**Minimum version of Kotlin is now 1.8**
+
 * Removed Ktor 1.x module, and merged Ktor 2.x module into the `cohort-core` module.
 * Added `HttpWarmup`, `RedisConnectionWarmup`, `FibWarmup`, `JacksonWarmup`, `DataSourceWarmup`
   warm up health checks which will

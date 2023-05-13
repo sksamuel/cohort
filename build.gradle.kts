@@ -15,7 +15,7 @@ buildscript {
 plugins {
    signing
    `maven-publish`
-   kotlin("jvm").version(Libs.kotlinVersion)
+   kotlin("jvm").version("1.8.21")
 }
 
 allprojects {
@@ -29,18 +29,16 @@ allprojects {
       }
    }
 
-   group = Libs.org
+   group = "com.sksamuel.cohort"
    version = Ci.version
 
    dependencies {
-      implementation(Libs.Kotlin.stdlib)
-      implementation(Libs.Kotlin.coroutines)
-      implementation(Libs.Kotlin.coroutinesJdk8)
-      implementation(Libs.Tabby.fp)
-      testImplementation(Libs.Kotest.assertions)
-      testImplementation(Libs.Kotest.junit5)
-      api("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-22")
-      api("org.slf4j:slf4j-api:2.0.7")
+      api(rootProject.libs.coroutines.core)
+      api(rootProject.libs.coroutines.jdk8)
+      implementation(rootProject.libs.kotlin.logging)
+      implementation(rootProject.libs.slf4j.api)
+      implementation(rootProject.libs.sksamuel.tabby)
+      testApi(rootProject.libs.bundles.testing)
    }
 
    tasks.named<Test>("test") {
