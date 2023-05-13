@@ -3,24 +3,23 @@ package com.sksamuel.cohort.healthcheck.http
 import com.sksamuel.cohort.WarmupHealthCheck
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache5.Apache5
+import io.ktor.client.statement.HttpResponse
 
-@Deprecated("Use EndpointWarmup")
-class HttpWarmup(
-   private val command: suspend (HttpClient) -> Unit,
+/**
+ * A Cohort [WarmupHealthCheck] that executes a http request for the specified iteration count.
+ */
+class EndpointWarmup(
+   private val fn: (HttpClient) -> HttpResponse,
    override val iterations: Int = 1000,
 ) : WarmupHealthCheck() {
 
-   override val name: String = "http_warmup"
+   override val name: String = "endpoint_warmup"
 
    private val client = HttpClient(Apache5) {
       expectSuccess = false
    }
 
    override suspend fun warm(iteration: Int) {
-      command(client)
-   }
-
-   override suspend fun close() {
-      client.close()
+      fn(client)
    }
 }

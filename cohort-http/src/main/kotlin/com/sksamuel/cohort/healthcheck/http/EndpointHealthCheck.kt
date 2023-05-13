@@ -15,7 +15,7 @@ class EndpointHealthCheck(
    private val fn: (HttpClient) -> HttpResponse,
 ) : HealthCheck {
 
-   override val name: String = "http_call"
+   override val name: String = "endpoint_request"
 
    private val client = HttpClient(Apache5) {
       expectSuccess = false
