@@ -11,8 +11,8 @@ import io.ktor.http.isSuccess
  * Executes a custom http request using a Ktor [Apache5] client.
  */
 class EndpointHealthCheck(
-   private val eval: (HttpResponse) -> Boolean = { it.status.isSuccess() },
-   private val fn: (HttpClient) -> HttpResponse,
+   private val eval: suspend (HttpResponse) -> Boolean = { it.status.isSuccess() },
+   private val fn: suspend (HttpClient) -> HttpResponse,
 ) : HealthCheck {
 
    override val name: String = "endpoint_request"

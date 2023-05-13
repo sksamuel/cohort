@@ -73,6 +73,7 @@ dependencyResolutionManagement {
          val ktor = "2.3.0"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
+         library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
 
          val logback = "1.4.6"
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")

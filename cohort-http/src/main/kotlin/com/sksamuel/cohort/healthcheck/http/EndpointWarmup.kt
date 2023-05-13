@@ -9,8 +9,8 @@ import io.ktor.client.statement.HttpResponse
  * A Cohort [WarmupHealthCheck] that executes a http request for the specified iteration count.
  */
 class EndpointWarmup(
-   private val fn: (HttpClient) -> HttpResponse,
    override val iterations: Int = 1000,
+   private val fn: suspend (HttpClient) -> HttpResponse,
 ) : WarmupHealthCheck() {
 
    override val name: String = "endpoint_warmup"
