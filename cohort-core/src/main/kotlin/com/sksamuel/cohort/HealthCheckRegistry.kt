@@ -34,7 +34,7 @@ class HealthCheckRegistry(
    private val dispatcher: CoroutineDispatcher,
    private val startUnhealthy: Boolean = true,
    private val logUnhealthy: Boolean = true,
-) {
+) : AutoCloseable {
 
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-scheduler"))
    private val names = mutableSetOf<String>()
@@ -234,6 +234,10 @@ class HealthCheckRegistry(
             it.invoke(name, check, result)
          }.onFailure { logger.warn(it) { "Error notifying subscriber of health check $name" } }
       }
+   }
+
+   override fun close() {
+      scheduler.shutdown()
    }
 }
 
