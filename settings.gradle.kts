@@ -31,7 +31,7 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val coroutines = "1.6.4"
+         val coroutines = "1.7.1"
          library("coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
          library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
@@ -47,13 +47,18 @@ dependencyResolutionManagement {
          library("flyway-core", "org.flywaydb:flyway-core:9.17.0")
 
          library("kafka-client", "org.apache.kafka:kafka-clients:3.5.0")
-         library("lettuce-core", "io.lettuce:lettuce-core:6.2.3.RELEASE")
+
+         val lettuce = "6.2.4.RELEASE"
+         library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
+
          library("liquibase-core", "org.liquibase:liquibase-core:4.21.1")
          library("jedis", "redis.clients:jedis:4.4.0")
          library("rabbitmq", "com.rabbitmq:amqp-client:5.16.0")
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.9.0")
          library("pulsar-client", "org.apache.pulsar:pulsar-client:2.10.0")
-         library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:4.9.0")
+
+         val mongo = "4.9.1"
+         library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
 
          library(
             "elasticsearch-rest-high-level-client",
