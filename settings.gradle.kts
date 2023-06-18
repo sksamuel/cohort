@@ -38,21 +38,28 @@ dependencyResolutionManagement {
          library("kotlin-logging", "io.github.oshai:kotlin-logging-jvm:4.0.0-beta-28")
          library("slf4j-api", "org.slf4j:slf4j-api:2.0.7")
 
-         library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:2.2.3")
+         val tabby = "2.2.5"
+         library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
          val micrometer = "1.11.1"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
          library("hikari", "com.zaxxer:HikariCP:5.0.1")
 
-         library("flyway-core", "org.flywaydb:flyway-core:9.17.0")
+         val flyway = "9.19.4"
+         library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
-         library("kafka-client", "org.apache.kafka:kafka-clients:3.5.0")
+         val kakfa = "3.5.0"
+         library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
          val lettuce = "6.2.4.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
-         library("liquibase-core", "org.liquibase:liquibase-core:4.21.1")
-         library("jedis", "redis.clients:jedis:4.4.0")
+         val liquibase = "4.22.0"
+         library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
+
+         val jedis = "4.4.3"
+         library("jedis", "redis.clients:jedis:$jedis")
+
          library("rabbitmq", "com.rabbitmq:amqp-client:5.16.0")
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.9.0")
          library("pulsar-client", "org.apache.pulsar:pulsar-client:2.10.0")
