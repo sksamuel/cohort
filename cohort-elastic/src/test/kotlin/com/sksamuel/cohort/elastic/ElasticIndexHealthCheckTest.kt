@@ -10,20 +10,23 @@ import com.sksamuel.cohort.HealthCheckResult
 import com.sksamuel.cohort.HealthStatus
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.testcontainers.elastic.ElasticTestContainerExtension
+import io.kotest.extensions.testcontainers.elastic.ElasticsearchContainerExtension
+import io.kotest.extensions.testcontainers.elastic.client
 import io.kotest.matchers.shouldBe
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.utility.DockerImageName
 
 class ElasticIndexHealthCheckTest : FunSpec({
 
-   val container = ElasticsearchContainer(
-      DockerImageName.parse("elasticsearch:7.17.6")
-         .asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch")
+   val container = install(
+      ElasticsearchContainerExtension(
+         DockerImageName.parse("elasticsearch:7.17.6")
+            .asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch")
+      )
    )
-   val client: ElasticsearchClient = install(ElasticTestContainerExtension(container))
+
+   val client = container.client()
 
    test("ElasticIndexCheck should connect to elastic and check for topic") {
       client.indices().create(CreateIndexRequest.Builder().index("foo").build())

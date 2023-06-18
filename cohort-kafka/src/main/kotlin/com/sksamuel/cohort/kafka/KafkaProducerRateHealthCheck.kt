@@ -2,11 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.common.serialization.StringDeserializer
-import java.util.Properties
 import kotlin.math.roundToInt
 
 @Deprecated("use KafkaProducerRateHealthCheck")
@@ -38,11 +34,4 @@ class KafkaProducerRateHealthCheck(
       else
          HealthCheckResult.healthy(msg)
    }
-}
-
-fun main() {
-   val props = Properties()
-   props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
-   val producer = KafkaConsumer(props, StringDeserializer(), StringDeserializer())
-   producer.metrics().toList().sortedBy { it.first.name() }.forEach { (a, _) -> println(a) }
 }
