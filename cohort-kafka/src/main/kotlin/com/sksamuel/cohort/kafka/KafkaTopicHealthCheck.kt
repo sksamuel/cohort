@@ -2,24 +2,29 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.admin.AdminClient
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.future.await
+import org.apache.kafka.clients.admin.Admin
 
 /**
  * A [HealthCheck] that checks that a topic exists on a kafka cluster.
  */
 class KafkaTopicHealthCheck(
-  private val adminClient: AdminClient,
-  private val topic: String
+   private val admin: Admin,
+   private val topic: String
 ) : HealthCheck {
 
-  override val name: String = "kafka_topic"
+   override val name: String = "kafka_topic"
 
-  override suspend fun check(): HealthCheckResult {
-    val desc = adminClient.describeTopics(listOf(topic)).all().get(1, TimeUnit.MINUTES)[topic]
-    return if (desc == null)
-      HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", null)
-    else
-      HealthCheckResult.healthy("Kafka topic $topic confirmed (${desc.partitions().size} partitions)")
-  }
+   override suspend fun check(): HealthCheckResult {
+
+      val descriptionMap = runCatching {
+         admin.describeTopics(listOf(topic)).allTopicNames().toCompletionStage().await()
+      }.getOrElse { emptyMap() }
+
+      val topicDescription = descriptionMap[topic]
+      return if (topicDescription == null)
+         HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", null)
+      else
+         HealthCheckResult.healthy("Kafka topic $topicDescription confirmed (${topicDescription.partitions().size} partitions)")
+   }
 }
