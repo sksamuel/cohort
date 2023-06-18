@@ -59,7 +59,7 @@ dependencyResolutionManagement {
 
          library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.6.2")
 
-         val awssdk = "1.12.466"
+         val awssdk = "1.12.490"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
@@ -70,7 +70,7 @@ dependencyResolutionManagement {
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
 
-         val ktor = "2.3.0"
+         val ktor = "2.3.1"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
