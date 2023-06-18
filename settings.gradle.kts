@@ -79,7 +79,7 @@ dependencyResolutionManagement {
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")
          library("logback-core", "ch.qos.logback:logback-core:$logback")
 
-         val jackson = "2.14.2"
+         val jackson = "2.15.2"
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
