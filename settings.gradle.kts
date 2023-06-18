@@ -90,21 +90,24 @@ dependencyResolutionManagement {
          library("kotest-json", "io.kotest:kotest-assertions-json:$kotest")
          library("kotest-property", "io.kotest:kotest-property:$kotest")
          library("kotest-ktor", "io.kotest.extensions:kotest-assertions-ktor:2.0.0")
-         library("kotest-testcontainers", "io.kotest.extensions:kotest-extensions-testcontainers:1.3.4")
+
+         val kotestTestContainers = "2.0.0.116-SNAPSHOT"
+         library("kotest-extensions-testcontainers", "io.kotest.extensions:kotest-extensions-testcontainers:$kotestTestContainers")
+         library("kotest-extensions-testcontainers-kafka", "io.kotest.extensions:kotest-extensions-testcontainers-kafka:$kotestTestContainers")
          library(
             "kotest-extensions-testcontainers-elastic",
-            "io.kotest.extensions:kotest-extensions-testcontainers-elastic:1.4.0.56-SNAPSHOT"
+            "io.kotest.extensions:kotest-extensions-testcontainers-elastic:$kotestTestContainers"
          )
          library("kotest-httpstub", "io.kotest.extensions:kotest-extensions-httpstub:1.0.1")
          library("kotest-extensions-clock", "io.kotest.extensions:kotest-extensions-clock:1.0.0")
 
-         val testContainers = "1.18.0"
+         val testContainers = "1.18.3"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
          library("testcontainers-rabbitmq", "org.testcontainers:rabbitmq:$testContainers")
          library("testcontainers-elasticsearch", "org.testcontainers:elasticsearch:$testContainers")
          library("testcontainers-mongodb", "org.testcontainers:mongodb:$testContainers")
-
+         library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
 
          bundle(
             "testing", listOf(
@@ -114,11 +117,17 @@ dependencyResolutionManagement {
                "kotest-json",
                "kotest-property",
                "kotest-ktor",
-               "kotest-testcontainers",
                "kotest-httpstub",
+               "kotest-extensions-clock",
+               "kotest-extensions-testcontainers",
+               "kotest-extensions-testcontainers-elastic",
+               "kotest-extensions-testcontainers-kafka",
                "testcontainers",
                "testcontainers-postgresql",
-               "kotest-extensions-clock",
+               "testcontainers-kafka",
+               "testcontainers-mongodb",
+               "testcontainers-elasticsearch",
+               "testcontainers-rabbitmq",
             )
          )
       }

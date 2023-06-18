@@ -39,9 +39,9 @@ class HealthCheckRegistry(
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-scheduler"))
    private val names = mutableSetOf<String>()
 
-   // contains all the registered healthchecks
+   // tracks which checks are startup checks
+   private val startups = ConcurrentHashMap<String, Boolean>()
    private val checks = ConcurrentHashMap<String, HealthCheck>()
-
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
 
    private val logger = KotlinLogging.logger {}
@@ -66,16 +66,36 @@ class HealthCheckRegistry(
    }
 
    /**
-    * Adds a new [HealthCheck] to this registry using the [DEFAULT_INTERVAL] for both initial delay and intervals.
-    * The name is derived from the check class.
+    * Adds a [HealthCheck] to this registry which is invoked until [HealthStatus.Healthy] is returned,
+    * at which point the check is closed and removed from the registry.
+    *
+    * Checks registered in this way are intended to be used for a startup probe endpoint in kubernetes.
+    * Startup probe endpoints are invoked by kubernetes until they report healthy, at which point kubernetes
+    * marks the pod as healthy, and switches to liveness and readiness probes.
+    *
+    * Startup probes also support warmup processes by executing for a fixed period of time, before
+    * reporting healthy and completing.
+    */
+   fun startup(check: HealthCheck) {
+      startups[check.name] = true
+      register(check)
+   }
+
+   /**
+    * Adds a [HealthCheck] to this registry using the [DEFAULT_INTERVAL] for both initial delay and intervals.
+    * The name used for this check is the default name supplied by the healthcheck instance.
     */
    fun register(
       check: HealthCheck,
    ): HealthCheckRegistry = register(check.name, check)
 
    /**
-    * Adds a new [HealthCheck] to this registry, with the specified name, using the [DEFAULT_INTERVAL]
+    * Adds a [HealthCheck] to this registry, with the specified [name], using the [DEFAULT_INTERVAL]
     * for both initial delay and intervals.
+    *
+    * @param name the name is associated with the [check] in the output json. By supplying a custom
+    *             name, the same check can be registered multiple times. o healthcheck can be registered
+    *             more than once with a repeated name.
     */
    fun register(
       name: String,
@@ -83,8 +103,8 @@ class HealthCheckRegistry(
    ): HealthCheckRegistry = register(name, check, DEFAULT_INTERVAL, DEFAULT_INTERVAL)
 
    /**
-    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
-    * The name is derived from the check class.
+    * Adds a [HealthCheck] to this registry using the given [delay] for both initial delay and intervals.
+    * The name used for this check is the default name supplied by the healthcheck instance.
     */
    fun register(
       check: HealthCheck,
@@ -92,7 +112,12 @@ class HealthCheckRegistry(
    ): HealthCheckRegistry = register(check.name, check, delay, delay)
 
    /**
-    * Adds a new [HealthCheck] to this registry using the given duration for both initial delay and intervals.
+    * Adds a new [HealthCheck] to this registry, with the specified [name], using the given [delay]
+    * for both initial delay and intervals.
+    *
+    * @param name the name is associated with the [check] in the output json. By supplying a custom
+    *             name, the same check can be registered multiple times. o healthcheck can be registered
+    *             more than once with a repeated name.
     */
    fun register(
       name: String,
@@ -103,9 +128,9 @@ class HealthCheckRegistry(
    /**
     * Adds a new [HealthCheck] to this registry with the given schedule.
     *
-    * @param name the name is associated with the result in the output json.
-    *             This is useful to allow the same check to be registered multiple times against different configurations.
-    *             No healthcheck can be registered twice with the same name.
+    * @param name the name is associated with the [check] in the output json. By supplying a custom
+    *             name, the same check can be registered multiple times. o healthcheck can be registered
+    *             more than once with a repeated name.
     */
    fun register(
       name: String,
@@ -187,14 +212,12 @@ class HealthCheckRegistry(
    /**
     * Returns the [ServiceHealth] of the system.
     *
-    * A system is considered healthy if all the healthchecks are in healthy state.
+    * A service is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): ServiceHealth {
       val healthy = statuses.values.all { it.result.isHealthy }
       return ServiceHealth(healthy, statuses.toMap())
    }
-
-   fun checks(): Set<HealthCheck> = checks.values.toSet()
 
    /**
     * Adds a [Subscriber] to this registry, which will be invoked each time a health check completes.

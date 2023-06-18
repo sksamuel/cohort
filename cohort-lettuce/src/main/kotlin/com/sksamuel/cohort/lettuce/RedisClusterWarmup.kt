@@ -12,6 +12,7 @@ import kotlin.random.Random
  * By default, the [eval] function will set elements with a 1 second TTL under random keys with
  * the prefix "cohort_warmup". Any chain of commands can be used by providing a custom [eval] function.
  */
+@Deprecated("Use RedisClusterStartupProbe")
 class RedisClusterWarmup<K, V>(
    private val conn: StatefulRedisClusterConnection<K, V>,
    override val iterations: Int,
