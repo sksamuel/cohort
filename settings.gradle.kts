@@ -40,10 +40,13 @@ dependencyResolutionManagement {
 
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:2.2.3")
 
-         library("micrometer-core", "io.micrometer:micrometer-core:1.11.0")
+         val micrometer = "1.11.1"
+         library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
          library("hikari", "com.zaxxer:HikariCP:5.0.1")
+
          library("flyway-core", "org.flywaydb:flyway-core:9.17.0")
-         library("kafka-client", "org.apache.kafka:kafka-clients:3.4.0")
+
+         library("kafka-client", "org.apache.kafka:kafka-clients:3.5.0")
          library("lettuce-core", "io.lettuce:lettuce-core:6.2.3.RELEASE")
          library("liquibase-core", "org.liquibase:liquibase-core:4.21.1")
          library("jedis", "redis.clients:jedis:4.4.0")
