@@ -5,6 +5,7 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
 import io.kotest.extensions.testcontainers.kafka.admin
+import io.kotest.extensions.testcontainers.kafka.consumer
 import io.kotest.extensions.testcontainers.kafka.producer
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
@@ -17,7 +18,7 @@ import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import kotlin.time.Duration.Companion.seconds
 
-class KafkaProducerRateHealthCheckTest : FunSpec({
+class KafkaConsumerCountHealthCheckTest : FunSpec({
 
    val kafka = install(KafkaContainerExtension(KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka"))))
 
@@ -25,6 +26,8 @@ class KafkaProducerRateHealthCheckTest : FunSpec({
 
       kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic", 1, 1))).all().get() }
       val producer = kafka.producer()
+      val consumer = kafka.consumer()
+      consumer.subscribe(listOf("mytopic"))
 
       val job = launch {
          while (isActive) {
@@ -33,10 +36,12 @@ class KafkaProducerRateHealthCheckTest : FunSpec({
          }
       }
 
-      val healthcheck = KafkaProducerCountHealthCheck(producer, 80)
-      delay(1.seconds) // should have sent ~ 100
+      val healthcheck = KafkaConsumerCountHealthCheck(consumer, 80)
+      delay(1.seconds) // should have consumed ~ 100
       healthcheck.check().status shouldBe HealthStatus.Healthy
+
       job.cancel()
+
       delay(1.seconds) // now should be zero
       healthcheck.check().status shouldBe HealthStatus.Unhealthy
 
