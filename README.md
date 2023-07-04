@@ -35,16 +35,11 @@ Include the following dependencies in your build:
 
 * `com.sksamuel.cohort:cohort-core:<version>`
 
-And either
-
-* `com.sksamuel.cohort:cohort-ktor:<version>` for ktor 1.x
-  or
-* `com.sksamuel.cohort:cohort-ktor2:<version>` for ktor 2.x
-
 along with the additional modules for any features you wish to activate. For example the kafka module
 requires `com.sksamuel.cohort:cohort-kafka:<version>`.
 
 Then to wire into Ktor, install the `Cohort` plugin, and enable whichever features / endpoints we want to expose.
+Remember, endpoints are disabled by default for security, and you must enable them.
 
 Here is a sample configuration with each feature enabled.
 
