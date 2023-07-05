@@ -16,18 +16,20 @@ class WarmupTest : FunSpec() {
    init {
       test("health check should return unhealthy until the warmups have completed") {
 
-         val registry = HealthCheckRegistry {
+         val healthchecks = HealthCheckRegistry {
             register(ThreadDeadlockHealthCheck(), delay = 10.milliseconds)
             startUnhealthy = true
+         }
+
+         val warmups = WarmupRegistry {
+            register(CryptoWarmup(), 2.seconds)
          }
 
          testApplication {
             routing {
                cohort {
-                  warmup {
-                     register(CryptoWarmup(), 2.seconds)
-                  }
-                  healthcheck("healthy-mchealth-face", registry)
+                  warmup(warmups)
+                  healthcheck("healthy-mchealth-face", healthchecks)
                }
             }
 

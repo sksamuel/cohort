@@ -48,6 +48,7 @@ abstract class WarmupHealthCheck : HealthCheck {
 /**
  * Executes a [WarmupHealthCheck] until all iterations have completed.
  */
+@Deprecated("Use the new Warmup mechanism")
 internal class WarmupRunner {
 
    private val logger = KotlinLogging.logger { }
@@ -94,6 +95,7 @@ internal class WarmupRunner {
 /**
  * Returns a new [WarmupHealthCheck] with the implementation delegated to the given [fn].
  */
+@Deprecated("Use the new Warmup mechanism")
 fun warmup(fn: suspend (Int) -> Unit, iter: Int) = object : WarmupHealthCheck() {
    override val iterations = iter
    override suspend fun warm(iteration: Int) {
