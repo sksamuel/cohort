@@ -18,7 +18,7 @@ class WarmupRegistry(
 
    companion object {
       operator fun invoke(
-         dispatcher: CoroutineDispatcher,
+         dispatcher: CoroutineDispatcher = Dispatchers.Default,
          configure: WarmupRegistry.() -> Unit
       ): WarmupRegistry {
          val registry = WarmupRegistry(dispatcher)
