@@ -5,7 +5,6 @@ import com.sksamuel.cohort.WarmupRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.logging.LogManager
-import kotlinx.coroutines.Dispatchers
 
 class CohortConfiguration {
 
@@ -46,16 +45,6 @@ class CohortConfiguration {
 
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
       registry.warmupRegistry = warmupRegistry
-      healthchecks[endpoint] = registry
-   }
-
-   fun healthcheck(
-      endpoint: String,
-      configure: HealthCheckRegistry.() -> Unit
-   ) {
-      val registry = HealthCheckRegistry(dispatcher = Dispatchers.Default)
-      registry.warmupRegistry = warmupRegistry
-      registry.configure()
       healthchecks[endpoint] = registry
    }
 
