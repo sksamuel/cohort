@@ -223,7 +223,6 @@ class HealthCheckRegistry(
     */
    fun status(): ServiceHealth {
       val warmupState = warmupRegistry?.state() ?: WarmupState.Completed
-      println("warmupState = $warmupState")
       val healthy = statuses.values.all { it.result.isHealthy } && warmupState == WarmupState.Completed
       return ServiceHealth(healthy, warmupState, statuses.toMap())
    }

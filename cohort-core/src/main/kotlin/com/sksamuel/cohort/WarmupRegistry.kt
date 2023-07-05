@@ -54,8 +54,6 @@ class WarmupRegistry(
    }
 
    fun state(): WarmupState {
-      println("Warmups=${warmups.keys}")
-      println("Warmups=${System.identityHashCode(warmups)}")
       return if (warmups.all { it.value == WarmupState.Completed }) WarmupState.Completed else WarmupState.Running
    }
 }

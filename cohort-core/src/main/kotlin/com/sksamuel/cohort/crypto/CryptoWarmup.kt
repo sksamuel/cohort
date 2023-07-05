@@ -32,11 +32,3 @@ class CryptoWarmup(
       }
    }
 }
-
-suspend fun main() {
-   val w = CryptoWarmup()
-   repeat(1000) {
-      w.warm(it)
-      println(it)
-   }
-}
