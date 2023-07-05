@@ -52,6 +52,12 @@ class HealthCheckRegistry(
    var startUnhealthy: Boolean = true
    var logUnhealthy: Boolean = true
 
+   init {
+      Runtime.getRuntime().addShutdownHook(Thread {
+         close()
+      })
+   }
+
    companion object {
       val DEFAULT_INTERVAL = 5.seconds
 
