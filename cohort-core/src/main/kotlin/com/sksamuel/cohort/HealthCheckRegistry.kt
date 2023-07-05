@@ -28,25 +28,29 @@ import kotlin.time.Duration.Companion.seconds
  * for the actual execution of the scheduled events.
  *
  * @param dispatcher this dispatcher will be used for executing the checks
- * @param startUnhealthy if true, then all checks will start in failed state until they pass.
  */
 class HealthCheckRegistry(
    private val dispatcher: CoroutineDispatcher,
-   private val startUnhealthy: Boolean = true,
-   private val logUnhealthy: Boolean = true,
 ) : AutoCloseable {
 
-   private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-scheduler"))
+   private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-healthcheck-scheduler"))
    private val names = mutableSetOf<String>()
 
    // tracks which checks are startup checks
+   @Deprecated("Replaced with WarmupRegistry")
    private val startups = ConcurrentHashMap<String, Boolean>()
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
 
    private val logger = KotlinLogging.logger {}
    private val subscribers = mutableListOf<Subscriber>()
+
+   @Deprecated("Replaced with WarmupRegistry")
    private val warmupScope = CoroutineScope(Dispatchers.Default)
+
+   internal var warmupRegistry: WarmupRegistry? = null
+   var startUnhealthy: Boolean = true
+   var logUnhealthy: Boolean = true
 
    companion object {
       val DEFAULT_INTERVAL = 5.seconds
@@ -54,6 +58,20 @@ class HealthCheckRegistry(
       operator fun invoke(
          configure: HealthCheckRegistry.() -> Unit
       ): HealthCheckRegistry = invoke(Dispatchers.Default, configure)
+
+      @Deprecated("Use HealthCheckRegistry() or HealthCheckRegistry(dispatcher) and invoke startUnhealthy/logUnhealthy inside the configuration block")
+      operator fun invoke(
+         dispatcher: CoroutineDispatcher,
+         startUnhealthy: Boolean = true,
+         logUnhealthy: Boolean = true,
+         configure: HealthCheckRegistry.() -> Unit
+      ): HealthCheckRegistry {
+         val registry = HealthCheckRegistry(dispatcher)
+         registry.startUnhealthy = startUnhealthy
+         registry.logUnhealthy = logUnhealthy
+         registry.configure()
+         return registry
+      }
 
       operator fun invoke(
          dispatcher: CoroutineDispatcher,
@@ -63,22 +81,6 @@ class HealthCheckRegistry(
          registry.configure()
          return registry
       }
-   }
-
-   /**
-    * Adds a [HealthCheck] to this registry which is invoked until [HealthStatus.Healthy] is returned,
-    * at which point the check is closed and removed from the registry.
-    *
-    * Checks registered in this way are intended to be used for a startup probe endpoint in kubernetes.
-    * Startup probe endpoints are invoked by kubernetes until they report healthy, at which point kubernetes
-    * marks the pod as healthy, and switches to liveness and readiness probes.
-    *
-    * Startup probes also support warmup processes by executing for a fixed period of time, before
-    * reporting healthy and completing.
-    */
-   fun startup(check: HealthCheck) {
-      startups[check.name] = true
-      register(check)
    }
 
    /**
@@ -172,7 +174,6 @@ class HealthCheckRegistry(
          when (result.status) {
             HealthStatus.Healthy -> success(name, result)
             HealthStatus.Unhealthy -> failure(name, result)
-            HealthStatus.Startup -> failure(name, result)
          }
       } catch (t: Throwable) {
          val result = HealthCheckResult.unhealthy("$name failed due to ${t.javaClass.name}", t)
@@ -215,8 +216,10 @@ class HealthCheckRegistry(
     * A service is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): ServiceHealth {
-      val healthy = statuses.values.all { it.result.isHealthy }
-      return ServiceHealth(healthy, statuses.toMap())
+      val warmupState = warmupRegistry?.state() ?: WarmupState.Completed
+      println("warmupState = $warmupState")
+      val healthy = statuses.values.all { it.result.isHealthy } && warmupState == WarmupState.Completed
+      return ServiceHealth(healthy, warmupState, statuses.toMap())
    }
 
    /**
@@ -256,10 +259,11 @@ data class HealthCheckStatus(
 )
 
 /**
- * A service is considered healthy if all the healthchecks are in healthy state.
+ * A service is considered healthy if all the healthchecks are in healthy state and warmups are not running.
  */
 data class ServiceHealth(
    val healthy: Boolean,
+   val warmups: WarmupState,
    val healthchecks: Map<String, HealthCheckStatus>
 )
 

@@ -1,12 +1,15 @@
 package com.sksamuel.cohort.endpoints
 
 import com.sksamuel.cohort.HealthCheckRegistry
+import com.sksamuel.cohort.WarmupRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.logging.LogManager
+import kotlinx.coroutines.Dispatchers
 
 class CohortConfiguration {
 
+   private val warmupRegistry = WarmupRegistry()
    val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
 
    // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
@@ -39,20 +42,24 @@ class CohortConfiguration {
    // set to true to enable the /cohort/sysprops endpoint which returns current system properties
    var sysprops: Boolean = false
 
-   @Deprecated(
-      """Use cohort inside the routing block, eg
-      routing {
-        route("prefix") { // optional prefix
-          cohort {
-            jvmInfo = true // or any other option here
-          }
-        }
-      }
-      """
-   )
    var endpointPrefix = "cohort"
 
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+      registry.warmupRegistry = warmupRegistry
       healthchecks[endpoint] = registry
+   }
+
+   fun healthcheck(
+      endpoint: String,
+      configure: HealthCheckRegistry.() -> Unit
+   ) {
+      val registry = HealthCheckRegistry(dispatcher = Dispatchers.Default)
+      registry.warmupRegistry = warmupRegistry
+      registry.configure()
+      healthchecks[endpoint] = registry
+   }
+
+   fun warmup(configure: WarmupRegistry.() -> Unit) {
+      warmupRegistry.configure()
    }
 }

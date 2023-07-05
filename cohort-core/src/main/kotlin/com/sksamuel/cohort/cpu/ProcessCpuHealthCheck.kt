@@ -6,7 +6,7 @@ import com.sun.management.OperatingSystemMXBean
 import java.lang.management.ManagementFactory
 
 /**
- * A Cohort [HealthCheck] that the maximum system cpu is below a threshold.
+ * A Cohort [HealthCheck] that checks that the maximum system cpu is below a threshold.
  * Values are in the range 0 and 1.0.
  *
  * The check is considered healthy if the system cpu load is < [maxLoad].

@@ -8,6 +8,7 @@ import kotlin.random.Random
 /**
  * A Cohort [WarmupHealthCheck] that encrypts random strings using the supplied algorithms.
  */
+@Deprecated("Use com.sksamuel.cohort.cpu.CryptoWarmup")
 class CryptoWarmup(
    private val algos: Set<String> = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512"),
    override val iterations: Int = 1000,

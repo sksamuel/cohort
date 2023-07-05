@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Abstract class [HealthCheck]s that are designed to warm up a service, and then complete.
  * Once the warmup phase has completed, they continue to return true for the duration of the service.
  */
-@Deprecated("Replaced with StartupProbe")
+@Deprecated("Replaced with specialized WarmupCheck's")
 abstract class WarmupHealthCheck : HealthCheck {
 
    private val runner = WarmupRunner()
@@ -86,7 +86,7 @@ internal class WarmupRunner {
       return when {
          t != null -> HealthCheckResult.unhealthy("Warmup '${warmup.name}' error", t)
          completed == warmup.iterations -> HealthCheckResult.healthy("Warmup '${warmup.name}' has completed in ${time}ms")
-         else -> HealthCheckResult.startup("Warmup '${warmup.name}' has completed $completed iterations")
+         else -> HealthCheckResult.unhealthy("Warmup '${warmup.name}' has completed $completed iterations")
       }
    }
 }

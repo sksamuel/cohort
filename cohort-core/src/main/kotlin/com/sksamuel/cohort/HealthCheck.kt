@@ -43,7 +43,6 @@ data class HealthCheckResult(
 
    companion object {
       fun healthy(message: String) = HealthCheckResult(HealthStatus.Healthy, message, null)
-      fun startup(message: String) = HealthCheckResult(HealthStatus.Startup, message, null)
       fun unhealthy(message: String, cause: Throwable? = null) =
          HealthCheckResult(HealthStatus.Unhealthy, message, cause)
    }
@@ -53,5 +52,5 @@ data class HealthCheckResult(
  * The result of a [HealthCheck].
  */
 enum class HealthStatus {
-   Healthy, Unhealthy, Startup,
+   Healthy, Unhealthy
 }
