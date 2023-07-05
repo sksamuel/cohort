@@ -20,11 +20,11 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.util.getOrFail
 import java.time.ZoneOffset
-import kotlin.random.Random
 
-fun Route.cohort() {
+fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
 
-   val config = this.application.attributes[CohortConfigAttributeKey]
+   val config = this.application.attributes.getOrNull(CohortConfigAttributeKey) ?: CohortConfiguration()
+   config.configure()
 
    if (config.heapDump) {
       get("${config.endpointPrefix}/heapdump") {
@@ -135,12 +135,6 @@ fun Route.cohort() {
             { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
          )
-      }
-   }
-
-   if (config.warmup) {
-      get("${config.endpointPrefix}/warmup") {
-         call.respond(HttpStatusCode.OK, Random.nextInt().toString())
       }
    }
 

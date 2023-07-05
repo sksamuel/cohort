@@ -15,15 +15,16 @@ class CohortConfiguration {
    // set to true to enable the /cohort/os endpoint which returns operating system information
    var operatingSystem: Boolean = false
 
-   var warmup: Boolean = false
-
    // set to true to enable the /cohort/memory endpoint which returns memory pool information
    var memory: Boolean = false
 
+   // set to true to enable the /cohort/log endpoint which returns log system information
    var logManager: LogManager? = null
 
+   // register one or more DataSourceManagers to show information database pools
    var dataSources: List<DataSourceManager> = emptyList()
 
+   // register one or more DatabaseMigrationManagers to show information about database migrations
    var migrations: DatabaseMigrationManager? = null
 
    // set to true to enable the /cohort/jvm endpoint which returns JVM information
@@ -38,6 +39,17 @@ class CohortConfiguration {
    // set to true to enable the /cohort/sysprops endpoint which returns current system properties
    var sysprops: Boolean = false
 
+   @Deprecated(
+      """Use cohort inside the routing block, eg
+      routing {
+        route("prefix") { // optional prefix
+          cohort {
+            jvmInfo = true // or any other option here
+          }
+        }
+      }
+      """
+   )
    var endpointPrefix = "cohort"
 
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
