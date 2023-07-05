@@ -8,11 +8,24 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 
-class WarmupRegistry(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+class WarmupRegistry(
+   dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) {
 
    private val logger = KotlinLogging.logger { }
    private val scope = CoroutineScope(dispatcher)
    private val warmups = ConcurrentHashMap<String, WarmupState>()
+
+   companion object {
+      operator fun invoke(
+         dispatcher: CoroutineDispatcher,
+         configure: WarmupRegistry.() -> Unit
+      ): WarmupRegistry {
+         val registry = WarmupRegistry(dispatcher)
+         registry.configure()
+         return registry
+      }
+   }
 
    /**
     * Adds a [Warmup] to this registry using the default name.
@@ -27,18 +40,15 @@ class WarmupRegistry(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
       if (existing != null)
          error("Warmup registry already contains a warmup with the name ${warmup.name}")
 
-      println("Warmups=${warmups.keys}")
-      println("Warmups=${System.identityHashCode(warmups)}")
-
       scope.launch {
-         println("Starting warmup ${warmup.name} for $duration")
+         logger.info { "Starting warmup ${warmup.name} for $duration" }
          var iterations = 0
          val end = System.currentTimeMillis() + duration.inWholeMilliseconds
          while (System.currentTimeMillis() < end) {
             warmup.warm(iterations++)
          }
          warmup.close()
-         println("Warmup ${warmup.name} has completed")
+         logger.info { "Warmup ${warmup.name} has completed" }
          warmups[warmup.name] = WarmupState.Completed
       }
    }
