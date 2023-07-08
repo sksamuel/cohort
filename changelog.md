@@ -1,5 +1,14 @@
 # Changelog
 
+### 2.1.0
+
+* Introduced new `WarmupRegistry` to allow warmups to specify duration instead of iteration counts.
+* Allow routes to be registered in any Ktor routing block
+* Added `KafkaConsumerSubscriptionHealthCheck`
+* Added `close` method to `HealthCheckRegistry`
+* Auto shutdown `HealthCheckRegistry` when JVM is terminating.
+* Added `FibonacciWarmup`, `DataSourceConnectionWarmup`, `RedisClusterConnectionWarmup`, `JacksonMapperWarmup`.
+
 ### 2.0.2
 
 * Fixed race condition with 2.0.x warmup starts
@@ -15,6 +24,7 @@
 **Minimum version of Kotlin is now 1.8**
 
 * Removed Ktor 1.x module, and merged Ktor 2.x module into the `cohort-core` module.
+  * No additional dependencies are required for ktor.
 * Added `HttpWarmup`, `RedisConnectionWarmup`, `FibWarmup`, `JacksonWarmup`, `DataSourceWarmup`
   warm up health checks which will
   execute for a period of time to warm the JVM / connections before reporting as healthy. These are intended to be used
