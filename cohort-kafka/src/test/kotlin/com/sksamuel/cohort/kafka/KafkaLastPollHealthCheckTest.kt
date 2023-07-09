@@ -17,7 +17,6 @@ import org.apache.kafka.common.utils.Bytes
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class KafkaLastPollHealthCheckTest : FunSpec({
