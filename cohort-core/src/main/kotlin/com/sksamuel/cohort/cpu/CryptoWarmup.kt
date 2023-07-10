@@ -9,6 +9,8 @@ class CryptoWarmup(
    private val algos: Set<String> = setOf("HmacSHA256", "HmacSHA384", "HmacSHA512"),
 ) : Warmup {
 
+   override val name: String = "crypto_warmup"
+
    override suspend fun warm(iteration: Int) {
       algos.forEach { algorithm ->
          val secret = Random.nextBytes(4096)
