@@ -1,5 +1,10 @@
 # Changelog
 
+### 2.1.1
+
+* Allow specifying the coroutine dispatcher when creating a `KafkaConsumerSubscriptionHealthCheck`.
+* Fixed incorrect message on the `ThreadStateHealthCheck`.
+
 ### 2.1.0
 
 * Introduced new `WarmupRegistry` to allow warmups to specify duration instead of iteration counts.
