@@ -9,7 +9,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
  *
  * This check can be useful to detect stalled consumers.
  *
- * This check reports healthy if the records consumer per scan is >= [min].
+ * This check reports healthy if the records consumed between invocations is >= [min].
+ * For example, when you register this check, if you specify a min value of 100, then at least
+ * 100 records must be consumed during the interval you specify when you registered the check.
  */
 class KafkaConsumerCountHealthCheck(
    private val consumer: KafkaConsumer<*, *>,
