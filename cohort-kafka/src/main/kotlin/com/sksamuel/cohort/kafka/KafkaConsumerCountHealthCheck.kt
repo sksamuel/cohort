@@ -20,7 +20,7 @@ class KafkaConsumerCountHealthCheck(
 
    private val metricName = "records-consumed-total"
 
-   override val name: String = "kafka_consumer_rate"
+   override val name: String = "kafka_consumer_count"
 
    private var lastTotal: Long = -1
 
