@@ -31,27 +31,28 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val coroutines = "1.7.1"
+         val coroutines = "1.7.2"
          library("coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
          library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
-         library("kotlin-logging", "io.github.oshai:kotlin-logging-jvm:4.0.0-beta-28")
          library("slf4j-api", "org.slf4j:slf4j-api:2.0.7")
 
-         val tabby = "2.2.5"
+         val tabby = "2.2.7"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.11.1"
+         val micrometer = "1.11.2"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
-         library("hikari", "com.zaxxer:HikariCP:5.0.1")
+
+         val hikari = "5.0.1"
+         library("hikari", "com.zaxxer:HikariCP:$hikari")
 
          val flyway = "9.19.4"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
-         val kakfa = "3.5.0"
+         val kakfa = "3.5.1"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.2.4.RELEASE"
+         val lettuce = "6.2.5.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.22.0"
@@ -74,7 +75,7 @@ dependencyResolutionManagement {
 
          library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.6.2")
 
-         val awssdk = "1.12.490"
+         val awssdk = "1.12.512"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
