@@ -1,12 +1,8 @@
 package com.sksamuel.cohort.hikari
 
 import com.sksamuel.cohort.HealthCheck
-import com.sksamuel.cohort.HealthCheckRegistry
 import com.sksamuel.cohort.HealthCheckResult
-import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * A Cohort [HealthCheck] that checks for the number of connections in a [HikariDataSource].
