@@ -6,19 +6,18 @@ import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
 /**
- * A Redis [Warmup] that uses a supplied Lettuce [StatefulRedisConnection]
- * to execute commands.
+ * A Cohort [Warmup] that uses a supplied Lettuce [StatefulRedisConnection]
+ * to execute commands against a standalone redis instance.
  *
  * By default, the [eval] function will set elements with a 1 second TTL under random keys with
  * the prefix "cohort_warmup". Any chain of commands can be used by providing a custom [eval] function.
  */
 class RedisConnectionWarmup<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
-   private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,
+   private val eval: suspend (StatefulRedisConnection<K, V>) -> Unit,
 ) : Warmup {
 
    companion object {
-
       operator fun invoke(
          conn: StatefulRedisConnection<String, *>,
       ): RedisConnectionWarmup<String, *> {
@@ -34,6 +33,6 @@ class RedisConnectionWarmup<K, V>(
    override val name: String = "redis_warmup"
 
    override suspend fun warm(iteration: Int) {
-      command(conn)
+      eval(conn)
    }
 }

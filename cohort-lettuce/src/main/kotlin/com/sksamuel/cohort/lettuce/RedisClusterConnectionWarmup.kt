@@ -6,8 +6,8 @@ import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
 /**
- * A Redis [Warmup] that uses a supplied Lettuce [StatefulRedisClusterConnection]
- * to execute commands.
+ * A Cohort [Warmup] that uses a supplied Lettuce [StatefulRedisClusterConnection]
+ * to execute commands against a redis cluster.
  *
  * By default, the [eval] function will set elements with a 1 second TTL under random keys with
  * the prefix "cohort_warmup". Any chain of commands can be used by providing a custom [eval] function.
