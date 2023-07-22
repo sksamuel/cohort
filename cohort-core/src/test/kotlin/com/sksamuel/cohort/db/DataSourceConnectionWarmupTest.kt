@@ -11,9 +11,9 @@ class DataSourceConnectionWarmupTest : FunSpec({
 
    test("happy path") {
       val ds = createHikariDS()
-      ds.connection.use { it.createStatement().executeUpdate("CREATE TABLE foo (id int)") }
+      ds.connection.use { it.createStatement().executeUpdate("CREATE TABLE foo1 (id int)") }
       val warmups = WarmupRegistry {
-         register(DataSourceConnectionWarmup(ds, "select * from foo"), 3.seconds)
+         register(DataSourceConnectionWarmup(ds, "select * from foo1"), 3.seconds)
       }
       warmups.state() shouldBe WarmupState.Running
       delay(5.seconds)
