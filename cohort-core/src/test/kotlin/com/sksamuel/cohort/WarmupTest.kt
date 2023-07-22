@@ -26,10 +26,11 @@ class WarmupTest : FunSpec() {
          }
 
          testApplication {
+
             routing {
                cohort {
                   warmup(warmups)
-                  healthcheck("healthy-mchealth-face", healthchecks)
+                  healthcheck("/healthy-mchealth-face", healthchecks)
                }
             }
 
