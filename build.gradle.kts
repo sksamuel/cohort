@@ -34,7 +34,6 @@ allprojects {
    dependencies {
       api(rootProject.libs.coroutines.core)
       api(rootProject.libs.coroutines.jdk8)
-      implementation(rootProject.libs.kotlin.logging)
       implementation(rootProject.libs.slf4j.api)
       implementation(rootProject.libs.sksamuel.tabby)
       testApi(rootProject.libs.bundles.testing)
