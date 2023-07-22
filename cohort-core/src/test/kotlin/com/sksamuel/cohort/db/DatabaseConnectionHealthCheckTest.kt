@@ -16,10 +16,10 @@ class DatabaseConnectionHealthCheckTest : FunSpec({
 
    test("should return healthy for valid query") {
       val ds = createHikariDS()
-      ds.connection.use { it.createStatement().executeUpdate("CREATE TABLE foo (id int)") }
+      ds.connection.use { it.createStatement().executeUpdate("CREATE TABLE foo2 (id int)") }
       DatabaseConnectionHealthCheck(
          ds,
-         query = "select * from foo"
+         query = "select * from foo2"
       ).check().status shouldBe HealthStatus.Healthy
    }
 
