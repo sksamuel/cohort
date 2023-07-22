@@ -35,6 +35,7 @@ class JacksonMapperWarmup(
          l = List(100) { randomAZ(128) }.toSet(),
       )
       val json = mapper.writeValueAsString(fake)
-      mapper.readValue<Fake>(json)
+      val obj = mapper.readValue<Fake>(json)
+      if (Random.nextInt(1, 2) == 0) println(obj)
    }
 }
