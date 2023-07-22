@@ -18,6 +18,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
  * This class tracks counts for each consumer group.
  * if you do not want a consumer to be tracked, do not register the CountingConsumerInterceptor.
  *
+ * Note: It is best to register this check with a reasonably long period between invocations to allow
+ * for rebalances to occur. For example, if this was registered with 20 second intervals, it is quite likely
+ * that during a deployment, a rebalance could take longer than 20 seconds, thus reporting unhealthy.
+ *
  * This check can be useful to detect consumers which are making no progress.
  */
 class KafkaConsumersHealthCheck : HealthCheck {
