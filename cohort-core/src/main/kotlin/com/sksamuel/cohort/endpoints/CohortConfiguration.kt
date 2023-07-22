@@ -10,8 +10,8 @@ class CohortConfiguration {
 
    private val warmupRegistry = WarmupRegistry()
 
-   val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
-   val warmups = mutableSetOf<WarmupRegistry>()
+   internal val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+   private val warmups = mutableSetOf<WarmupRegistry>()
 
    // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
    var heapDump: Boolean = false
@@ -45,12 +45,28 @@ class CohortConfiguration {
 
    var endpointPrefix = "cohort"
 
+   /**
+    * Register a [HealthCheckRegistry] at the given [endpoint].
+    */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
       registry.warmupRegistry = warmupRegistry
       healthchecks[endpoint] = registry
    }
 
+   /**
+    * Register a [WarmupRegistry].
+    */
    fun warmup(registry: WarmupRegistry) {
       warmups.add(registry)
+   }
+
+   /**
+    * Creates a [WarmupRegistry], registers it, and executes the provided [configure] function
+    * against the new registry.
+    */
+   fun warmups(configure: WarmupRegistry.() -> Unit) {
+      val registry = WarmupRegistry()
+      configure.invoke(registry)
+      warmup(registry)
    }
 }

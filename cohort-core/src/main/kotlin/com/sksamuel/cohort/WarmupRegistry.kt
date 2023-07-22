@@ -1,10 +1,10 @@
 package com.sksamuel.cohort
 
-import io.github.oshai.KotlinLogging
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 
@@ -12,7 +12,7 @@ class WarmupRegistry(
    dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
 
-   private val logger = KotlinLogging.logger { }
+   private val logger = LoggerFactory.getLogger(WarmupRegistry::class.java)
    private val scope = CoroutineScope(dispatcher)
    private val warmups = ConcurrentHashMap<String, WarmupState>()
 
@@ -41,14 +41,18 @@ class WarmupRegistry(
          error("Warmup registry already contains a warmup with the name ${warmup.name}")
 
       scope.launch {
-         logger.info { "Starting warmup ${warmup.name} for $duration" }
+         logger.info("Starting warmup ${warmup.name} for $duration")
          var iterations = 0
          val end = System.currentTimeMillis() + duration.inWholeMilliseconds
          while (System.currentTimeMillis() < end) {
-            warmup.warm(iterations++)
+            try {
+               warmup.warm(iterations++)
+            } catch (e:Exception) {
+               logger.warn("Error running Warmup", e)
+            }
          }
          warmup.close()
-         logger.info { "Warmup ${warmup.name} has completed" }
+         logger.info("Warmup ${warmup.name} has completed")
          warmups[warmup.name] = WarmupState.Completed
       }
    }

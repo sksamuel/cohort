@@ -36,6 +36,7 @@ dependencyResolutionManagement {
          library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
          library("slf4j-api", "org.slf4j:slf4j-api:2.0.7")
+         library("slf4j-simple", "org.slf4j:slf4j-simple:2.0.7")
 
          val tabby = "2.2.7"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")

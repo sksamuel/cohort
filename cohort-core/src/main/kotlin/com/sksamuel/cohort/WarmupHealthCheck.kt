@@ -1,6 +1,5 @@
 package com.sksamuel.cohort
 
-import io.github.oshai.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +50,6 @@ abstract class WarmupHealthCheck : HealthCheck {
 @Deprecated("Use the new Warmup mechanism")
 internal class WarmupRunner {
 
-   private val logger = KotlinLogging.logger { }
    private val scope = CoroutineScope(Dispatchers.Default)
    private var completed = 0
    private var time = 0L
@@ -69,7 +67,6 @@ internal class WarmupRunner {
                completed++
             }.onFailure {
                error.set(it)
-               logger.warn(it) { "Warmup '${warmup.name}' error" }
             }.onSuccess {
                error.set(null)
             }
@@ -78,7 +75,6 @@ internal class WarmupRunner {
          warmup.close()
 
          time = System.currentTimeMillis() - start
-         logger.warn { "Warmup '${warmup.name}' has completed in ${time}ms" }
       }
    }
 

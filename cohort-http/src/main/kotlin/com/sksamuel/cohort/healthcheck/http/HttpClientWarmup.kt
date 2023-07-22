@@ -2,7 +2,9 @@ package com.sksamuel.cohort.healthcheck.http
 
 import com.sksamuel.cohort.Warmup
 import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.WarmupRegistry
 import io.ktor.client.HttpClient
+import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 
 /**
@@ -27,13 +29,15 @@ class HttpClientWarmup(
  *
  * @param delay an optional delay between iterations
  */
-class HttpRequestWarmup(
+class HttpWarmup(
    private val client: HttpClient,
-   private val eval: suspend (HttpClient) -> Unit,
    private val delay: Duration?, // delay between iterations
+   private val eval: suspend (HttpClient) -> Unit,
 ) : Warmup {
 
-   constructor(client: HttpClient, eval: suspend (HttpClient) -> Unit) : this(client, eval, null)
+   private val logger = LoggerFactory.getLogger(WarmupRegistry::class.java)
+
+   constructor(client: HttpClient, eval: suspend (HttpClient) -> Unit) : this(client, null, eval)
 
    override suspend fun warm(iteration: Int) {
       eval(client)
