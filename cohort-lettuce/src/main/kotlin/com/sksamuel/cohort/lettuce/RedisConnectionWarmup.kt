@@ -5,6 +5,13 @@ import io.lettuce.core.api.StatefulRedisConnection
 import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
+/**
+ * A Redis [Warmup] that uses a supplied Lettuce [StatefulRedisConnection]
+ * to execute commands.
+ *
+ * By default, the [eval] function will set elements with a 1 second TTL under random keys with
+ * the prefix "cohort_warmup". Any chain of commands can be used by providing a custom [eval] function.
+ */
 class RedisConnectionWarmup<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
    private val command: suspend (StatefulRedisConnection<K, V>) -> Unit,

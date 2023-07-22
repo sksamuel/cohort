@@ -9,7 +9,7 @@ import kotlin.random.Random
  * A Redis [Warmup] that uses a supplied Lettuce [StatefulRedisClusterConnection]
  * to execute commands.
  *
- * By default, the [eval] function will set elements with a 5 second TTL under random keys with
+ * By default, the [eval] function will set elements with a 1 second TTL under random keys with
  * the prefix "cohort_warmup". Any chain of commands can be used by providing a custom [eval] function.
  */
 class RedisClusterConnectionWarmup<K, V>(
