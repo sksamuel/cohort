@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class HttpRequestWarmupTest : FunSpec({
+class HttpWarmupTest : FunSpec({
 
    test("HttpWarmup happy path") {
 
