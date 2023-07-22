@@ -3,19 +3,17 @@ package com.sksamuel.cohort.jackson
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.sksamuel.cohort.WarmupHealthCheck
+import com.sksamuel.cohort.Warmup
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
 
 /**
- * A [WarmupHealthCheck] that will marshall and unmarshall JSON.
+ * A [Warmup] that will marshall and unmarshall JSON using Jackson.
  */
-@Deprecated("Use JacksonMapperWarmup")
-class JacksonWarmup(
+class JacksonMapperWarmup(
    private val mapper: ObjectMapper = jacksonObjectMapper(),
-   override val iterations: Int = 1000,
-) : WarmupHealthCheck() {
+) : Warmup {
 
    override val name: String = "jackson_warmup"
 
@@ -38,28 +36,5 @@ class JacksonWarmup(
       )
       val json = mapper.writeValueAsString(fake)
       mapper.readValue<Fake>(json)
-   }
-}
-
-data class Fake(
-   val a: String,
-   val b: Int,
-   val c: Long,
-   val d: Boolean,
-   val e: Double,
-   val f: Float,
-   val g: BigDecimal,
-   val h: BigInteger,
-   val i: Short,
-   val j: Byte,
-   val k: List<String>,
-   val l: Set<String>,
-)
-
-suspend fun main() {
-   val w = JacksonMapperWarmup()
-   repeat(1000) {
-      w.warm(it)
-      println(it)
    }
 }
