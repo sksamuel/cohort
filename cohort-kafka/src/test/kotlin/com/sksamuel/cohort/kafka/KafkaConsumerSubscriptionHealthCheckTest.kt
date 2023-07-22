@@ -10,7 +10,6 @@ import io.kotest.extensions.testcontainers.kafka.admin
 import io.kotest.extensions.testcontainers.kafka.consumer
 import io.kotest.extensions.testcontainers.kafka.producer
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
