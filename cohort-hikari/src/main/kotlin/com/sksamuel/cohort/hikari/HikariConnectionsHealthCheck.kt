@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
  * This is useful to ensure a service has opened a required number of connections before being
  * considered healthy.
  *
- * The check is considered healthy if the total connection count is >= [minConnections].
+ * The check is considered healthy if the total connection count - idle and active - is >= [minConnections].
  */
 class HikariConnectionsHealthCheck(
    private val ds: HikariDataSource,
@@ -32,27 +32,4 @@ class HikariConnectionsHealthCheck(
          HealthCheckResult.unhealthy(msg, null)
       }
    }
-}
-
-fun createHikariDS(): HikariDataSource =
-   HikariConfig().apply {
-      jdbcUrl = "jdbc:h2:mem:kjs;DB_CLOSE_DELAY=-1"
-      username = "sa"
-      password = ""
-      maximumPoolSize = 1
-   }.let { HikariDataSource(it) }
-
-fun createHealthChecks(ds: HikariDataSource): HealthCheckRegistry =
-   HealthCheckRegistry(Dispatchers.Default) {
-      register(HikariConnectionsHealthCheck(ds, 1), 1.seconds)
-   }
-
-fun main() {
-   val dataSource = createHikariDS()
-   println("Created datasource $dataSource")
-   val registry = createHealthChecks(dataSource)
-   Thread.sleep(5000) // let the healthcheck run a few times
-   dataSource.close()
-   println("Closed datasource ${dataSource.isClosed}")
-   registry.close()
 }
