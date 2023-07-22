@@ -8,6 +8,12 @@ import io.kotest.matchers.shouldBe
 
 class DatabaseConnectionHealthCheckTest : FunSpec({
 
+   test("should return healthy if query null and connection is open") {
+      DatabaseConnectionHealthCheck(
+         createHikariDS(),
+      ).check().status shouldBe HealthStatus.Healthy
+   }
+
    test("should return healthy for valid query") {
       val ds = createHikariDS()
       ds.connection.use { it.createStatement().executeUpdate("CREATE TABLE foo (id int)") }
