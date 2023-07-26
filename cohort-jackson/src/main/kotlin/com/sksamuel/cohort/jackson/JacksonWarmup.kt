@@ -55,11 +55,3 @@ data class Fake(
    val k: List<String>,
    val l: Set<String>,
 )
-
-suspend fun main() {
-   val w = JacksonMapperWarmup()
-   repeat(1000) {
-      w.warm(it)
-      println(it)
-   }
-}

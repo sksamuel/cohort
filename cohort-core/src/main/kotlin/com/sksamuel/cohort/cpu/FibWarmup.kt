@@ -20,11 +20,3 @@ class FibWarmup(
       fib(Random.nextInt(0, depth))
    }
 }
-
-suspend fun main() {
-   val w = FibonacciWarmup()
-   repeat(1000) {
-      w.warm(it)
-      println(it)
-   }
-}
