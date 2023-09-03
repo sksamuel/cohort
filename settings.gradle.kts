@@ -38,7 +38,7 @@ dependencyResolutionManagement {
          library("slf4j-api", "org.slf4j:slf4j-api:2.0.7")
          library("slf4j-simple", "org.slf4j:slf4j-simple:2.0.7")
 
-         val tabby = "2.2.7"
+         val tabby = "2.2.9"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
          val micrometer = "1.11.2"
@@ -53,7 +53,7 @@ dependencyResolutionManagement {
          val kakfa = "3.5.1"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.2.5.RELEASE"
+         val lettuce = "6.2.6.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.22.0"
@@ -87,13 +87,13 @@ dependencyResolutionManagement {
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
 
-         val ktor = "2.3.2"
+         val ktor = "2.3.4"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
          library("ktor-server-test-host", "io.ktor:ktor-server-test-host:$ktor")
 
-         val logback = "1.4.8"
+         val logback = "1.4.11"
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")
          library("logback-core", "ch.qos.logback:logback-core:$logback")
 
@@ -101,7 +101,7 @@ dependencyResolutionManagement {
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val kotest = "5.5.4"
+         val kotest = "5.7.1"
          library("kotest-datatest", "io.kotest:kotest-framework-datatest:$kotest")
          library("kotest-junit5", "io.kotest:kotest-runner-junit5:$kotest")
          library("kotest-core", "io.kotest:kotest-assertions-core:$kotest")
