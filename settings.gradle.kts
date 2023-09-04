@@ -20,7 +20,7 @@ include(
    "cohort-mongo",
    "cohort-pulsar",
    "cohort-rabbit",
-   "cohort-redis",
+   "cohort-jedis",
    "cohort-micrometer",
 )
 
