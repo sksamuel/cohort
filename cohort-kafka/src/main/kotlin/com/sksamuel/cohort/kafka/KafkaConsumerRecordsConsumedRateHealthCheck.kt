@@ -20,7 +20,7 @@ class KafkaConsumerRecordsConsumedRateHealthCheck(
 ) : KafkaConsumerMetricHealthCheck(consumer) {
 
    init {
-      require(minThreshold >= 1.0) { "The minimum thresold is >= 1.0" }
+      require(minThreshold > 0.0) { "The minimum thresold is > 0.0" }
    }
 
    private val metricName = "records-consumed-rate"
