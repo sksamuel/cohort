@@ -1,15 +1,15 @@
 package com.sksamuel.cohort.logback
 
-import com.sksamuel.cohort.HealthCheckRegistry
+import com.sksamuel.cohort.HealthCheck
+import com.sksamuel.cohort.HealthCheckResult
+import com.sksamuel.cohort.Subscriber
 import org.slf4j.LoggerFactory
 
-class LogbackHealthCheckLogging {
+class LogbackHealthCheckLogging : Subscriber {
 
    private val logger = LoggerFactory.getLogger(LogbackHealthCheckLogging::class.java)
 
-   fun bindTo(registry: HealthCheckRegistry) {
-      registry.addSubscriber { name, _, result ->
-         logger.info("HealthCheck $name: $result")
-      }
+   override suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult) {
+      logger.info("HealthCheck $name: $result")
    }
 }
