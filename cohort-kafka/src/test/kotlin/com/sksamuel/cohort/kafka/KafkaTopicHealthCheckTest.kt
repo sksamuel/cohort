@@ -1,6 +1,7 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthStatus
+import io.kotest.assertions.nondeterministic.continually
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
@@ -18,10 +19,18 @@ class KafkaTopicHealthCheckTest : FunSpec({
 
    test("health check should pass if the topic exists") {
 
-      val healthcheck = KafkaTopicHealthCheck(kafka.admin(), "mytopic")
+      val healthcheck = KafkaTopicHealthCheck(kafka.admin(), "mytopic1")
       healthcheck.check().status shouldBe HealthStatus.Unhealthy
-      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic", 1, 1))).all().get() }
+      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic1", 1, 1))).all().get() }
       delay(1.seconds)
       healthcheck.check().status shouldBe HealthStatus.Healthy
+   }
+
+   test("health check should fail if the topic does not exists") {
+
+      val healthcheck = KafkaTopicHealthCheck(kafka.admin(), "mytopic2")
+      continually(5.seconds) {
+         healthcheck.check().status shouldBe HealthStatus.Unhealthy
+      }
    }
 })
