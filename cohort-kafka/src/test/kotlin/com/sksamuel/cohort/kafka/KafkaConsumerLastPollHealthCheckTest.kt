@@ -1,7 +1,7 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthStatus
-import io.kotest.assertions.timing.continually
+import io.kotest.assertions.nondeterministic.continually
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
