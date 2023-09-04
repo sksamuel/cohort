@@ -7,7 +7,7 @@ import kotlin.math.roundToLong
 
 /**
  * A Cohort [HealthCheck] that checks that the average time between polls is above a given minimum.
- * This metric is measured in milliseconds
+ * This metric is measured in milliseconds.
  *
  * This metric does not begin to return unhealthy until the time is above zero. A time of zero,
  * which means no records were consumed, returns healthy. This allows consumers to take time
@@ -18,7 +18,7 @@ import kotlin.math.roundToLong
 class KafkaConsumerTimeBetweenPollHealthCheck(
    consumer: KafkaConsumer<*, *>,
    private val minThreshold: Long,
-) : KafkaConsumerMetricHealthCheck(consumer) {
+) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
       require(minThreshold > 0) { "The minimum threshold is > 0" }

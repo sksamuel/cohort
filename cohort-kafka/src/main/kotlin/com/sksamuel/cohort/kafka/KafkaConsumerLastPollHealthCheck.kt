@@ -6,12 +6,13 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
-@Deprecated("renamed to KafkaConsumerLastPollHealthCheck")
+@Deprecated("Renamed to KafkaConsumerLastPollHealthCheck")
 typealias KafkaLastPollHealthCheck = KafkaConsumerLastPollHealthCheck
 
 /**
  * A Cohort [HealthCheck] that checks that a kafka consumer made a call to poll,
- * regardless of whether the poll returned records or not, within the given [interval] period.
+ * regardless of whether the poll returned records or not, within the given [interval] period,
+ * across any topics this consumer is subscribed to.
  *
  * The granularity on the check is seconds, so specifying an [interval] less than 1 second
  * will always result in an error.
@@ -21,7 +22,7 @@ typealias KafkaLastPollHealthCheck = KafkaConsumerLastPollHealthCheck
 class KafkaConsumerLastPollHealthCheck(
    consumer: KafkaConsumer<*, *>,
    private val interval: Duration,
-) : KafkaConsumerMetricHealthCheck(consumer) {
+) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
       require(interval.inWholeSeconds > 0) { "The minimum resolution is 1 second" }

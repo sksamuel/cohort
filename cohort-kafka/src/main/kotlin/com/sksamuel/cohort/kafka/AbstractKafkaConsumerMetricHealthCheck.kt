@@ -11,7 +11,7 @@ import org.apache.kafka.common.Metric
 /**
  * Kafka metrics can subclass this class and use the provided methods to retrieve metrics.
  */
-abstract class KafkaConsumerMetricHealthCheck(private val consumer: KafkaConsumer<*, *>) : HealthCheck {
+abstract class AbstractKafkaConsumerMetricHealthCheck(private val consumer: KafkaConsumer<*, *>) : HealthCheck {
 
    /**
     * Returns the metric with the given [name] that has the least number of tags (most generic metric value).

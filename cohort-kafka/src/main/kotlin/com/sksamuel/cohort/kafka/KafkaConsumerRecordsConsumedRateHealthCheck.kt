@@ -5,7 +5,7 @@ import com.sksamuel.cohort.HealthCheckResult
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
 /**
- * A Cohort [HealthCheck] that checks that the rate of consumption of records from a topic,
+ * A Cohort [HealthCheck] that checks that the rate of consumption of records per second
  * is above a given minimum.
  *
  * This metric does not begin to return unhealthy until the rate is above zero. A rate of zero,
@@ -17,7 +17,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 class KafkaConsumerRecordsConsumedRateHealthCheck(
    consumer: KafkaConsumer<*, *>,
    private val minThreshold: Double,
-) : KafkaConsumerMetricHealthCheck(consumer) {
+) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
       require(minThreshold > 0.0) { "The minimum thresold is > 0.0" }
