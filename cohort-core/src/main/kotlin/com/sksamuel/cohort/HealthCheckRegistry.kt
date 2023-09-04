@@ -43,7 +43,7 @@ class HealthCheckRegistry(
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
 
    private val logger = LoggerFactory.getLogger(WarmupRegistry::class.java)
-   private val subscribers = mutableListOf<Subscriber>()
+   private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
 
    @Deprecated("Replaced with WarmupRegistry")
    private val warmupScope = CoroutineScope(Dispatchers.Default)
@@ -229,9 +229,7 @@ class HealthCheckRegistry(
    }
 
    /**
-    * Adds a [Subscriber] to this registry, which will be invoked each time a health check completes.
-    *
-    * Note: This method is not thread safe.
+    * Adds a [Subscriber] to this registry, which will be invoked each time a health check is invoked.
     */
    fun addSubscriber(subscriber: Subscriber) {
       subscribers.add(subscriber)
