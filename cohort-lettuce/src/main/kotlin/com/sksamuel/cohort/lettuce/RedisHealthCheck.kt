@@ -7,10 +7,11 @@ import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
 /**
- * A Cohort [HealthCheck] that checks that a connection can be made to a redis standalone instance using
- * the lettuce client.
+ * A Cohort [HealthCheck] that checks that a connection can be made to a redis standalone
+ * instance using the supplied lettuce connection.
  *
- * @param command a command to execute against the redis instance. Defaults to retrieving a random key.
+ * @param command a command to execute against the redis instance.
+ *                Defaults to retrieving a random key, which may or may not exist.
  */
 class RedisHealthCheck<K, V>(
    private val conn: StatefulRedisConnection<K, V>,
