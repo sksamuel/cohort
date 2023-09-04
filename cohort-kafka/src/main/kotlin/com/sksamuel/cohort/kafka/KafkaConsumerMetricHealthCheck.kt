@@ -13,8 +13,13 @@ import org.apache.kafka.common.Metric
  */
 abstract class KafkaConsumerMetricHealthCheck(private val consumer: KafkaConsumer<*, *>) : HealthCheck {
 
+   /**
+    * Returns the metric with the given [name] that has the least number of tags (most generic metric value).
+    */
    protected fun metric(name: String): Either<HealthCheckResult, Metric> =
-      consumer.metrics().values.firstOrNull { it.metricName().name() == name }?.right()
+      consumer.metrics().values
+         .filter { it.metricName().name() == name }
+         .minByOrNull { it.metricName().tags().size }?.right()
          ?: HealthCheckResult.unhealthy("Could not locate kafka metric '${name}'", null).left()
 
 }

@@ -6,17 +6,20 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
-@Deprecated("use KafkaLastPollHealthCheck")
-typealias KafkaConsumerLastPollTimeHealthCheck = KafkaLastPollHealthCheck
+@Deprecated("renamed to KafkaConsumerLastPollHealthCheck")
+typealias KafkaLastPollHealthCheck = KafkaConsumerLastPollHealthCheck
 
 /**
  * A Cohort [HealthCheck] that checks that a kafka consumer made a call to poll,
  * regardless of whether the poll returned records or not, within the given [interval] period.
  *
+ * The granularity on the check is seconds, so specifying an [interval] less than 1 second
+ * will always result in an error.
+ *
  * This check can be useful to detect stalled consumers.
  */
-class KafkaLastPollHealthCheck(
-   private val consumer: KafkaConsumer<*, *>,
+class KafkaConsumerLastPollHealthCheck(
+   consumer: KafkaConsumer<*, *>,
    private val interval: Duration,
 ) : KafkaConsumerMetricHealthCheck(consumer) {
 

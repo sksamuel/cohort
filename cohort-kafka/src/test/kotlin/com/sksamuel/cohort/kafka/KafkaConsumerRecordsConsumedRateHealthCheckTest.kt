@@ -1,8 +1,9 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthStatus
-import io.kotest.assertions.timing.Continually
 import io.kotest.assertions.timing.continually
+import io.kotest.assertions.timing.eventually
+import io.kotest.assertions.withClue
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
@@ -22,33 +23,45 @@ import java.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class KafkaLastPollHealthCheckTest : FunSpec({
+class KafkaConsumerRecordsConsumedRateHealthCheckTest : FunSpec({
 
    val kafka = install(KafkaContainerExtension(KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka"))))
 
-   test("health check should pass while the consumer is active") {
+   test("health check should pass while consumer has not yet consumed") {
 
-      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic", 1, 1))).all().get() }
+      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic1", 1, 1))).all().get() }
+      val consumer = kafka.consumer()
+      val healthcheck = KafkaConsumerRecordsConsumedRateHealthCheck(consumer, 1.0)
+      continually(5.seconds) {
+         healthcheck.check().status shouldBe HealthStatus.Healthy
+         delay(250.milliseconds)
+      }
+   }
+
+   test("health check should pass while rate is above threshold") {
+
+      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic2", 1, 1))).all().get() }
 
       val producer = kafka.producer()
       val consumer = kafka.consumer()
-      consumer.subscribe(listOf("mytopic"))
+      consumer.subscribe(listOf("mytopic2"))
 
       val job = launch {
          while (isActive) {
             delay(10)
-            producer.send(ProducerRecord("mytopic", Bytes.wrap(byteArrayOf()), Bytes.wrap(byteArrayOf())))
+            producer.send(ProducerRecord("mytopic2", Bytes.wrap(byteArrayOf()), Bytes.wrap(byteArrayOf())))
          }
       }
 
-      val healthcheck = KafkaLastPollHealthCheck(consumer, 1.seconds)
-      continually(5.seconds) {
+      val healthcheck = KafkaConsumerRecordsConsumedRateHealthCheck(consumer, 5.0)
+      eventually(5.seconds) {
          consumer.poll(Duration.ofMillis(100))
-         healthcheck.check().status shouldBe HealthStatus.Healthy
+         val result = healthcheck.check()
+         withClue(result) {
+            result.status shouldBe HealthStatus.Healthy
+         }
          delay(250.milliseconds)
       }
-      delay(2.seconds)
-      healthcheck.check().status shouldBe HealthStatus.Unhealthy
 
       job.cancel()
       producer.close()
