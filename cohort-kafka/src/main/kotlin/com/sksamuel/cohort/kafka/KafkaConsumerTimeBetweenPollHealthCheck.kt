@@ -30,7 +30,7 @@ class KafkaConsumerTimeBetweenPollHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->
-         val rate = metric.metricValue().toString().toDoubleOrNull()?.roundToLong() ?: 0L
+         val rate = runCatching { metric.metricValue().toString().toDouble().roundToLong() }.getOrElse { 0L }
          val msg = "Kafka consumer time-between-poll-avg $rate [minThreshold $minThreshold]"
          return when {
             rate == 0L -> HealthCheckResult.healthy(msg)

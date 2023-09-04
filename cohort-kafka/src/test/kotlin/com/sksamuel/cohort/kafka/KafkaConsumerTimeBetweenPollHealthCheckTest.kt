@@ -31,7 +31,7 @@ class KafkaConsumerTimeBetweenPollHealthCheckTest : FunSpec({
 
       kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic1", 1, 1))).all().get() }
       val consumer = kafka.consumer()
-      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 1.0)
+      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 1)
       continually(5.seconds) {
          healthcheck.check().status shouldBe HealthStatus.Healthy
          delay(250.milliseconds)
@@ -53,7 +53,7 @@ class KafkaConsumerTimeBetweenPollHealthCheckTest : FunSpec({
          }
       }
 
-      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 5.0)
+      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 200)
       eventually(5.seconds) {
          consumer.poll(Duration.ofMillis(100))
          val result = healthcheck.check()
