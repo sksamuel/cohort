@@ -1,6 +1,8 @@
 package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthStatus
+import io.kotest.assertions.timing.Continually
+import io.kotest.assertions.timing.continually
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
@@ -17,6 +19,7 @@ import org.apache.kafka.common.utils.Bytes
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class KafkaLastPollHealthCheckTest : FunSpec({
@@ -39,8 +42,11 @@ class KafkaLastPollHealthCheckTest : FunSpec({
       }
 
       val healthcheck = KafkaLastPollHealthCheck(consumer, 1.seconds)
-      consumer.poll(Duration.ofMillis(100))
-      healthcheck.check().status shouldBe HealthStatus.Healthy
+      continually(5.seconds) {
+         consumer.poll(Duration.ofMillis(100))
+         healthcheck.check().status shouldBe HealthStatus.Healthy
+         delay(250.milliseconds)
+      }
       delay(2.seconds)
       healthcheck.check().status shouldBe HealthStatus.Unhealthy
 
