@@ -2,7 +2,7 @@
 
 ### 2.2.1
 
-* Added logHealthyStatus option to logging subscribers
+* Added `logHealthyStatus` option to logging subscribers
 
 ### 2.2.0
 
