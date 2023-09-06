@@ -12,7 +12,7 @@ on:
         required: true
         default: 'main'
 
-permissions: read-all|write-all
+permissions: write-all
 
 jobs:
   publish:
