@@ -6,7 +6,8 @@
 
 ### 2.2.0
 
-* Added new Kafka healthchecks
+* Added new Kafka healthchecks: `KafkaConsumerRecordsConsumedRateHealthCheck`, `KafkaConsumerRecordsConsumedHealthCheck`, `KafkaConsumerTimeBetweenPollHealthCheck`
+* Deprecated `KafkaConsumerSubscriptionHealthCheck`
 * Renamed `cohort-redis` module to `cohort-jedis`
 * Added `Log4j2HealthCheckLogging` and `LogbackHealthCheckLogging` subscribers to log results of healthchecks
 
