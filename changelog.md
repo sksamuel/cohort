@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.2.1
+
+* Added logHealthyStatus option to logging subscribers
+
 ### 2.2.0
 
 * Added new Kafka healthchecks
