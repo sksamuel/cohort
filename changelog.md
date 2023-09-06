@@ -10,6 +10,16 @@
 * Renamed `cohort-redis` module to `cohort-jedis`
 * Added `Log4j2HealthCheckLogging` and `LogbackHealthCheckLogging` subscribers to log results of healthchecks
 
+### 2.1.3
+
+* Added `S3WriteBucketHealthCheck`
+
+### 2.1.2
+
+* Added `ArrayCopyWarmup`
+* Added `EndpointStartupHealthCheck`
+* Added `HttpRequestWarmup`
+
 ### 2.1.1
 
 * Allow specifying the coroutine dispatcher when creating a `KafkaConsumerSubscriptionHealthCheck`.
