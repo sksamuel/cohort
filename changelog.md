@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.2.0
+
+* Added new Kafka healthchecks
+* Renamed `cohort-redis` module to `cohort-jedis`
+* Added `Log4j2HealthCheckLogging` and `LogbackHealthCheckLogging` subscribers to log results of healthchecks
+
 ### 2.1.1
 
 * Allow specifying the coroutine dispatcher when creating a `KafkaConsumerSubscriptionHealthCheck`.
