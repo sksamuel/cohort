@@ -31,17 +31,17 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val coroutines = "1.7.2"
+         val coroutines = "1.7.3"
          library("coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
          library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
-         library("slf4j-api", "org.slf4j:slf4j-api:2.0.7")
-         library("slf4j-simple", "org.slf4j:slf4j-simple:2.0.7")
+         library("slf4j-api", "org.slf4j:slf4j-api:2.0.9")
+         library("slf4j-simple", "org.slf4j:slf4j-simple:2.0.9")
 
          val tabby = "2.2.9"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.11.2"
+         val micrometer = "1.11.4"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
          val hikari = "5.0.1"
@@ -56,10 +56,10 @@ dependencyResolutionManagement {
          val lettuce = "6.2.6.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
-         val liquibase = "4.22.0"
+         val liquibase = "4.23.2"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
-         val jedis = "4.4.3"
+         val jedis = "4.4.4"
          library("jedis", "redis.clients:jedis:$jedis")
 
          library("rabbitmq", "com.rabbitmq:amqp-client:5.16.0")
@@ -101,7 +101,7 @@ dependencyResolutionManagement {
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val kotest = "5.7.1"
+         val kotest = "5.7.2"
          library("kotest-datatest", "io.kotest:kotest-framework-datatest:$kotest")
          library("kotest-junit5", "io.kotest:kotest-runner-junit5:$kotest")
          library("kotest-core", "io.kotest:kotest-assertions-core:$kotest")
