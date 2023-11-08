@@ -44,6 +44,7 @@ class HealthCheckRegistry(
 
    private val logger = LoggerFactory.getLogger(WarmupRegistry::class.java)
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
+   private val listeners = ConcurrentHashMap.newKeySet<Listener>()
 
    @Deprecated("Replaced with WarmupRegistry")
    private val warmupScope = CoroutineScope(Dispatchers.Default)
@@ -125,8 +126,8 @@ class HealthCheckRegistry(
     * for both initial delay and intervals.
     *
     * @param name the name is associated with the [check] in the output json. By supplying a custom
-    *             name, the same check can be registered multiple times. o healthcheck can be registered
-    *             more than once with a repeated name.
+    *             name, the same check can be registered multiple times. No healthcheck can be registered
+    *             more than once with a repeated (or default) name.
     */
    fun register(
       name: String,
@@ -138,8 +139,8 @@ class HealthCheckRegistry(
     * Adds a new [HealthCheck] to this registry with the given schedule.
     *
     * @param name the name is associated with the [check] in the output json. By supplying a custom
-    *             name, the same check can be registered multiple times. o healthcheck can be registered
-    *             more than once with a repeated name.
+    *             name, the same check can be registered multiple times. No healthcheck can be registered
+    *             more than once with a repeated (or default) name.
     */
    fun register(
       name: String,
@@ -150,6 +151,8 @@ class HealthCheckRegistry(
 
       if (checks.containsKey(name)) error("Check $name already registered")
       checks.putIfAbsent(name, check)
+
+      listeners.forEach { it.registered(name, initialDelay, checkInterval) }
 
       if (startUnhealthy) {
          statuses[name] =
@@ -178,6 +181,7 @@ class HealthCheckRegistry(
       try {
          val result = check.check()
          notifySubscribers(name, check, result)
+         notifyListeners(name, result)
          when (result.status) {
             HealthStatus.Healthy -> success(name, result)
             HealthStatus.Unhealthy -> failure(name, result)
@@ -185,6 +189,7 @@ class HealthCheckRegistry(
       } catch (t: Throwable) {
          val result = HealthCheckResult.unhealthy("$name failed due to ${t.javaClass.name}", t)
          notifySubscribers(name, check, result)
+         notifyListeners(name, result)
          failure(name, result)
       }
    }
@@ -231,8 +236,16 @@ class HealthCheckRegistry(
    /**
     * Adds a [Subscriber] to this registry, which will be invoked each time a health check is invoked.
     */
+   @Deprecated("Use the new Listener interface with more callbacks. Deprecated in 2.3.0")
    fun addSubscriber(subscriber: Subscriber) {
       subscribers.add(subscriber)
+   }
+
+   /**
+    * Adds a [Listener] to this registry.
+    */
+   fun addListener(listener: Listener) {
+      listeners.add(listener)
    }
 
    private suspend fun notifySubscribers(name: String, check: HealthCheck, result: HealthCheckResult) {
@@ -243,13 +256,27 @@ class HealthCheckRegistry(
       }
    }
 
+   private fun notifyListeners(name: String, result: HealthCheckResult) {
+      listeners.forEach {
+         runCatching {
+            it.invoked(name, result)
+         }.onFailure { logger.warn("Error notifying listenerA of health check $name", it) }
+      }
+   }
+
    override fun close() {
       scheduler.shutdown()
    }
 }
 
+@Deprecated("Use the new Listener interface with more callbacks. Deprecated in 2.3.0")
 fun interface Subscriber {
    suspend fun invoke(name: String, check: HealthCheck, result: HealthCheckResult)
+}
+
+interface Listener {
+   fun invoked(name: String, result: HealthCheckResult)
+   fun registered(name: String, initialDelay: Duration, checkInterval: Duration)
 }
 
 /**
