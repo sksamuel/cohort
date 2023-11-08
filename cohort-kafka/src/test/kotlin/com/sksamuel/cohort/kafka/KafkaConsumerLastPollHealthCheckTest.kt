@@ -26,23 +26,39 @@ class KafkaConsumerLastPollHealthCheckTest : FunSpec() {
 
       val kafka = install(KafkaContainerExtension(KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka"))))
 
+      test("health check should pass while the consumer has not yet started") {
+
+         val consumer = kafka.consumer()
+         val healthcheck = KafkaConsumerLastPollHealthCheck(consumer, 1.seconds)
+
+         continually(5.seconds) {
+            healthcheck.check().status shouldBe HealthStatus.Healthy
+            delay(250.milliseconds)
+         }
+
+         consumer.metrics().values.toList().sortedBy { it.metricName().name() }
+            .forEach { println("${it.metricName()} = ${it.metricValue()}") }
+
+         consumer.close()
+      }
+
       test("health check should pass while the consumer is active") {
 
-         kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic", 1, 1))).all().get() }
+         kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic2", 1, 1))).all().get() }
 
          val producer = kafka.producer()
          val consumer = kafka.consumer()
-         consumer.subscribe(listOf("mytopic"))
+         consumer.subscribe(listOf("mytopic2"))
 
          val job = launch {
             while (isActive) {
                delay(10)
-               producer.send(ProducerRecord("mytopic", Bytes.wrap(byteArrayOf()), Bytes.wrap(byteArrayOf())))
+               producer.send(ProducerRecord("mytopic2", Bytes.wrap(byteArrayOf()), Bytes.wrap(byteArrayOf())))
             }
          }
 
          val healthcheck = KafkaConsumerLastPollHealthCheck(consumer, 1.seconds)
-         continually(15.seconds) {
+         continually(5.seconds) {
             consumer.poll(Duration.ofMillis(100))
             healthcheck.check().status shouldBe HealthStatus.Healthy
             delay(250.milliseconds)
