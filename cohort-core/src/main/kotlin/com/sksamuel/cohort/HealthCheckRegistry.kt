@@ -260,7 +260,7 @@ class HealthCheckRegistry(
       listeners.forEach {
          runCatching {
             it.invoked(name, result)
-         }.onFailure { logger.warn("Error notifying listenerA of health check $name", it) }
+         }.onFailure { logger.warn("Error notifying listener of health check '$name'", it) }
       }
    }
 
