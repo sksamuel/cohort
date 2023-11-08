@@ -116,10 +116,19 @@ class HealthCheckRegistry(
     * Adds a [HealthCheck] to this registry using the given [delay] for both initial delay and intervals.
     * The name used for this check is the default name supplied by the healthcheck instance.
     */
+   @Deprecated("Use register(check, initialDelay, checkInterval) to be explicit",
+      ReplaceWith("register(check.name, check, delay, delay)")
+   )
    fun register(
       check: HealthCheck,
       delay: Duration,
    ): HealthCheckRegistry = register(check.name, check, delay, delay)
+
+   fun register(
+      check: HealthCheck,
+      initialDelay: Duration,
+      checkInterval: Duration,
+   ): HealthCheckRegistry = register(check.name, check, initialDelay, checkInterval)
 
    /**
     * Adds a new [HealthCheck] to this registry, with the specified [name], using the given [delay]
@@ -129,6 +138,9 @@ class HealthCheckRegistry(
     *             name, the same check can be registered multiple times. No healthcheck can be registered
     *             more than once with a repeated (or default) name.
     */
+   @Deprecated("Use register(name, check, initialDelay, checkInterval) to be explicit",
+      ReplaceWith("register(name, check, delay, delay)")
+   )
    fun register(
       name: String,
       check: HealthCheck,
@@ -146,7 +158,7 @@ class HealthCheckRegistry(
       name: String,
       check: HealthCheck,
       initialDelay: Duration,
-      checkInterval: Duration
+      checkInterval: Duration,
    ): HealthCheckRegistry {
 
       if (checks.containsKey(name)) error("Check $name already registered")
