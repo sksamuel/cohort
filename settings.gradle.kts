@@ -41,7 +41,7 @@ dependencyResolutionManagement {
          val tabby = "2.2.9"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.11.4"
+         val micrometer = "1.11.5"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
          val hikari = "5.0.1"
@@ -62,9 +62,9 @@ dependencyResolutionManagement {
          val jedis = "4.4.4"
          library("jedis", "redis.clients:jedis:$jedis")
 
-         library("rabbitmq", "com.rabbitmq:amqp-client:5.16.0")
-         library("dbcp2", "org.apache.commons:commons-dbcp2:2.9.0")
-         library("pulsar-client", "org.apache.pulsar:pulsar-client:2.10.0")
+         library("rabbitmq", "com.rabbitmq:amqp-client:5.20.0")
+         library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
+         library("pulsar-client", "org.apache.pulsar:pulsar-client:2.11.2")
 
          val mongo = "4.9.1"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
