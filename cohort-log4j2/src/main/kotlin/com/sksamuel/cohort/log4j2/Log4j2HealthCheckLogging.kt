@@ -35,7 +35,7 @@ class Log4j2HealthCheckLoggingListener(private val logHealthyStatus: Boolean) : 
 
    override fun invoked(name: String, result: HealthCheckResult) {
       if (result.status == HealthStatus.Unhealthy || logHealthyStatus)
-         logger.info("${result.status.name.uppercase()} '${name.padEnd(35, ' ')}': ${result.message}")
+         logger.info("Healthcheck ${result.status.name.padEnd(10, ' ')} '${name.padEnd(50, ' ')}': ${result.message}")
    }
 
    override fun registered(name: String, initialDelay: Duration, checkInterval: Duration) {
