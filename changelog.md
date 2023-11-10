@@ -1,5 +1,10 @@
 # Changelog
 
+### 2.3.0
+
+* Added `Listener` interface for registration and healthcheck events.
+* Deprecated the register methods that use a single delay parameter.
+
 ### 2.2.1
 
 * Added `logHealthyStatus` option to logging subscribers
