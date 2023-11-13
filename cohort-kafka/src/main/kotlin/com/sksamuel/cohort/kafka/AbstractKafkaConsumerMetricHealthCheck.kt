@@ -16,10 +16,20 @@ abstract class AbstractKafkaConsumerMetricHealthCheck(private val consumer: Kafk
    /**
     * Returns the metric with the given [name] that has the least number of tags (most generic metric value).
     */
-   protected fun metric(name: String): Either<HealthCheckResult, Metric> =
-      consumer.metrics().values
+   protected fun metric(name: String): Either<HealthCheckResult, Metric> {
+      return consumer.metrics().values
          .filter { it.metricName().name() == name }
          .minByOrNull { it.metricName().tags().size }?.right()
          ?: HealthCheckResult.unhealthy("Could not locate kafka metric '${name}'", null).left()
+   }
 
+
+   /**
+    * Returns the metric with the given [name] that has the least number of tags (most generic metric value).
+    */
+   protected fun metricOrNull(name: String): Metric? {
+      return consumer.metrics().values
+         .filter { it.metricName().name() == name }
+         .minByOrNull { it.metricName().tags().size }
+   }
 }
