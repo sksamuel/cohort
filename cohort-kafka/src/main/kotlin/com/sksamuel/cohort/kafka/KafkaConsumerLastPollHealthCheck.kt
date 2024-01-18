@@ -2,7 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.Consumer
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -17,7 +17,7 @@ import kotlin.time.Duration
  * This check can be useful to detect stalled consumers.
  */
 class KafkaConsumerLastPollHealthCheck(
-   consumer: KafkaConsumer<*, *>,
+   consumer: Consumer<*, *>,
    private val interval: Duration,
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 

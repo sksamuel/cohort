@@ -2,7 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.Consumer
 
 /**
  * A Cohort [HealthCheck] that checks that the rate of consumption of records per second
@@ -15,7 +15,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
  * This check can be useful to detect stalled consumers.
  */
 class KafkaConsumerRecordsConsumedRateHealthCheck(
-   consumer: KafkaConsumer<*, *>,
+   consumer: Consumer<*, *>,
    private val minThreshold: Double,
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
