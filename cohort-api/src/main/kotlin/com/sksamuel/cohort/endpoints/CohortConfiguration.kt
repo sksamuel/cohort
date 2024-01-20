@@ -8,7 +8,8 @@ import com.sksamuel.cohort.logging.LogManager
 
 class CohortConfiguration {
 
-   internal val healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+   private val _healthchecks = mutableMapOf<String, HealthCheckRegistry>()
+   val healthchecks: Map<String, HealthCheckRegistry> get() = _healthchecks
    private var warmupRegistry: WarmupRegistry? = null
 
    // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
@@ -48,14 +49,14 @@ class CohortConfiguration {
     */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
       registry.warmupRegistry = warmupRegistry
-      healthchecks[endpoint] = registry
+      _healthchecks[endpoint] = registry
    }
 
    /**
     * Register a [WarmupRegistry].
     */
    fun warmup(registry: WarmupRegistry) {
-      if (healthchecks.isNotEmpty()) error("WarmupRegister must be registered before healthchecks")
+      if (_healthchecks.isNotEmpty()) error("WarmupRegister must be registered before healthchecks")
       if (warmupRegistry != null) error("WarmupRegistry already registered")
       this.warmupRegistry = registry
    }

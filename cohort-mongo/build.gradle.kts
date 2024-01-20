@@ -1,5 +1,5 @@
 dependencies {
-   implementation(projects.cohortCore)
+   implementation(projects.cohortApi)
    api(libs.mongodb.driver.sync)
    testImplementation(libs.testcontainers.mongodb)
 }
