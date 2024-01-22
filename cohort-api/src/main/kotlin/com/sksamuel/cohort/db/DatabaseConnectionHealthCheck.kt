@@ -23,7 +23,9 @@ class DatabaseConnectionHealthCheck(
 
    override suspend fun check(): HealthCheckResult = runCatching {
       ds.connection.use { conn ->
-         conn.isValid(timeout.inWholeSeconds.toInt())
+         if (!conn.isValid(timeout.inWholeSeconds.toInt())) {
+            return@use HealthCheckResult.unhealthy("Connection is invalid")
+         }
          if (query != null)
             conn.createStatement().use { it.execute(query) }
          HealthCheckResult.healthy("Connected to database successfully")
