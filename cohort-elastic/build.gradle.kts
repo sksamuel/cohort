@@ -1,5 +1,5 @@
 dependencies {
-   implementation(projects.cohortCore)
+   implementation(projects.cohortApi)
    api(libs.elasticsearch.rest.high.level.client)
    api(libs.elasticsearch.java)
    testImplementation(libs.testcontainers.elasticsearch)

@@ -21,6 +21,10 @@ plugins {
 allprojects {
    apply(plugin = "org.jetbrains.kotlin.jvm")
 
+   kotlin {
+      jvmToolchain(11)
+   }
+
    repositories {
       mavenLocal()
       mavenCentral()
@@ -46,9 +50,5 @@ allprojects {
          showStandardStreams = true
          exceptionFormat = TestExceptionFormat.FULL
       }
-   }
-
-   tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-      kotlinOptions.jvmTarget = "11"
    }
 }

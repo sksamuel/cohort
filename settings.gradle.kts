@@ -1,6 +1,7 @@
 rootProject.name = "cohort"
 
 include(
+   "cohort-api",
    "cohort-aws-dynamo",
    "cohort-aws-s3",
    "cohort-aws-sqs",

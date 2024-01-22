@@ -1,5 +1,5 @@
 dependencies {
-   implementation(projects.cohortCore)
+   implementation(projects.cohortApi)
    implementation(libs.jackson.core)
    implementation(libs.jackson.module.kotlin)
 }
