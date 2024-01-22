@@ -19,10 +19,9 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus
  */
 class ElasticClusterHealthCheck(
   private val client: RestHighLevelClient,
-  private val errorOnYellow: Boolean = false
+  private val errorOnYellow: Boolean = false,
+  override val name: String = "elastic_cluster_health",
 ) : HealthCheck {
-
-  override val name: String = "elastic_cluster_health"
 
   override suspend fun check(): HealthCheckResult {
     return runCatching {

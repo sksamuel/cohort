@@ -18,9 +18,8 @@ class ElasticIndexHealthCheck(
    private val client: ElasticsearchClient,
    private val index: String,
    private val failIfEmpty: Boolean = false,
+   override val name: String = "elastic_index",
 ) : HealthCheck {
-
-   override val name: String = "elastic_index"
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {

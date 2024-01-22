@@ -12,10 +12,9 @@ import io.ktor.http.isSuccess
  */
 class EndpointHealthCheck(
    private val eval: suspend (HttpResponse) -> Boolean = { it.status.isSuccess() },
+   override val name: String = "endpoint_request",
    private val fn: suspend (HttpClient) -> HttpResponse,
 ) : HealthCheck {
-
-   override val name: String = "endpoint_request"
 
    private val client = HttpClient(Apache5) {
       expectSuccess = false

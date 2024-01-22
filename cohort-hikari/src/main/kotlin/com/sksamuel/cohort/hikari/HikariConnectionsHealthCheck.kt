@@ -15,9 +15,8 @@ import com.zaxxer.hikari.HikariDataSource
 class HikariConnectionsHealthCheck(
    private val ds: HikariDataSource,
    private val minConnections: Int,
+   override val name: String = "hikari_open_connections",
 ) : HealthCheck {
-
-   override val name: String = "hikari_open_connections"
 
    override suspend fun check(): HealthCheckResult {
       val conns = ds.hikariPoolMXBean.totalConnections

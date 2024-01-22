@@ -17,14 +17,13 @@ import kotlin.math.roundToLong
  */
 class KafkaConsumerRecordsConsumedHealthCheck(
    consumer: Consumer<*, *>,
-   private val minRecords: Int
+   private val minRecords: Int,
+   override val name: String = "kafka_consumer_records_consumed",
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
       require(minRecords > 0) { "The minimum thresold is > 0" }
    }
-
-   override val name: String = "kafka_consumer_records_consumed"
 
    private val metricName = "records-consumed-total"
    private var lastTotal = 0L

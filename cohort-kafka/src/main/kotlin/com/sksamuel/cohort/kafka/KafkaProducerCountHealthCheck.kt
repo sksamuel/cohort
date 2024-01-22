@@ -14,11 +14,10 @@ import org.apache.kafka.clients.producer.Producer
 class KafkaProducerCountHealthCheck(
    private val producer: Producer<*, *>,
    private val min: Int,
+   override val name: String = "kafka_producer_rate",
 ) : HealthCheck {
 
    private val metricName = "record-send-total"
-
-   override val name: String = "kafka_producer_rate"
 
    private var lastTotal: Long = -1
 

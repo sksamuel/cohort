@@ -18,9 +18,8 @@ class DatabaseConnectionHealthCheck(
    private val ds: DataSource,
    private val timeout: Duration = 1.seconds,
    private val query: String? = null,
+   override val name: String = "database_connection",
 ) : HealthCheck {
-
-   override val name: String = "database_connection"
 
    override suspend fun check(): HealthCheckResult = runCatching {
       ds.connection.use { conn ->

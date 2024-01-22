@@ -19,6 +19,7 @@ import kotlin.time.Duration
 class KafkaConsumerLastPollHealthCheck(
    consumer: Consumer<*, *>,
    private val interval: Duration,
+   override val name: String = "kafka_consumer_last_poll",
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
@@ -26,8 +27,6 @@ class KafkaConsumerLastPollHealthCheck(
    }
 
    private val metricName = "last-poll-seconds-ago"
-
-   override val name: String = "kafka_consumer_last_poll"
 
    override suspend fun check(): HealthCheckResult {
       val metric = metricOrNull(metricName)

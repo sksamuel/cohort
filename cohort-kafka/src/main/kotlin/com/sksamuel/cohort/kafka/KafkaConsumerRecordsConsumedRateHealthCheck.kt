@@ -17,6 +17,7 @@ import org.apache.kafka.clients.consumer.Consumer
 class KafkaConsumerRecordsConsumedRateHealthCheck(
    consumer: Consumer<*, *>,
    private val minThreshold: Double,
+   override val name: String = "kafka_consumer_records_consumed_rate",
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
@@ -24,8 +25,6 @@ class KafkaConsumerRecordsConsumedRateHealthCheck(
    }
 
    private val metricName = "records-consumed-rate"
-
-   override val name: String = "kafka_consumer_records_consumed_rate"
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->

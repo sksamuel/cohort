@@ -24,6 +24,7 @@ class RedisConnectionHealthCheck(
          HealthCheckResult.healthy("Ping to redis cluster failed")
       }
    },
+   override val name: String = "redis",
 ) : HealthCheck {
 
    companion object {
@@ -45,8 +46,6 @@ class RedisConnectionHealthCheck(
          return RedisConnectionHealthCheck(jedis, command)
       }
    }
-
-   override val name: String = "redis"
 
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {

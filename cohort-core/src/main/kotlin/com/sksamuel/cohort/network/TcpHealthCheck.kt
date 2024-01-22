@@ -13,7 +13,8 @@ import kotlin.time.Duration.Companion.seconds
 class TcpHealthCheck(
    private val host: String,
    private val port: Int,
-   private val connectionTimeout: Duration = 4.seconds
+   private val connectionTimeout: Duration = 4.seconds,
+   override val name: String = "tcp",
 ) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {

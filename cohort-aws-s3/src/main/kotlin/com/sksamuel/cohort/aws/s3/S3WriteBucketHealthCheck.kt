@@ -14,10 +14,9 @@ import kotlin.random.Random
  */
 class S3WriteBucketHealthCheck(
    private val bucketName: String,
-   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() }
-) : HealthCheck {
-
+   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
    override val name: String = "aws_s3_bucket_write"
+) : HealthCheck {
 
    private suspend fun use(client: AmazonS3): Result<Unit> {
       return runInterruptible(Dispatchers.IO) {

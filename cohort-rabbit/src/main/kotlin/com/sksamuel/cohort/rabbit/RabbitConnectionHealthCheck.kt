@@ -8,9 +8,10 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
-class RabbitConnectionHealthCheck(private val factory: ConnectionFactory) : HealthCheck {
-
-   override val name: String = "rabbit_connection"
+class RabbitConnectionHealthCheck(
+   private val factory: ConnectionFactory,
+   override val name: String = "rabbit_connection",
+) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {

@@ -26,9 +26,8 @@ class HttpHealthCheck(
    private val body: ByteArray? = null,
    private val headers: Map<String, String> = emptyMap(),
    private val successCodes: Set<Int> = setOf(200, 201, 202, 203, 204, 205),
+   override val name: String = "http_call",
 ) : HealthCheck {
-
-   override val name: String = "http_call"
 
    private val client = HttpClient(Apache5) {
       expectSuccess = false

@@ -13,9 +13,8 @@ import com.sksamuel.tabby.results.flatMap
 class SQSQueueHealthCheck(
    private val queue: String,
    val createClient: () -> AmazonSQS = { AmazonSQSClient.builder().build() },
+   override val name: String = "aws_sqs_queue",
 ) : HealthCheck {
-
-   override val name: String = "aws_sqs_queue"
 
    private fun use(client: AmazonSQS): Result<GetQueueUrlResult> {
       return runCatching { client.getQueueUrl(queue) }.also { client.shutdown() }

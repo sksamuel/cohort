@@ -18,6 +18,7 @@ import kotlin.math.roundToLong
 class KafkaConsumerTimeBetweenPollHealthCheck(
    consumer: Consumer<*, *>,
    private val minThreshold: Long,
+   override val name: String = "kafka_consumer_time_between_poll_avg",
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
@@ -25,8 +26,6 @@ class KafkaConsumerTimeBetweenPollHealthCheck(
    }
 
    private val metricName = "time-between-poll-avg"
-
-   override val name: String = "kafka_consumer_time_between_poll_avg"
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->

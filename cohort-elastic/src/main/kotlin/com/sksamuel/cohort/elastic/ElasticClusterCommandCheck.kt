@@ -17,9 +17,8 @@ import org.elasticsearch.client.RestHighLevelClient
 class ElasticClusterCommandCheck(
   private val client: RestHighLevelClient,
   private val command: (RestHighLevelClient) -> HealthCheckResult,
+  override val name: String = "elastic_cluster",
 ) : HealthCheck {
-
-  override val name: String = "elastic_cluster"
 
   override suspend fun check(): HealthCheckResult {
     return runCatching {

@@ -15,7 +15,10 @@ import javax.naming.directory.InitialDirContext
  *    Context.PROVIDER_URL to "ldap://localhost:10389"
  * )
  */
-class c(private val environment: Map<String, String>) : HealthCheck {
+class LdapHealthCheck(
+   private val environment: Map<String, String>,
+   override val name: String = "ldap",
+) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult = runCatching {
 

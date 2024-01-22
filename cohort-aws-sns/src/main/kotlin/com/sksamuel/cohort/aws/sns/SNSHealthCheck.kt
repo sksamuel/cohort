@@ -12,9 +12,8 @@ import com.sksamuel.tabby.results.flatMap
  */
 class SNSHealthCheck(
    val createClient: () -> AmazonSNS = { AmazonSNSClient.builder().build() },
+   override val name: String = "aws_sns_topic",
 ) : HealthCheck {
-
-   override val name: String = "aws_sns_topic"
 
    private fun use(client: AmazonSNS): Result<ListTopicsResult> {
       return runCatching { client.listTopics() }.also { client.shutdown() }
