@@ -1,5 +1,5 @@
 dependencies {
-   implementation(projects.cohortCore)
+   implementation(projects.cohortApi)
    implementation(libs.logback.core)
    implementation(libs.logback.classic)
 }
