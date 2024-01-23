@@ -17,9 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 class RabbitQueueHealthCheck(
    private val factory: ConnectionFactory,
    private val queue: String,
+   override val name: String = "rabbit_queue",
 ) : HealthCheck {
-
-   override val name: String = "rabbit_queue"
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {

@@ -21,10 +21,9 @@ import kotlin.math.roundToInt
  */
 class DiskSpaceHealthCheck(
   private val fileStore: FileStore,
-  private val minFreeSpacePercentage: Double = 10.0
+  private val minFreeSpacePercentage: Double = 10.0,
+  override val name: String = "disk_space_free",
 ) : HealthCheck {
-
-  override val name: String = "disk_space_free"
 
   override suspend fun check(): HealthCheckResult {
     return try {

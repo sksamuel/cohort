@@ -14,9 +14,8 @@ import com.zaxxer.hikari.HikariDataSource
 class HikariMinIdleHealthCheck(
   private val ds: HikariDataSource,
   private val minIdle: Int,
+  override val name: String = "hikari_min_idle",
 ) : HealthCheck {
-
-  override val name: String = "hikari_min_idle"
 
   override suspend fun check(): HealthCheckResult {
     val idleConnections = ds.hikariPoolMXBean.idleConnections

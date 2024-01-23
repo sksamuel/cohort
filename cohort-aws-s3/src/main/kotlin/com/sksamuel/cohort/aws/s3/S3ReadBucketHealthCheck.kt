@@ -15,10 +15,9 @@ import kotlinx.coroutines.runInterruptible
  */
 class S3ReadBucketHealthCheck(
    private val bucketName: String,
-   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() }
+   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
+   override val name: String = "aws_s3_bucket",
 ) : HealthCheck {
-
-   override val name: String = "aws_s3_bucket"
 
    private suspend fun use(client: AmazonS3): Result<HeadBucketResult> {
       return runInterruptible(Dispatchers.IO) {

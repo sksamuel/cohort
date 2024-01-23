@@ -14,8 +14,9 @@ import org.apache.commons.dbcp2.BasicDataSource
 class DbcpConnectionsHealthCheck(
   private val ds: BasicDataSource,
   private val minConnections: Int,
+  override val name: String = "dbcp_connections",
 ) : HealthCheck {
-  override suspend fun check(): HealthCheckResult {
+   override suspend fun check(): HealthCheckResult {
     val total = ds.numActive + ds.numIdle
     val msg = "Database connections is $total [min required is $minConnections]"
     return if (total >= minConnections) HealthCheckResult.healthy(msg) else HealthCheckResult.unhealthy(msg, null)

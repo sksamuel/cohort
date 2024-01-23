@@ -15,6 +15,7 @@ import kotlin.random.Random
  */
 class RedisClusterHealthCheck<K, V>(
    private val conn: StatefulRedisClusterConnection<K, V>,
+   override val name: String = "redis_cluster",
    private val command: suspend (StatefulRedisClusterConnection<K, V>) -> Unit,
 ) : HealthCheck {
 
@@ -37,9 +38,6 @@ class RedisClusterHealthCheck<K, V>(
          return RedisClusterHealthCheck(conn) { it.async().get(Random.nextInt().toString()).await() }
       }
    }
-
-
-   override val name: String = "redis_cluster"
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {

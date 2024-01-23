@@ -18,13 +18,14 @@ class DatabaseConnectionHealthCheck(
    private val ds: DataSource,
    private val timeout: Duration = 1.seconds,
    private val query: String? = null,
+   override val name: String = "database_connection",
 ) : HealthCheck {
-
-   override val name: String = "database_connection"
 
    override suspend fun check(): HealthCheckResult = runCatching {
       ds.connection.use { conn ->
-         conn.isValid(timeout.inWholeSeconds.toInt())
+         if (!conn.isValid(timeout.inWholeSeconds.toInt())) {
+            return@use HealthCheckResult.unhealthy("Connection is invalid")
+         }
          if (query != null)
             conn.createStatement().use { it.execute(query) }
          HealthCheckResult.healthy("Connected to database successfully")

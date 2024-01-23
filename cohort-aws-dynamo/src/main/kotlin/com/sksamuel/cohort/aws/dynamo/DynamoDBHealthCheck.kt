@@ -13,9 +13,8 @@ import kotlinx.coroutines.runInterruptible
  */
 class DynamoDBHealthCheck(
    val createClient: () -> AmazonDynamoDB = { AmazonDynamoDBClient.builder().build() },
+   override val name: String = "aws_dynamodb",
 ) : HealthCheck {
-
-   override val name: String = "aws_dynamodb"
 
    private fun <T> AmazonDynamoDB.use(f: (AmazonDynamoDB) -> T): Result<T> {
       val result = runCatching { f(this) }

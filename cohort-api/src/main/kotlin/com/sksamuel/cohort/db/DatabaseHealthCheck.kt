@@ -14,9 +14,8 @@ import javax.sql.DataSource
 class DatabaseHealthCheck(
    private val ds: DataSource,
    private val query: String = "SELECT 1",
+   override val name: String = "database",
 ) : HealthCheck {
-
-   override val name: String = "database"
 
    override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
       conn.createStatement().executeQuery(query)

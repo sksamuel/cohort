@@ -2,7 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.Consumer
 import kotlin.math.roundToLong
 
 /**
@@ -16,8 +16,9 @@ import kotlin.math.roundToLong
  * This check can be useful to detect stalled consumers.
  */
 class KafkaConsumerTimeBetweenPollHealthCheck(
-   consumer: KafkaConsumer<*, *>,
+   consumer: Consumer<*, *>,
    private val minThreshold: Long,
+   override val name: String = "kafka_consumer_time_between_poll_avg",
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
@@ -25,8 +26,6 @@ class KafkaConsumerTimeBetweenPollHealthCheck(
    }
 
    private val metricName = "time-between-poll-avg"
-
-   override val name: String = "kafka_consumer_time_between_poll_avg"
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->

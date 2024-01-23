@@ -2,7 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.Producer
 
 /**
  * A [HealthCheck] that checks that a kafka producer is producing enough records.
@@ -12,13 +12,12 @@ import org.apache.kafka.clients.producer.KafkaProducer
  * This check reports healthy if the minimum number of records sent since the last scan is >= [min].
  */
 class KafkaProducerCountHealthCheck(
-   private val producer: KafkaProducer<*, *>,
+   private val producer: Producer<*, *>,
    private val min: Int,
+   override val name: String = "kafka_producer_rate",
 ) : HealthCheck {
 
    private val metricName = "record-send-total"
-
-   override val name: String = "kafka_producer_rate"
 
    private var lastTotal: Long = -1
 

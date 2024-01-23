@@ -10,10 +10,9 @@ import org.apache.kafka.clients.admin.Admin
  */
 class KafkaTopicHealthCheck(
    private val admin: Admin,
-   private val topic: String
+   private val topic: String,
+   override val name: String = "kafka_topic",
 ) : HealthCheck {
-
-   override val name: String = "kafka_topic"
 
    override suspend fun check(): HealthCheckResult {
 

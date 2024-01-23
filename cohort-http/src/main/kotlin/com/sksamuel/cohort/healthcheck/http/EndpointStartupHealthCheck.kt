@@ -17,10 +17,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class EndpointStartupHealthCheck(
    private val client: HttpClient,
+   override val name: String = "endpoint_startup_request",
    private val eval: suspend (HttpClient) -> Boolean,
 ) : HealthCheck {
-
-   override val name: String = "endpoint_startup_request"
 
    private val successful = AtomicBoolean(false)
 

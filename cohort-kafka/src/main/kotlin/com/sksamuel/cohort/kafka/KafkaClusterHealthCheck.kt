@@ -9,9 +9,10 @@ import org.apache.kafka.clients.admin.Admin
  * A [HealthCheck] that checks that a connection can be made to a kafka cluster, the controller
  * can be located, and at least one node is present.
  */
-class KafkaClusterHealthCheck(private val admin: Admin) : HealthCheck {
-
-   override val name: String = "kafka_cluster"
+class KafkaClusterHealthCheck(
+   private val admin: Admin,
+   override val name: String = "kafka_cluster",
+) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
       return try {

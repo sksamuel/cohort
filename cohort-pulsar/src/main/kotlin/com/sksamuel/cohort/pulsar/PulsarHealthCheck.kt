@@ -4,7 +4,10 @@ import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import org.apache.pulsar.client.admin.PulsarAdmin
 
-class PulsarHealthCheck(private val client: PulsarAdmin) : HealthCheck {
+class PulsarHealthCheck(
+   private val client: PulsarAdmin,
+   override val name: String = "pulsar_cluster",
+) : HealthCheck {
 
    companion object {
       operator fun invoke(serviceHttpUrl: String): PulsarHealthCheck {
@@ -13,8 +16,6 @@ class PulsarHealthCheck(private val client: PulsarAdmin) : HealthCheck {
          )
       }
    }
-
-   override val name: String = "pulsar_cluster"
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {

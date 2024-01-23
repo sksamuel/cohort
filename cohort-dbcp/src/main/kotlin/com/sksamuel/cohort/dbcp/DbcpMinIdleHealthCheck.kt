@@ -14,8 +14,10 @@ import org.apache.commons.dbcp2.BasicDataSource
 class DbcpMinIdleHealthCheck(
   private val ds: BasicDataSource,
   private val minIdle: Int,
+  override val name: String = "dbcp_min_idle",
 ) : HealthCheck {
-  override suspend fun check(): HealthCheckResult {
+
+   override suspend fun check(): HealthCheckResult {
     val msg = "Idle connections ${ds.numIdle} [min required is $minIdle]"
     return if (ds.numIdle >= minIdle) HealthCheckResult.healthy(msg) else HealthCheckResult.unhealthy(msg, null)
   }

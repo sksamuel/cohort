@@ -26,6 +26,7 @@ class RedisClusterHealthCheck(
          HealthCheckResult.unhealthy("Connected to redis cluster but zero nodes detected", null)
       }
    },
+   override val name: String = "redis_cluster",
 ) : HealthCheck {
 
    companion object {
@@ -48,8 +49,6 @@ class RedisClusterHealthCheck(
          return RedisClusterHealthCheck(jedis, command)
       }
    }
-
-   override val name: String = "redis_cluster"
 
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
