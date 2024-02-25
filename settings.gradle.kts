@@ -129,6 +129,13 @@ dependencyResolutionManagement {
          library("testcontainers-mongodb", "org.testcontainers:mongodb:$testContainers")
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
 
+         val vertx = "4.5.4"
+         library("vertx-core", "io.vertx:vertx-core:$vertx")
+         library("vertx-web", "io.vertx:vertx-web:$vertx")
+         library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
+         library("vertx-coroutines", "io.vertx:vertx-lang-kotlin-coroutines:$vertx")
+         library("vertx-micrometer", "io.vertx:vertx-micrometer-metrics:$vertx")
+
          bundle(
             "testing", listOf(
                "kotest-datatest",

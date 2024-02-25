@@ -1,4 +1,4 @@
-package com.sksamuel.cohort.endpoints
+package com.sksamuel.cohort.vertx
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.sksamuel.cohort.HealthStatus

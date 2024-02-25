@@ -4,6 +4,7 @@ import com.sksamuel.cohort.CohortConfigAttributeKey
 import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
 import com.sksamuel.cohort.jvm.getJvmDetails
+import com.sksamuel.cohort.logging.LogInfo
 import com.sksamuel.cohort.memory.getMemoryInfo
 import com.sksamuel.cohort.os.getOperatingSystem
 import com.sksamuel.cohort.system.getSysProps
