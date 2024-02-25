@@ -5,7 +5,7 @@
 [<img src="https://img.shields.io/nexus/s/https/oss.sonatype.org/com.sksamuel.cohort/cohort-core.svg?label=latest%20snapshot&style=plastic"/>](https://oss.sonatype.org/content/repositories/snapshots/com/sksamuel/cohort/)
 
 Cohort is a [Spring Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html) style
-replacement for [Ktor](https://ktor.io). It provides health checks for orchestrators like Kubernetes and management of logging, databases, JVM settings, memory and threads in production.
+replacement for [Ktor](https://ktor.io) and [Vertx](https://vertx.io). It provides health checks for orchestrators like Kubernetes and management of logging, databases, JVM settings, memory and threads in production.
 
 See [changelog](changelog.md)
 
@@ -31,12 +31,11 @@ See [changelog](changelog.md)
 
 ## How to use
 
+### For ktor projects:
+
 Include the following dependencies in your build:
 
-* `com.sksamuel.cohort:cohort-core:<version>`
-
-along with the additional modules for any features you wish to activate. For example the kafka module
-requires `com.sksamuel.cohort:cohort-kafka:<version>`.
+* `com.sksamuel.cohort:cohort-ktor:<version>`
 
 Then to wire into Ktor, install the `Cohort` plugin, and enable whichever features / endpoints we want to expose.
 Remember, endpoints are disabled by default for security, and you must enable them.
@@ -75,6 +74,62 @@ install(Cohort) {
    healthcheck("/startup", startupchecks)
 }
 ```
+
+### For vertx projects:
+
+Include the following dependencies in your build:
+
+* `com.sksamuel.cohort:cohort-vertx:<version>`
+
+Then deploy the `HealthVerticle` into your `Vertx` instance, passing in a web `Router` instance, and a configuration block to enable whichever features / endpoints we want to expose.
+Remember, endpoints are disabled by default for security, and you must enable them.
+
+Here is a sample configuration with each feature enabled.
+
+```kotlin
+val vertx = Vertx.vertx()
+val router = Router.router(vertx)
+
+val verticle = HealthVerticle(router) {
+
+   // enable an endpoint to display operating system name and version
+   operatingSystem = true
+
+   // enable runtime JVM information such as vm options and vendor name
+   jvmInfo = true
+
+   // configure the Logback log manager to show effective log levels and allow runtime adjustment
+   logManager = LogbackManager
+
+   // show connection pool information
+   dataSources = listOf(HikariDataSourceManager(ds))
+
+   // show current system properties
+   sysprops = true
+
+   // enable an endpoint to dump the heap in hprof format
+   heapdump = true
+
+   // enable an endpoint to dump threads
+   threaddump = true
+
+   // enable healthchecks for kubernetes
+   // each of these is optional and can map to any healthcheck url you wish
+   // for example if you just want a single health endpoint, you could use /health
+   healthcheck("/liveness", livenessChecks)
+   healthcheck("/readiness", readinessChecks)
+   healthcheck("/startup", startupChecks)
+}
+
+vertx.deployVerticle(verticle)
+```
+
+### Other modules
+
+Finally, add any additional modules for any features you wish to activate. For example the kafka module
+requires `com.sksamuel.cohort:cohort-kafka:<version>`.
+
+
 
 ## Healthchecks
 
