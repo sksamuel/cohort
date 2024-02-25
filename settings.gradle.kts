@@ -6,23 +6,24 @@ include(
    "cohort-aws-s3",
    "cohort-aws-sqs",
    "cohort-aws-sns",
-   "cohort-core",
    "cohort-dbcp",
    "cohort-elastic",
    "cohort-flyway",
    "cohort-hikari",
    "cohort-http",
    "cohort-jackson",
+   "cohort-jedis",
    "cohort-kafka",
+   "cohort-ktor",
    "cohort-lettuce",
    "cohort-liquibase",
    "cohort-log4j2",
    "cohort-logback",
+   "cohort-micrometer",
    "cohort-mongo",
    "cohort-pulsar",
    "cohort-rabbit",
-   "cohort-jedis",
-   "cohort-micrometer",
+   "cohort-vertx",
 )
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
@@ -54,7 +55,7 @@ dependencyResolutionManagement {
          val kakfa = "3.5.1"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.2.9.RELEASE"
+         val lettuce = "6.3.1.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.23.2"
