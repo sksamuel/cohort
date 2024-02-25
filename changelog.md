@@ -1,5 +1,19 @@
 # Changelog
 
+### 2.4.0
+
+* Renamed `cohort-core` to `cohort-ktor`.
+* Added Vertx `HealthVerticle` support in the `cohort-vertx` module.
+
+### 2.3.1
+
+* Refactor: use Kafka interfaces instead of implementations
+* Fix: align compileJava and compileKotlin tasks target
+* Feature: make it possible to register multiple instances of the same check
+* Fix: DatabaseConnectionHealthCheck should return `Unhealthy` when connection is invalid
+* Fix: make the MongoConnectionHealthCheck usable with both sync and async clients
+
+
 ### 2.3.0
 
 * Added `Listener` interface for registration and healthcheck events.
