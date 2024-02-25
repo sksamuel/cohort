@@ -39,13 +39,13 @@ dependencyResolutionManagement {
          library("slf4j-api", "org.slf4j:slf4j-api:2.0.9")
          library("slf4j-simple", "org.slf4j:slf4j-simple:2.0.9")
 
-         val tabby = "2.2.9"
+         val tabby = "2.2.11"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.11.5"
+         val micrometer = "1.12.3"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
-         val hikari = "5.0.1"
+         val hikari = "5.1.0"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
          val flyway = "9.19.4"
@@ -54,7 +54,7 @@ dependencyResolutionManagement {
          val kakfa = "3.5.1"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.2.6.RELEASE"
+         val lettuce = "6.2.9.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.23.2"
@@ -88,7 +88,7 @@ dependencyResolutionManagement {
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
 
-         val ktor = "2.3.6"
+         val ktor = "2.3.8"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
