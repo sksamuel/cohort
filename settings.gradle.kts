@@ -90,7 +90,7 @@ dependencyResolutionManagement {
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
 
-         val ktor = "2.3.8"
+         val ktor = "2.3.10"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
