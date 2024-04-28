@@ -12,21 +12,32 @@ import com.sksamuel.cohort.threads.getThreadDump
 import com.sksamuel.tabby.results.sequence
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.http.HttpHeaders
+import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.coroutineRouter
+import kotlinx.coroutines.future.await
 import java.time.ZoneOffset
 
+/**
+ * Creates a [CoroutineVerticle] that will deploy an HTTP server on the given [port].
+ */
 class HealthVerticle(
-   private val router: Router,
+   private val port: Int,
+   private val options: HttpServerOptions = HttpServerOptions(),
    configure: CohortConfiguration.() -> Unit = {},
 ) : CoroutineVerticle() {
 
    private val cohort = CohortConfiguration().also(configure)
 
    override suspend fun start() {
+
+      val router = Router.router(vertx)
+      val server = vertx.createHttpServer(options)
+         .requestHandler(router)
+
       coroutineRouter {
          if (cohort.heapDump) {
             router.get("${cohort.endpointPrefix}/heapdump").coHandler { context ->
@@ -163,5 +174,7 @@ class HealthVerticle(
             }
          }
       }
+
+      server.listen(port).toCompletionStage().await()
    }
 }
