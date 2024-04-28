@@ -84,7 +84,7 @@ dependencyResolutionManagement {
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
 
-         val log4j2 = "2.20.0"
+         val log4j2 = "2.23.1"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
