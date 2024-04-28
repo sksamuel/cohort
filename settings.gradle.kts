@@ -130,7 +130,7 @@ dependencyResolutionManagement {
          library("testcontainers-mongodb", "org.testcontainers:mongodb:$testContainers")
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
 
-         val vertx = "4.5.4"
+         val vertx = "4.5.7"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
          library("vertx-web", "io.vertx:vertx-web:$vertx")
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
