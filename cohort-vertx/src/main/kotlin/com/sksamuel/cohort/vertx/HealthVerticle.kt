@@ -50,7 +50,7 @@ class HealthVerticle(
    override suspend fun start() {
 
       val router = Router.router(vertx)
-         .errorHandler(404) { it.end("Could not find path ${it.request().path()}") }
+         .errorHandler(404) { it.end("Could not find request ${it.request().path()} ${it.request()}") }
 
       val server = vertx.createHttpServer(options)
          .requestHandler(router)
