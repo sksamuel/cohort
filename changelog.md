@@ -1,5 +1,10 @@
 # Changelog
 
+### 2.5.0
+
+* Removed warmup checks
+* Removed `cohort-http` module. Instead these healthchecks can be found inside `cohort-ktor` or `cohort-vertx` depending on your choice of framework.
+
 ### 2.4.1
 
 * Bumped versions of dependencies
@@ -9,7 +14,6 @@
 
 * Renamed `cohort-core` to `cohort-ktor`.
 * Added Vertx support.
-* Removed warmups
 
 ### 2.3.1
 
