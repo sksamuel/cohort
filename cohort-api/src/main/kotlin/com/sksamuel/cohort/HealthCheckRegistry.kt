@@ -3,7 +3,6 @@
 package com.sksamuel.cohort
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -36,18 +35,12 @@ class HealthCheckRegistry(
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-healthcheck-scheduler"))
    private val names = mutableSetOf<String>()
 
-   // tracks which checks are startup checks
-   @Deprecated("Replaced with WarmupRegistry")
-   private val startups = ConcurrentHashMap<String, Boolean>()
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
 
    private val logger = LoggerFactory.getLogger(HealthCheckRegistry::class.java)
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
    private val listeners = ConcurrentHashMap.newKeySet<Listener>()
-
-   @Deprecated("Replaced with WarmupRegistry")
-   private val warmupScope = CoroutineScope(Dispatchers.Default)
 
    var startUnhealthy: Boolean = true
    var logUnhealthy: Boolean = true
@@ -302,7 +295,7 @@ data class HealthCheckStatus(
 )
 
 /**
- * A service is considered healthy if all the healthchecks are in healthy state and warmups are not running.
+ * A service is considered healthy if all the healthchecks are in healthy state.
  */
 data class ServiceHealth(
    val healthy: Boolean,

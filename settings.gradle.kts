@@ -11,7 +11,6 @@ include(
    "cohort-flyway",
    "cohort-hikari",
    "cohort-http",
-   "cohort-jackson",
    "cohort-jedis",
    "cohort-kafka",
    "cohort-ktor",
