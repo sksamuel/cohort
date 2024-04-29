@@ -52,6 +52,14 @@ class HealthVerticle(
       val router = Router.router(vertx)
          .errorHandler(404) { it.end("Could not find request ${it.request().path()} ${it.request()}") }
 
+      router.route()
+         .failureHandler {
+            if (it.failure() == null)
+               logger.warn("Unhandled error in health verticle ${it.statusCode()}")
+            else
+               logger.warn("Unhandled error in health verticle ${it.statusCode()}", it.failure())
+         }
+
       val server = vertx.createHttpServer(options)
          .requestHandler(router)
          .exceptionHandler { logger.warn("Socket error", it) }
@@ -222,9 +230,12 @@ class HealthVerticle(
                      )
                   }
 
+                  registry.logUnhealthy
+
                   when (status.healthy) {
                      true -> context.json(results).coAwait()
-                     false -> context.response().setStatusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.code()).end().coAwait()
+                     false -> context.response().setStatusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.code()).end()
+                        .coAwait()
                   }
                }
          }
