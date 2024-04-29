@@ -58,7 +58,7 @@ class HealthVerticle(
          .requestHandler(router)
          .exceptionHandler { logger.warn("Socket error", it) }
          .invalidRequestHandler {
-            logger.warn("invaoid request", it)
+            logger.warn("Invalid request")
             it.response().setStatusCode(400).end()
          }
 
