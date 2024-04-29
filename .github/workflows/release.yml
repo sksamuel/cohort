@@ -6,7 +6,6 @@ on:
       version:
         description: "The release version"
         required: true
-        default: "2.2."
       branch:
         description: "The branch to release from"
         required: true
