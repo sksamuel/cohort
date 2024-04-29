@@ -1,7 +1,6 @@
 package com.sksamuel.cohort.endpoints
 
 import com.sksamuel.cohort.HealthCheckRegistry
-import com.sksamuel.cohort.WarmupRegistry
 import com.sksamuel.cohort.db.DataSourceManager
 import com.sksamuel.cohort.db.DatabaseMigrationManager
 import com.sksamuel.cohort.logging.LogManager
@@ -10,7 +9,6 @@ class CohortConfiguration {
 
    private val _healthchecks = mutableMapOf<String, HealthCheckRegistry>()
    val healthchecks: Map<String, HealthCheckRegistry> get() = _healthchecks
-   private var warmupRegistry: WarmupRegistry? = null
 
    // set to true to enable the /cohort/heapdump endpoint which will generate a heapdump in hprof format
    var heapDump: Boolean = false
@@ -48,26 +46,6 @@ class CohortConfiguration {
     * Register a [HealthCheckRegistry] at the given [endpoint].
     */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
-      registry.warmupRegistry = warmupRegistry
       _healthchecks[endpoint] = registry
-   }
-
-   /**
-    * Register a [WarmupRegistry].
-    */
-   fun warmup(registry: WarmupRegistry) {
-      if (_healthchecks.isNotEmpty()) error("WarmupRegister must be registered before healthchecks")
-      if (warmupRegistry != null) error("WarmupRegistry already registered")
-      this.warmupRegistry = registry
-   }
-
-   /**
-    * Creates a [WarmupRegistry], registers it, and executes the provided [configure] function
-    * against the new registry.
-    */
-   fun warmups(configure: WarmupRegistry.() -> Unit) {
-      val registry = WarmupRegistry()
-      configure.invoke(registry)
-      warmup(registry)
    }
 }

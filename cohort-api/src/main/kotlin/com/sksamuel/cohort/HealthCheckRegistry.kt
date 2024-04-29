@@ -42,14 +42,13 @@ class HealthCheckRegistry(
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
 
-   private val logger = LoggerFactory.getLogger(WarmupRegistry::class.java)
+   private val logger = LoggerFactory.getLogger(HealthCheckRegistry::class.java)
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
    private val listeners = ConcurrentHashMap.newKeySet<Listener>()
 
    @Deprecated("Replaced with WarmupRegistry")
    private val warmupScope = CoroutineScope(Dispatchers.Default)
 
-   internal var warmupRegistry: WarmupRegistry? = null
    var startUnhealthy: Boolean = true
    var logUnhealthy: Boolean = true
 
@@ -116,7 +115,8 @@ class HealthCheckRegistry(
     * Adds a [HealthCheck] to this registry using the given [delay] for both initial delay and intervals.
     * The name used for this check is the default name supplied by the healthcheck instance.
     */
-   @Deprecated("Use register(check, initialDelay, checkInterval) to be explicit",
+   @Deprecated(
+      "Use register(check, initialDelay, checkInterval) to be explicit",
       ReplaceWith("register(check.name, check, delay, delay)")
    )
    fun register(
@@ -138,7 +138,8 @@ class HealthCheckRegistry(
     *             name, the same check can be registered multiple times. No healthcheck can be registered
     *             more than once with a repeated (or default) name.
     */
-   @Deprecated("Use register(name, check, initialDelay, checkInterval) to be explicit",
+   @Deprecated(
+      "Use register(name, check, initialDelay, checkInterval) to be explicit",
       ReplaceWith("register(name, check, delay, delay)")
    )
    fun register(
@@ -240,9 +241,8 @@ class HealthCheckRegistry(
     * A service is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): ServiceHealth {
-      val warmupState = warmupRegistry?.state() ?: WarmupState.Completed
-      val healthy = statuses.values.all { it.result.isHealthy } && warmupState == WarmupState.Completed
-      return ServiceHealth(healthy, warmupState, statuses.toMap())
+      val healthy = statuses.values.all { it.result.isHealthy }
+      return ServiceHealth(healthy, statuses.toMap())
    }
 
    /**
@@ -306,7 +306,6 @@ data class HealthCheckStatus(
  */
 data class ServiceHealth(
    val healthy: Boolean,
-   val warmups: WarmupState,
    val healthchecks: Map<String, HealthCheckStatus>
 )
 

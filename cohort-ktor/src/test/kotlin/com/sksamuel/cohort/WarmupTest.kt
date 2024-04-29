@@ -1,6 +1,5 @@
 package com.sksamuel.cohort
 
-import com.sksamuel.cohort.cpu.CryptoWarmup
 import com.sksamuel.cohort.endpoints.cohort
 import com.sksamuel.cohort.threads.ThreadDeadlockHealthCheck
 import io.kotest.core.spec.style.FunSpec
@@ -21,15 +20,10 @@ class WarmupTest : FunSpec() {
             startUnhealthy = true
          }
 
-         val warmups = WarmupRegistry {
-            register(CryptoWarmup(), 2.seconds)
-         }
-
          testApplication {
 
             routing {
                cohort {
-                  warmup(warmups)
                   healthcheck("/healthy-mchealth-face", healthchecks)
                }
             }
