@@ -57,7 +57,7 @@ publishing {
       from(components["java"])
       pom {
         name.set("cohort")
-        description.set("Ktor Actuator")
+        description.set("Ktor and Vertx Actuator and Monitoring")
         url.set("http://www.github.com/sksamuel/cohort")
 
         scm {
