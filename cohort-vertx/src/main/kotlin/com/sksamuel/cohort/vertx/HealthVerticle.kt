@@ -15,13 +15,14 @@ import io.vertx.ext.web.Router
 import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
 
-fun Router.cohort(
-   configure: CohortConfiguration.() -> Unit = {},
-) {
+fun initializeCohort(configure: CohortConfiguration.() -> Unit = {}): CohortConfiguration {
+   return CohortConfiguration().also(configure)
+}
+
+fun Router.cohort(cohort: CohortConfiguration) {
 
    val router = this
    val logger = LoggerFactory.getLogger(Router::class.java)
-   val cohort = CohortConfiguration().also(configure)
 
    if (cohort.heapDump) {
       router.get("${cohort.endpointPrefix}/heapdump")
