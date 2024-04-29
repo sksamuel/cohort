@@ -12,7 +12,6 @@ import com.sksamuel.cohort.threads.getThreadDump
 import com.sksamuel.tabby.results.sequence
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.ext.web.Router
-import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
 
 fun initializeCohort(configure: CohortConfiguration.() -> Unit = {}): CohortConfiguration {
@@ -22,7 +21,6 @@ fun initializeCohort(configure: CohortConfiguration.() -> Unit = {}): CohortConf
 fun Router.cohort(cohort: CohortConfiguration) {
 
    val router = this
-   val logger = LoggerFactory.getLogger(Router::class.java)
 
    if (cohort.heapDump) {
       router.get("${cohort.endpointPrefix}/heapdump")
@@ -164,7 +162,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
    }
 
    cohort.healthchecks.forEach { (endpoint, registry) ->
-      logger.info("Deploying healthcheck at $endpoint")
 
       router.get(endpoint)
          .consumes("*")
