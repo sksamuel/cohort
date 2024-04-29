@@ -43,140 +43,176 @@ class HealthVerticle(
 
       coroutineRouter {
          if (cohort.heapDump) {
-            router.get("${cohort.endpointPrefix}/heapdump").coHandler { context ->
-               getHeapDump().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
-         }
-
-         if (cohort.memory) {
-            router.get("${cohort.endpointPrefix}/memory").coHandler { context ->
-               getMemoryInfo().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
-         }
-
-         cohort.dataSources.let { dsm ->
-            if (dsm.isNotEmpty()) {
-               router.get("${cohort.endpointPrefix}/datasources").coHandler { context ->
-                  dsm.map { it.info() }.sequence().fold(
+            router.get("${cohort.endpointPrefix}/heapdump")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getHeapDump().fold(
                      { context.json(it).coAwait() },
                      { context.response().setStatusCode(500).end().coAwait() },
                   )
                }
+         }
+
+         if (cohort.memory) {
+            router.get("${cohort.endpointPrefix}/memory")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getMemoryInfo().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
+         }
+
+         cohort.dataSources.let { dsm ->
+            if (dsm.isNotEmpty()) {
+               router.get("${cohort.endpointPrefix}/datasources")
+                  .consumes("*")
+                  .produces("*")
+                  .coHandler { context ->
+                     dsm.map { it.info() }.sequence().fold(
+                        { context.json(it).coAwait() },
+                        { context.response().setStatusCode(500).end().coAwait() },
+                     )
+                  }
             }
          }
 
          cohort.migrations?.let { m ->
-            router.get("${cohort.endpointPrefix}/dbmigration").coHandler { context ->
-               m.migrations().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/dbmigration")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  m.migrations().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          cohort.logManager?.let { manager ->
 
-            router.get("${cohort.endpointPrefix}/logging").coHandler { context ->
-               runCatching {
-                  val levels = manager.levels()
-                  val loggers = manager.loggers()
-                  LogInfo(levels, loggers).toJson()
-               }.fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/logging")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  runCatching {
+                     val levels = manager.levels()
+                     val loggers = manager.loggers()
+                     LogInfo(levels, loggers).toJson()
+                  }.fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
 
-            router.put("${cohort.endpointPrefix}/logging/{name}/{level}").coHandler { context ->
-               val name = context.pathParam("name")
-               val level = context.pathParam("level")
-               manager.set(name, level).fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.put("${cohort.endpointPrefix}/logging/{name}/{level}")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  val name = context.pathParam("name")
+                  val level = context.pathParam("level")
+                  manager.set(name, level).fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          if (cohort.jvmInfo) {
-            router.get("${cohort.endpointPrefix}/jvm").coHandler { context ->
-               getJvmDetails().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/jvm")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getJvmDetails().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          if (cohort.gc) {
-            router.get("${cohort.endpointPrefix}/gc").coHandler { context ->
-               getGcInfo().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/gc")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getGcInfo().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          if (cohort.threadDump) {
-            router.get("${cohort.endpointPrefix}/threaddump").coHandler { context ->
-               getThreadDump().fold(
-                  { context.response().end(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/threaddump")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getThreadDump().fold(
+                     { context.response().end(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          if (cohort.sysprops) {
-            router.get("${cohort.endpointPrefix}/sysprops").coHandler { context ->
-               getSysProps().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/sysprops")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getSysProps().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          if (cohort.operatingSystem) {
-            router.get("${cohort.endpointPrefix}/os").coHandler { context ->
-               getOperatingSystem().fold(
-                  { context.json(it).coAwait() },
-                  { context.response().setStatusCode(500).end().coAwait() },
-               )
-            }
+            router.get("${cohort.endpointPrefix}/os")
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
+                  getOperatingSystem().fold(
+                     { context.json(it).coAwait() },
+                     { context.response().setStatusCode(500).end().coAwait() },
+                  )
+               }
          }
 
          cohort.healthchecks.forEach { (endpoint, registry) ->
             logger.info("Deploying healthcheck at $endpoint")
 
-            router.get(endpoint).coHandler { context ->
+            router.get(endpoint)
+               .consumes("*")
+               .produces("*")
+               .coHandler { context ->
 
-               val status = registry.status()
+                  val status = registry.status()
 
-               val results = status.healthchecks.map {
-                  ResultJson(
-                     name = it.key,
-                     status = it.value.result.status,
-                     lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
-                     message = it.value.result.message,
-                     cause = it.value.result.cause?.stackTraceToString(),
-                     consecutiveSuccesses = it.value.consecutiveSuccesses,
-                     consecutiveFailures = it.value.consecutiveFailures,
-                  )
+                  val results = status.healthchecks.map {
+                     ResultJson(
+                        name = it.key,
+                        status = it.value.result.status,
+                        lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
+                        message = it.value.result.message,
+                        cause = it.value.result.cause?.stackTraceToString(),
+                        consecutiveSuccesses = it.value.consecutiveSuccesses,
+                        consecutiveFailures = it.value.consecutiveFailures,
+                     )
+                  }
+
+                  val httpStatusCode = when (status.healthy) {
+                     true -> HttpResponseStatus.OK.code()
+                     false -> HttpResponseStatus.SERVICE_UNAVAILABLE.code()
+                  }
+
+                  context.response().setStatusCode(httpStatusCode)
+                     .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                     .end(Json.encodeToBuffer(results))
+                     .coAwait()
                }
-
-               val httpStatusCode = when (status.healthy) {
-                  true -> HttpResponseStatus.OK.code()
-                  false -> HttpResponseStatus.SERVICE_UNAVAILABLE.code()
-               }
-
-               context.response().setStatusCode(httpStatusCode)
-                  .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                  .end(Json.encodeToBuffer(results))
-                  .coAwait()
-            }
          }
       }
 
