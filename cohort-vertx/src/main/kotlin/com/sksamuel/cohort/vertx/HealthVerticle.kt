@@ -10,6 +10,7 @@ import com.sksamuel.cohort.os.getOperatingSystem
 import com.sksamuel.cohort.system.getSysProps
 import com.sksamuel.cohort.threads.getThreadDump
 import com.sksamuel.tabby.results.sequence
+import io.netty.handler.codec.compression.StandardCompressionOptions
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.http.HttpHeaders
 import io.vertx.core.http.HttpServerOptions
@@ -27,9 +28,23 @@ import java.time.ZoneOffset
  */
 class HealthVerticle(
    private val port: Int,
-   private val options: HttpServerOptions = HttpServerOptions(),
+   private val options: HttpServerOptions,
    configure: CohortConfiguration.() -> Unit = {},
 ) : CoroutineVerticle() {
+
+   companion object {
+
+      operator fun invoke(
+         port: Int,
+         configure: CohortConfiguration.() -> Unit = {},
+      ): HealthVerticle {
+         val options = HttpServerOptions()
+            .setCompressionSupported(true)
+            .setDecompressionSupported(true)
+            .addCompressor(StandardCompressionOptions.gzip())
+         return HealthVerticle(port, options, configure)
+      }
+   }
 
    private val cohort = CohortConfiguration().also(configure)
    private val logger = LoggerFactory.getLogger(HealthVerticle::class.java)
@@ -41,6 +56,11 @@ class HealthVerticle(
 
       val server = vertx.createHttpServer(options)
          .requestHandler(router)
+         .exceptionHandler { logger.warn("Socket error", it) }
+         .invalidRequestHandler {
+            logger.warn("invaoid request", it)
+            it.response().setStatusCode(400).end()
+         }
 
       coroutineRouter {
          if (cohort.heapDump) {
