@@ -1,5 +1,6 @@
 package com.sksamuel.cohort.vertx
 
+import com.sksamuel.cohort.WarmupRegistry
 import com.sksamuel.cohort.endpoints.CohortConfiguration
 import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
@@ -19,6 +20,7 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.coroutineRouter
 import kotlinx.coroutines.future.await
+import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
 
 /**
@@ -31,6 +33,7 @@ class HealthVerticle(
 ) : CoroutineVerticle() {
 
    private val cohort = CohortConfiguration().also(configure)
+   private val logger = LoggerFactory.getLogger(HealthVerticle::class.java)
 
    override suspend fun start() {
 
@@ -146,6 +149,8 @@ class HealthVerticle(
          }
 
          cohort.healthchecks.forEach { (endpoint, registry) ->
+            logger.info("Deploying healthcheck at $endpoint")
+
             router.get(endpoint).coHandler { context ->
 
                val status = registry.status()
