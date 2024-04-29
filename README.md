@@ -81,16 +81,13 @@ Include the following dependencies in your build:
 
 * `com.sksamuel.cohort:cohort-vertx:<version>`
 
-Then deploy the `HealthVerticle` into your `Vertx` instance, passing in a web `Router` instance, and a configuration block to enable whichever features / endpoints we want to expose.
-Remember, endpoints are disabled by default for security, and you must enable them.
+Then in your app, create a `cohort` object using the `initializeCohort` function. Then pass that object to the `router.cohort` extension function.
+Note: If you are deploying multiple instances of a verticle, be sure to initialize cohort outside of the verticle and pass in the instance. Otherwise, each verticle will create its own set of background checks.
 
 Here is a sample configuration with each feature enabled.
 
 ```kotlin
-val vertx = Vertx.vertx()
-val router = Router.router(vertx)
-
-val verticle = HealthVerticle(router) {
+val cohort = initializeCohort {
 
    // enable an endpoint to display operating system name and version
    operatingSystem = true
@@ -121,7 +118,9 @@ val verticle = HealthVerticle(router) {
    healthcheck("/startup", startupChecks)
 }
 
-vertx.deployVerticle(verticle)
+val vertx = Vertx.vertx()
+val router = Router.router(vertx)
+router.cohort(cohort)
 ```
 
 ### Other modules

@@ -1,9 +1,15 @@
 # Changelog
 
+### 2.4.1
+
+* Bumped versions of dependencies
+* Added deployment logging on startup
+
 ### 2.4.0
 
 * Renamed `cohort-core` to `cohort-ktor`.
-* Added Vertx `HealthVerticle` support in the `cohort-vertx` module.
+* Added Vertx support.
+* Removed warmups
 
 ### 2.3.1
 
