@@ -12,9 +12,7 @@ import com.sksamuel.cohort.threads.getThreadDump
 import com.sksamuel.tabby.results.sequence
 import io.netty.handler.codec.compression.StandardCompressionOptions
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.vertx.core.http.HttpHeaders
 import io.vertx.core.http.HttpServerOptions
-import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
@@ -224,15 +222,10 @@ class HealthVerticle(
                      )
                   }
 
-                  val httpStatusCode = when (status.healthy) {
-                     true -> HttpResponseStatus.OK.code()
-                     false -> HttpResponseStatus.SERVICE_UNAVAILABLE.code()
+                  when (status.healthy) {
+                     true -> context.json(results).coAwait()
+                     false -> context.response().setStatusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.code()).end().coAwait()
                   }
-
-                  context.response().setStatusCode(httpStatusCode)
-                     .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                     .end(Json.encodeToBuffer(results))
-                     .coAwait()
                }
          }
       }
