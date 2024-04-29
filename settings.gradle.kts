@@ -10,7 +10,6 @@ include(
    "cohort-elastic",
    "cohort-flyway",
    "cohort-hikari",
-   "cohort-http",
    "cohort-jedis",
    "cohort-kafka",
    "cohort-ktor",
