@@ -1,6 +1,5 @@
 package com.sksamuel.cohort.vertx
 
-import com.sksamuel.cohort.WarmupRegistry
 import com.sksamuel.cohort.endpoints.CohortConfiguration
 import com.sksamuel.cohort.gc.getGcInfo
 import com.sksamuel.cohort.heap.getHeapDump
@@ -38,6 +37,8 @@ class HealthVerticle(
    override suspend fun start() {
 
       val router = Router.router(vertx)
+         .errorHandler(404) { it.end("Could not find path ${it.request().path()}") }
+
       val server = vertx.createHttpServer(options)
          .requestHandler(router)
 
