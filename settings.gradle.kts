@@ -31,54 +31,54 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val coroutines = "1.7.3"
+         val coroutines = "1.8.1"
          library("coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
          library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
-         val slf4j = "2.0.13"
+         val slf4j = "2.0.14"
          library("slf4j-api", "org.slf4j:slf4j-api:$slf4j")
          library("slf4j-simple", "org.slf4j:slf4j-simple:$slf4j")
 
          val tabby = "2.2.11"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.12.8"
+         val micrometer = "1.13.2"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
          val hikari = "5.1.0"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
-         val flyway = "9.19.4"
+         val flyway = "9.22.3"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
-         val kakfa = "3.7.0"
+         val kakfa = "3.8.0"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.3.2.RELEASE"
+         val lettuce = "6.4.0.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.29.1"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
-         val jedis = "4.4.4"
+         val jedis = "5.1.4"
          library("jedis", "redis.clients:jedis:$jedis")
 
-         library("rabbitmq", "com.rabbitmq:amqp-client:5.20.0")
+         library("rabbitmq", "com.rabbitmq:amqp-client:5.21.0")
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
-         library("pulsar-client", "org.apache.pulsar:pulsar-client:2.11.2")
+         library("pulsar-client", "org.apache.pulsar:pulsar-client:3.3.1")
 
-         val mongo = "5.1.0"
+         val mongo = "5.1.2"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
          library("mongodb-driver-coroutine", "org.mongodb:mongodb-driver-kotlin-coroutine:$mongo")
 
          library(
             "elasticsearch-rest-high-level-client",
-            "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.9"
+            "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.23"
          )
 
-         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.6.2")
+         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.14.3")
 
-         val awssdk = "1.12.583"
+         val awssdk = "1.12.767"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
@@ -95,15 +95,15 @@ dependencyResolutionManagement {
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
          library("ktor-server-test-host", "io.ktor:ktor-server-test-host:$ktor")
 
-         val logback = "1.4.14"
+         val logback = "1.5.6"
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")
          library("logback-core", "ch.qos.logback:logback-core:$logback")
 
-         val jackson = "2.15.3"
+         val jackson = "2.17.2"
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val kotest = "5.7.2"
+         val kotest = "5.9.1"
          library("kotest-datatest", "io.kotest:kotest-framework-datatest:$kotest")
          library("kotest-junit5", "io.kotest:kotest-runner-junit5:$kotest")
          library("kotest-core", "io.kotest:kotest-assertions-core:$kotest")
@@ -111,7 +111,7 @@ dependencyResolutionManagement {
          library("kotest-property", "io.kotest:kotest-property:$kotest")
          library("kotest-ktor", "io.kotest.extensions:kotest-assertions-ktor:2.0.0")
 
-         val kotestTestContainers = "2.0.0"
+         val kotestTestContainers = "2.0.2"
          library("kotest-extensions-testcontainers", "io.kotest.extensions:kotest-extensions-testcontainers:$kotestTestContainers")
          library("kotest-extensions-testcontainers-kafka", "io.kotest.extensions:kotest-extensions-testcontainers-kafka:$kotestTestContainers")
          library(
@@ -121,7 +121,7 @@ dependencyResolutionManagement {
          library("kotest-httpstub", "io.kotest.extensions:kotest-extensions-httpstub:1.0.1")
          library("kotest-extensions-clock", "io.kotest.extensions:kotest-extensions-clock:1.0.0")
 
-         val testContainers = "1.18.3"
+         val testContainers = "1.20.1"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
          library("testcontainers-rabbitmq", "org.testcontainers:rabbitmq:$testContainers")
