@@ -60,7 +60,7 @@ dependencyResolutionManagement {
          val liquibase = "4.23.2"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
-         val jedis = "4.4.4"
+         val jedis = "4.4.8"
          library("jedis", "redis.clients:jedis:$jedis")
 
          library("rabbitmq", "com.rabbitmq:amqp-client:5.20.0")
