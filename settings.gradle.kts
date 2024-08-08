@@ -121,7 +121,7 @@ dependencyResolutionManagement {
          library("kotest-httpstub", "io.kotest.extensions:kotest-extensions-httpstub:1.0.1")
          library("kotest-extensions-clock", "io.kotest.extensions:kotest-extensions-clock:1.0.0")
 
-         val testContainers = "1.18.3"
+         val testContainers = "1.20.1"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
          library("testcontainers-rabbitmq", "org.testcontainers:rabbitmq:$testContainers")
