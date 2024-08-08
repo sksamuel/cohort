@@ -103,7 +103,7 @@ dependencyResolutionManagement {
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val kotest = "5.7.2"
+         val kotest = "5.9.1"
          library("kotest-datatest", "io.kotest:kotest-framework-datatest:$kotest")
          library("kotest-junit5", "io.kotest:kotest-runner-junit5:$kotest")
          library("kotest-core", "io.kotest:kotest-assertions-core:$kotest")
