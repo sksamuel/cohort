@@ -65,7 +65,7 @@ dependencyResolutionManagement {
 
          library("rabbitmq", "com.rabbitmq:amqp-client:5.20.0")
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
-         library("pulsar-client", "org.apache.pulsar:pulsar-client:2.11.2")
+         library("pulsar-client", "org.apache.pulsar:pulsar-client:3.3.1")
 
          val mongo = "5.1.0"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
