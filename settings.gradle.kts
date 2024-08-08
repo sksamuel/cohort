@@ -73,7 +73,7 @@ dependencyResolutionManagement {
 
          library(
             "elasticsearch-rest-high-level-client",
-            "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.9"
+            "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.23"
          )
 
          library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.14.3")
