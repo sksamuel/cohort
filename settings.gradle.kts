@@ -64,7 +64,7 @@ dependencyResolutionManagement {
          library("jedis", "redis.clients:jedis:$jedis")
 
          library("rabbitmq", "com.rabbitmq:amqp-client:5.21.0")
-         library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
+         library("dbcp2", "org.apache.commons:commons-dbcp2:2.12.0")
          library("pulsar-client", "org.apache.pulsar:pulsar-client:3.3.1")
 
          val mongo = "5.1.2"
