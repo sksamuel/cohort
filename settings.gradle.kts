@@ -111,7 +111,7 @@ dependencyResolutionManagement {
          library("kotest-property", "io.kotest:kotest-property:$kotest")
          library("kotest-ktor", "io.kotest.extensions:kotest-assertions-ktor:2.0.0")
 
-         val kotestTestContainers = "2.0.0"
+         val kotestTestContainers = "2.0.2"
          library("kotest-extensions-testcontainers", "io.kotest.extensions:kotest-extensions-testcontainers:$kotestTestContainers")
          library("kotest-extensions-testcontainers-kafka", "io.kotest.extensions:kotest-extensions-testcontainers-kafka:$kotestTestContainers")
          library(
