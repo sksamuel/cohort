@@ -67,7 +67,7 @@ dependencyResolutionManagement {
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
          library("pulsar-client", "org.apache.pulsar:pulsar-client:2.11.2")
 
-         val mongo = "5.1.0"
+         val mongo = "5.1.2"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
          library("mongodb-driver-coroutine", "org.mongodb:mongodb-driver-kotlin-coroutine:$mongo")
 
