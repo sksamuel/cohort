@@ -63,7 +63,7 @@ dependencyResolutionManagement {
          val jedis = "4.4.4"
          library("jedis", "redis.clients:jedis:$jedis")
 
-         library("rabbitmq", "com.rabbitmq:amqp-client:5.20.0")
+         library("rabbitmq", "com.rabbitmq:amqp-client:5.21.0")
          library("dbcp2", "org.apache.commons:commons-dbcp2:2.11.0")
          library("pulsar-client", "org.apache.pulsar:pulsar-client:2.11.2")
 
