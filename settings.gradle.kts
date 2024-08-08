@@ -42,7 +42,7 @@ dependencyResolutionManagement {
          val tabby = "2.2.11"
          library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
 
-         val micrometer = "1.12.8"
+         val micrometer = "1.13.2"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
          val hikari = "5.1.0"
