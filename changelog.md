@@ -1,5 +1,10 @@
 # Changelog
 
+
+### 2.6.0
+
+* Updated to use ktor 3.0
+
 ### 2.5.0
 
 * Removed warmup checks
