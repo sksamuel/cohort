@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.6.1
+
+* Fix for free memory calculation [#81](https://github.com/sksamuel/cohort/pull/81)
 
 ### 2.6.0
 
