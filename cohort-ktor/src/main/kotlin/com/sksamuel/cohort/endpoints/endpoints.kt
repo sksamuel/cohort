@@ -141,27 +141,29 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
 
    config.healthchecks.forEach { (endpoint, registry) ->
       get(endpoint) {
-
          val status = registry.status()
-
-         val results = status.healthchecks.map {
-            ResultJson(
-               name = it.key,
-               status = it.value.result.status,
-               lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
-               message = it.value.result.message,
-               cause = it.value.result.cause?.stackTraceToString(),
-               consecutiveSuccesses = it.value.consecutiveSuccesses,
-               consecutiveFailures = it.value.consecutiveFailures,
-            )
-         }
 
          val httpStatusCode = when (status.healthy) {
             true -> HttpStatusCode.OK
             false -> HttpStatusCode.ServiceUnavailable
          }
 
-         call.respondText(results.toJson(), ContentType.Application.Json, httpStatusCode)
+         val resultPayload = when (config.verboseHealthCheckResponse) {
+            true -> status.healthchecks.map {
+               ResultJson(
+                  name = it.key,
+                  status = it.value.result.status,
+                  lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
+                  message = it.value.result.message,
+                  cause = it.value.result.cause?.stackTraceToString(),
+                  consecutiveSuccesses = it.value.consecutiveSuccesses,
+                  consecutiveFailures = it.value.consecutiveFailures,
+               )
+            }.toJson()
+            false -> httpStatusCode.description
+         }
+
+         call.respondText(resultPayload, ContentType.Application.Json, httpStatusCode)
       }
    }
 }
