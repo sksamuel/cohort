@@ -66,6 +66,9 @@ install(Cohort) {
    // enable an endpoint to dump threads
    threaddump = true
 
+   // set to true to return the detailed status of the healthcheck response
+   verboseHealthCheckResponse = true
+
    // enable healthchecks for kubernetes
    // each of these is optional and can map to any healthcheck url you wish
    // for example if you just want a single health endpoint, you could use /health
@@ -643,4 +646,35 @@ Example output:
 	at java.base@11.0.10/jdk.internal.ref.CleanerImpl.run(CleanerImpl.java:148)
 	at java.base@11.0.10/java.lang.Thread.run(Thread.java:834)
 	at java.base@11.0.10/jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:134)
+```
+
+## Verbose healthcheck response
+
+By settings the verbose parameter to false the response of the healthcheck is being reduced.
+
+To enable, set `verboseHealthCheckResponse` to false inside the `Cohort` plugin configuration block, its set to true by default:
+
+```kotlin
+install(Cohort) {
+   verboseHealthCheckResponse = false
+}
+```
+
+Output is being reduced to 
+```
+"OK" or "Service unavailable"
+```
+
+ instead of:
+
+```
+{
+      "name": "com.sksamuel.cohort.threads.ThreadDeadlockHealthCheck",
+      "healthy": true,
+      "lastCheck": "2022-03-15T03:00:54.419733Z",
+      "message": "There are 0 deadlocked threads",
+      "cause": null,
+      "consecutiveSuccesses": 6,
+      "consecutiveFailures": 0
+   }
 ```

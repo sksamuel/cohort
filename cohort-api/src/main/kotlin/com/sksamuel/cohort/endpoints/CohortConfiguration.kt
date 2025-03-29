@@ -40,6 +40,9 @@ class CohortConfiguration {
    // set to true to enable the /cohort/sysprops endpoint which returns current system properties
    var sysprops: Boolean = false
 
+   // set to true to return the detailed status of the healthcheck response
+   var verboseHealthCheckResponse: Boolean = true
+
    var endpointPrefix = "cohort"
 
    /**
