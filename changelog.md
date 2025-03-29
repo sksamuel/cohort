@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.6.2
+
+* Adding verbosity option to health check output [#82](https://github.com/sksamuel/cohort/pull/82)
+
 ### 2.6.1
 
 * Fix for free memory calculation [#81](https://github.com/sksamuel/cohort/pull/81)
