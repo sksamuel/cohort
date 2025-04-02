@@ -56,7 +56,7 @@ dependencyResolutionManagement {
          val kakfa = "3.8.0"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
 
-         val lettuce = "6.4.0.RELEASE"
+         val lettuce = "6.5.5.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.31.1"
