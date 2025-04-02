@@ -47,7 +47,7 @@ dependencyResolutionManagement {
          val micrometer = "1.13.2"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
-         val hikari = "5.1.0"
+         val hikari = "6.3.0"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
          val flyway = "10.17.0"
