@@ -97,7 +97,7 @@ dependencyResolutionManagement {
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
          library("ktor-server-test-host", "io.ktor:ktor-server-test-host:$ktor")
 
-         val logback = "1.5.6"
+         val logback = "1.5.18"
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")
          library("logback-core", "ch.qos.logback:logback-core:$logback")
 
