@@ -164,7 +164,7 @@ class HealthCheckRegistry(
          {
             val previousCheck = jobs[name]
             if(previousCheck == null || !previousCheck.isActive) {
-               jobs[name] = scope.launch(dispatcher) {
+               jobs[name] = scope.launch {
                   run(name)
                   jobs.remove(name)
                }
