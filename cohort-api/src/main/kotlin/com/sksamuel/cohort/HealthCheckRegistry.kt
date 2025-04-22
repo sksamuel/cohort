@@ -2,10 +2,7 @@
 
 package com.sksamuel.cohort
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -22,21 +19,19 @@ import kotlin.time.Duration.Companion.seconds
  * Individual checks are free to shift the dispatcher onto a [Dispatchers.IO] for IO calls.
  * It is recommended that the provided dispatcher has parallelism limited to 1.
  *
- * This registry creates one additional thread for its own use, to run the scheduler. This thread remains
- * in [Thread.State.BLOCKED] while waiting to fire a scheduled event, and this thread is not used
- * for the actual execution of the scheduled events.
- *
  * @param dispatcher this dispatcher will be used for executing the checks
  */
 class HealthCheckRegistry(
    private val dispatcher: CoroutineDispatcher,
 ) : AutoCloseable {
 
+   private val scope = CoroutineScope(dispatcher)
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-healthcheck-scheduler"))
    private val names = mutableSetOf<String>()
 
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
+   private val jobs = ConcurrentHashMap<String, Job>()
 
    private val logger = LoggerFactory.getLogger(HealthCheckRegistry::class.java)
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
@@ -167,11 +162,14 @@ class HealthCheckRegistry(
 
       scheduler.scheduleWithFixedDelay(
          {
-            // we block the thread used by the scheduler, as we execute inside the provided coroutine dispatcher
-            runBlocking {
-               launch(dispatcher) {
+            val previousCheck = jobs[name]
+            if(previousCheck == null || !previousCheck.isActive) {
+               jobs[name] = scope.launch {
                   run(name)
+                  jobs.remove(name)
                }
+            } else {
+               logger.debug("Check $name is still running. Skipping rescheduling to avoid pileup")
             }
          },
          initialDelay.inWholeMilliseconds,
@@ -270,6 +268,7 @@ class HealthCheckRegistry(
    }
 
    override fun close() {
+      scope.cancel()
       scheduler.shutdown()
    }
 }
