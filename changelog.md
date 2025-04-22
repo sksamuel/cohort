@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.7.0 (April 2025)
+
+* Use coroutine dispatcher instead of run blocking for invoking scheduled health checks [#85](https://github.com/sksamuel/cohort/pull/85)
+
 ### 2.6.2
 
 * Adding verbosity option to health check output [#82](https://github.com/sksamuel/cohort/pull/82)
