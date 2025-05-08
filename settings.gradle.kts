@@ -6,6 +6,7 @@ include(
    "cohort-aws-s3",
    "cohort-aws-sqs",
    "cohort-aws-sns",
+   "cohort-cassandra",
    "cohort-dbcp",
    "cohort-elastic",
    "cohort-flyway",
@@ -130,6 +131,7 @@ dependencyResolutionManagement {
          library("testcontainers-elasticsearch", "org.testcontainers:elasticsearch:$testContainers")
          library("testcontainers-mongodb", "org.testcontainers:mongodb:$testContainers")
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
+         library("testcontainers-cassandra", "org.testcontainers:cassandra:$testContainers")
 
          val vertx = "4.5.9"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
@@ -137,6 +139,12 @@ dependencyResolutionManagement {
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
          library("vertx-coroutines", "io.vertx:vertx-lang-kotlin-coroutines:$vertx")
          library("vertx-micrometer", "io.vertx:vertx-micrometer-metrics:$vertx")
+
+         val cassandra = "4.19.0"
+         library("cassandra", "org.apache.cassandra:java-driver-core:$cassandra")
+
+         val mockk = "1.14.2"
+         library("mockk", "io.mockk:mockk:$mockk")
 
          bundle(
             "testing", listOf(
