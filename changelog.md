@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.7.1 (May 2025)
+
+* Added cassandra health check
+
 ### 2.7.0 (April 2025)
 
 * Use coroutine dispatcher instead of run blocking for invoking scheduled health checks [#85](https://github.com/sksamuel/cohort/pull/85)
