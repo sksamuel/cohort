@@ -104,6 +104,7 @@ dependencyResolutionManagement {
 
          val jackson = "2.17.2"
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
+         library("jackson-datatype-jsr310","com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
          val kotest = "5.9.1"
