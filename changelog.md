@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.7.2 (May 2025)
+
+* Fix: Liquibase RanChangeSet tracking & Jackson date serialization [#87](https://github.com/sksamuel/cohort/pull/87)
+
 ### 2.7.1 (May 2025)
 
 * Added cassandra health check
