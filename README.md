@@ -61,10 +61,10 @@ install(Cohort) {
    sysprops = true
 
    // enable an endpoint to dump the heap in hprof format
-   heapdump = true
+   heapDump = true
 
    // enable an endpoint to dump threads
-   threaddump = true
+   threadDump = true
 
    // set to true to return the detailed status of the healthcheck response
    verboseHealthCheckResponse = true
@@ -660,7 +660,7 @@ install(Cohort) {
 }
 ```
 
-Output is being reduced to 
+Output is being reduced to
 ```
 "OK" or "Service unavailable"
 ```
