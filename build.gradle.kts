@@ -4,9 +4,6 @@ buildscript {
    repositories {
       mavenCentral()
       maven {
-         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-      }
-      maven {
          url = uri("https://plugins.gradle.org/m2/")
       }
    }
@@ -15,7 +12,7 @@ buildscript {
 plugins {
    signing
    `maven-publish`
-   kotlin("jvm").version("1.9.25")
+   kotlin("jvm").version("2.1.21")
 }
 
 allprojects {
@@ -23,13 +20,6 @@ allprojects {
 
    kotlin {
       jvmToolchain(11)
-   }
-
-   repositories {
-      mavenLocal()
-      mavenCentral()
-      maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-      maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots") }
    }
 
    group = "com.sksamuel.cohort"
