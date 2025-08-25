@@ -19,7 +19,7 @@ allprojects {
    apply(plugin = "org.jetbrains.kotlin.jvm")
 
    kotlin {
-      jvmToolchain(11)
+      jvmToolchain(17)
    }
 
    group = "com.sksamuel.cohort"
