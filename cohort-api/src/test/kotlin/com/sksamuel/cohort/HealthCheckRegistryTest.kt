@@ -51,15 +51,15 @@ class HealthCheckRegistryTest : FunSpec({
          register("check3", check3, 1.milliseconds, 1.milliseconds)
       }
 
-      delay(5)
+      eventually(1.seconds) {
+         reg.status().apply {
+            this.healthy shouldBe false
+            this.healthchecks.size shouldBe 3
 
-      reg.status().apply {
-         this.healthy shouldBe false
-         this.healthchecks.size shouldBe 3
-
-         this.healthchecks["check1"]?.result?.isHealthy shouldBe true
-         this.healthchecks["check2"]?.result?.isHealthy shouldBe false
-         this.healthchecks["check3"]?.result?.isHealthy shouldBe true
+            this.healthchecks["check1"]?.result?.isHealthy shouldBe true
+            this.healthchecks["check2"]?.result?.isHealthy shouldBe false
+            this.healthchecks["check3"]?.result?.isHealthy shouldBe true
+         }
       }
 
       delay(5)
