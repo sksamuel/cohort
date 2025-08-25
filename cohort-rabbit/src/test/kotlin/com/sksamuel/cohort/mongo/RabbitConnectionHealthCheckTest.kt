@@ -5,7 +5,7 @@ import com.sksamuel.cohort.HealthCheckResult
 import com.sksamuel.cohort.rabbit.RabbitConnectionHealthCheck
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.extensions.testcontainers.TestContainerSpecExtension
 import io.kotest.matchers.shouldBe
 import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.utility.DockerImageName
@@ -13,7 +13,7 @@ import org.testcontainers.utility.DockerImageName
 class RabbitConnectionHealthCheckTest : FunSpec({
 
   val container = RabbitMQContainer(DockerImageName.parse("rabbitmq"))
-  install(TestContainerExtension(container))
+  install(TestContainerSpecExtension(container))
 
   test("RabbitConnectionHealthCheck should connect to RabbitMQ") {
     val connection = ConnectionFactory().apply {
