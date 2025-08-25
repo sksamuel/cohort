@@ -19,7 +19,7 @@ allprojects {
    apply(plugin = "org.jetbrains.kotlin.jvm")
 
    kotlin {
-      jvmToolchain(17)
+      jvmToolchain(11)
       compilerOptions {
          jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
          apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
