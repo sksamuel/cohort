@@ -100,24 +100,6 @@ dependencyResolutionManagement {
          library("jackson-datatype-jsr310","com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val kotest = "5.9.1"
-         library("kotest-datatest", "io.kotest:kotest-framework-datatest:$kotest")
-         library("kotest-junit5", "io.kotest:kotest-runner-junit5:$kotest")
-         library("kotest-core", "io.kotest:kotest-assertions-core:$kotest")
-         library("kotest-json", "io.kotest:kotest-assertions-json:$kotest")
-         library("kotest-property", "io.kotest:kotest-property:$kotest")
-         library("kotest-ktor", "io.kotest.extensions:kotest-assertions-ktor:2.0.0")
-
-         val kotestTestContainers = "2.0.2"
-         library("kotest-extensions-testcontainers", "io.kotest.extensions:kotest-extensions-testcontainers:$kotestTestContainers")
-         library("kotest-extensions-testcontainers-kafka", "io.kotest.extensions:kotest-extensions-testcontainers-kafka:$kotestTestContainers")
-         library(
-            "kotest-extensions-testcontainers-elastic",
-            "io.kotest.extensions:kotest-extensions-testcontainers-elastic:$kotestTestContainers"
-         )
-         library("kotest-httpstub", "io.kotest.extensions:kotest-extensions-httpstub:1.0.1")
-         library("kotest-extensions-clock", "io.kotest.extensions:kotest-extensions-clock:1.0.0")
-
          val testContainers = "1.20.1"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
@@ -139,29 +121,6 @@ dependencyResolutionManagement {
 
          val mockk = "1.14.2"
          library("mockk", "io.mockk:mockk:$mockk")
-
-         bundle(
-            "testing", listOf(
-               "kotest-datatest",
-               "kotest-junit5",
-               "kotest-core",
-               "kotest-json",
-               "kotest-property",
-               "kotest-ktor",
-               "kotest-httpstub",
-               "kotest-extensions-clock",
-               "kotest-extensions-testcontainers",
-               "kotest-extensions-testcontainers-elastic",
-               "kotest-extensions-testcontainers-kafka",
-               "testcontainers",
-               "testcontainers-postgresql",
-               "testcontainers-kafka",
-               "testcontainers-mongodb",
-               "testcontainers-elasticsearch",
-               "testcontainers-rabbitmq",
-               "ktor-server-test-host",
-            )
-         )
       }
    }
 }
