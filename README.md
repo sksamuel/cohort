@@ -2,7 +2,7 @@
 
 ![main](https://github.com/sksamuel/cohort/workflows/main/badge.svg)
 [<img src="https://img.shields.io/maven-central/v/com.sksamuel.cohort/cohort-api.svg?label=latest%20release"/>](http://search.maven.org/#search%7Cga%7C1%7Ccohort)
-[<img src="https://img.shields.io/nexus/s/https/s01.oss.sonatype.org/com.sksamuel.cohort/cohort-api.svg?label=latest%20snapshot&style=plastic"/>](https://s01.oss.sonatype.org/content/repositories/snapshots/com/sksamuel/cohort/)
+[<img src="https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Fcom%2Fsksamuel%2Fcohort%2Fcohort-api%2Fmaven-metadata.xml"/>](https://central.sonatype.com/repository/maven-snapshots/com/sksamuel/cohort/cohort-api/maven-metadata.xml)
 
 Cohort is a [Spring Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html) style
 replacement for [Ktor](https://ktor.io) and [Vertx](https://vertx.io). It provides health checks for orchestrators like Kubernetes and management of logging, databases, JVM settings, memory and threads in production.
