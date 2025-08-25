@@ -38,17 +38,6 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val coroutines = "1.8.1"
-         library("coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-         library("coroutines-jdk8", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
-
-         val slf4j = "2.0.14"
-         library("slf4j-api", "org.slf4j:slf4j-api:$slf4j")
-         library("slf4j-simple", "org.slf4j:slf4j-simple:$slf4j")
-
-         val tabby = "2.2.11"
-         library("sksamuel-tabby", "com.sksamuel.tabby:tabby-fp:$tabby")
-
          val micrometer = "1.14.5"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 

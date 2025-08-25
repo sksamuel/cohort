@@ -1,16 +1,12 @@
 package com.sksamuel.cohort
 
-import com.sksamuel.cohort.HealthCheckRegistry.Companion.DEFAULT_INTERVAL
 import com.sksamuel.cohort.threads.ThreadDeadlockHealthCheck
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
-import org.testcontainers.shaded.org.bouncycastle.oer.its.ieee1609dot2.basetypes.Duration
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.milliseconds

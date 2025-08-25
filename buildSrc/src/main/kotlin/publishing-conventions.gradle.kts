@@ -2,7 +2,7 @@ plugins {
    id("com.vanniktech.maven.publish")
 }
 
-group = "com.sksamuel.scrimage"
+group = "com.sksamuel.cohort"
 version = Ci.version
 
 mavenPublishing {
@@ -11,12 +11,12 @@ mavenPublishing {
    pom {
       name.set("cohort")
       description.set("Ktor and Vertx Actuator and Monitoring")
-      url.set("http://www.github.com/sksamuel/cohort")
+      url.set("https://www.github.com/sksamuel/cohort")
 
       scm {
-         connection.set("scm:git:http://www.github.com/sksamuel/cohort/")
-         developerConnection.set("scm:git:http://github.com/sksamuel/")
-         url.set("http://www.github.com/sksamuel/cohort/")
+         connection.set("scm:git:https://www.github.com/sksamuel/cohort/")
+         developerConnection.set("scm:git:https://github.com/sksamuel/")
+         url.set("https://www.github.com/sksamuel/cohort/")
       }
 
       licenses {
