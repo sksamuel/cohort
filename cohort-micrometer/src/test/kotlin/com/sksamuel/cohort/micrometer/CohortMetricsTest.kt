@@ -11,29 +11,29 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 object FooHealthCheck : HealthCheck {
-  override suspend fun check(): HealthCheckResult = HealthCheckResult.healthy("foo")
+   override suspend fun check(): HealthCheckResult = HealthCheckResult.healthy("foo")
 }
 
 object BarHealthCheck : HealthCheck {
-  override suspend fun check(): HealthCheckResult = HealthCheckResult.unhealthy("bar")
+   override suspend fun check(): HealthCheckResult = HealthCheckResult.unhealthy("bar")
 }
 
 class CohortMetricsTest : FunSpec() {
 
-  init {
-    test("should collect metrics") {
-      val registry = HealthCheckRegistry(Dispatchers.Default) {
-        this.register("foo", FooHealthCheck, 5.seconds)
-        this.register("bar", BarHealthCheck, 3.seconds)
+   init {
+      test("should collect metrics") {
+         val registry = HealthCheckRegistry(Dispatchers.Default) {
+            register("foo", FooHealthCheck, 5.seconds, 5.seconds)
+            register("bar", BarHealthCheck, 3.seconds, 3.seconds)
+         }
+         val mm = SimpleMeterRegistry()
+         CohortMetrics(registry).bindTo(mm)
+         mm.metersAsString shouldBe ""
+         delay(4.seconds)
+         mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=1.0"
+         delay(3.seconds)
+         mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=2.0\n" +
+            "cohort.healthcheck(COUNTER)[name='foo', status='Healthy', type='com.sksamuel.cohort.micrometer.FooHealthCheck']; count=1.0"
       }
-      val mm = SimpleMeterRegistry()
-      CohortMetrics(registry).bindTo(mm)
-      mm.metersAsString shouldBe ""
-      delay(4.seconds)
-      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=1.0"
-      delay(3.seconds)
-      mm.metersAsString shouldBe "cohort.healthcheck(COUNTER)[name='bar', status='Unhealthy', type='com.sksamuel.cohort.micrometer.BarHealthCheck']; count=2.0\n" +
-         "cohort.healthcheck(COUNTER)[name='foo', status='Healthy', type='com.sksamuel.cohort.micrometer.FooHealthCheck']; count=1.0"
-    }
-  }
+   }
 }
