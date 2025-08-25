@@ -19,11 +19,8 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: run tests
-        run: ./gradlew test
-
-      - name: deploy snapshot
-        run: ./gradlew publish
+      - name: run tests and publish snapshots
+        run: ./gradlew test publishToMavenCentral
 
       - name: bundle the build report
         if: failure()
