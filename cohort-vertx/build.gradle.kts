@@ -1,3 +1,8 @@
+plugins {
+   id("kotlin-conventions")
+   id("publishing-conventions")
+}
+
 dependencies {
    implementation(projects.cohortApi)
    implementation(libs.jackson.module.kotlin)
@@ -7,5 +12,3 @@ dependencies {
    api(libs.vertx.web)
    api(libs.vertx.micrometer)
 }
-
-apply("../publish.gradle.kts")

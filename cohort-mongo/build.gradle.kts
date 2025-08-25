@@ -1,3 +1,8 @@
+plugins {
+   id("kotlin-conventions")
+   id("publishing-conventions")
+}
+
 dependencies {
    implementation(projects.cohortApi)
    compileOnly(libs.mongodb.driver.sync)
@@ -6,5 +11,3 @@ dependencies {
    testImplementation(libs.mongodb.driver.sync)
    testImplementation(libs.mongodb.driver.coroutine)
 }
-
-apply("../publish.gradle.kts")

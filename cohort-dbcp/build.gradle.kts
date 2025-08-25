@@ -1,6 +1,9 @@
+plugins {
+   id("kotlin-conventions")
+   id("publishing-conventions")
+}
+
 dependencies {
    implementation(projects.cohortApi)
    implementation(libs.dbcp2)
 }
-
-apply("../publish.gradle.kts")

@@ -1,3 +1,8 @@
+plugins {
+   id("kotlin-conventions")
+   id("publishing-conventions")
+}
+
 dependencies {
    implementation(projects.cohortApi)
    api(libs.cassandra)
@@ -5,5 +10,3 @@ dependencies {
    testImplementation(libs.slf4j.simple)
    testImplementation(libs.mockk)
 }
-
-apply("../publish.gradle.kts")
