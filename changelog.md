@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.8.0 (August 2025)
+
+* Updated Ktor support for 3.2.x
+
 ### 2.7.2 (May 2025)
 
 * Fix: Liquibase RanChangeSet tracking & Jackson date serialization [#87](https://github.com/sksamuel/cohort/pull/87)
