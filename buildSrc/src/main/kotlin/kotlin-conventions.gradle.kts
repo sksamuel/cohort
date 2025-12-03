@@ -15,24 +15,24 @@ java {
 
 dependencies {
 
-   val coroutines = "1.8.1"
+   val coroutines = "1.10.2"
    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
-   val slf4j = "2.0.14"
+   val slf4j = "2.0.17"
    implementation("org.slf4j:slf4j-api:$slf4j")
    testImplementation("org.slf4j:slf4j-simple:$slf4j")
 
    implementation("com.sksamuel.tabby:tabby-fp:2.2.12")
 
-   testImplementation("io.kotest:kotest-runner-junit5:6.0.1")
-   testImplementation("io.kotest:kotest-assertions-core:6.0.1")
-   testImplementation("io.kotest:kotest-runner-junit5:6.0.1")
-   testImplementation("io.kotest:kotest-assertions-core:6.0.1")
-   testImplementation("io.kotest:kotest-assertions-json:6.0.1")
-   testImplementation("io.kotest:kotest-assertions-ktor:6.0.1")
-   testImplementation("io.kotest:kotest-property:6.0.1")
-   testImplementation("io.kotest:kotest-extensions-testcontainers:6.0.1")
+   testImplementation("io.kotest:kotest-runner-junit5:6.0.2")
+   testImplementation("io.kotest:kotest-assertions-core:6.0.2")
+   testImplementation("io.kotest:kotest-runner-junit5:6.0.2")
+   testImplementation("io.kotest:kotest-assertions-core:6.0.2")
+   testImplementation("io.kotest:kotest-assertions-json:6.0.2")
+   testImplementation("io.kotest:kotest-assertions-ktor:6.0.2")
+   testImplementation("io.kotest:kotest-property:6.0.2")
+   testImplementation("io.kotest:kotest-extensions-testcontainers:6.0.2")
 }
 
 kotlin {

@@ -38,32 +38,32 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val micrometer = "1.14.5"
+         val micrometer = "1.15.0"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
-         val hikari = "6.3.0"
+         val hikari = "6.3.1"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
-         val flyway = "10.17.0"
+         val flyway = "11.3.2"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
-         val kakfa = "3.8.0"
-         library("kafka-client", "org.apache.kafka:kafka-clients:$kakfa")
+         val kafka = "3.9.0"
+         library("kafka-client", "org.apache.kafka:kafka-clients:$kafka")
 
-         val lettuce = "6.5.5.RELEASE"
+         val lettuce = "6.6.0.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
          val liquibase = "4.31.1"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
-         val jedis = "5.1.4"
+         val jedis = "5.2.0"
          library("jedis", "redis.clients:jedis:$jedis")
 
-         library("rabbitmq", "com.rabbitmq:amqp-client:5.25.0")
-         library("dbcp2", "org.apache.commons:commons-dbcp2:2.12.0")
-         library("pulsar-client", "org.apache.pulsar:pulsar-client:3.3.1")
+         library("rabbitmq", "com.rabbitmq:amqp-client:5.26.0")
+         library("dbcp2", "org.apache.commons:commons-dbcp2:2.13.0")
+         library("pulsar-client", "org.apache.pulsar:pulsar-client:4.0.4")
 
-         val mongo = "5.1.2"
+         val mongo = "5.3.0"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
          library("mongodb-driver-coroutine", "org.mongodb:mongodb-driver-kotlin-coroutine:$mongo")
 
@@ -72,35 +72,35 @@ dependencyResolutionManagement {
             "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.23"
          )
 
-         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.14.3")
+         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.17.2")
 
-         val awssdk = "1.12.767"
+         val awssdk = "1.12.788"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
 
-         val log4j2 = "2.23.1"
+         val log4j2 = "2.25.0"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
 
-         val ktor = "3.2.2"
+         val ktor = "3.2.3"
          library("ktor-client-apache5", "io.ktor:ktor-client-apache5:$ktor")
          library("ktor-server-host-common", "io.ktor:ktor-server-host-common:$ktor")
          library("ktor-server-netty", "io.ktor:ktor-server-netty:$ktor")
          library("ktor-server-test-host", "io.ktor:ktor-server-test-host:$ktor")
 
-         val logback = "1.5.18"
+         val logback = "1.5.19"
          library("logback-classic", "ch.qos.logback:logback-classic:$logback")
          library("logback-core", "ch.qos.logback:logback-core:$logback")
 
-         val jackson = "2.17.2"
+         val jackson = "2.19.0"
          library("jackson-core", "com.fasterxml.jackson.core:jackson-core:$jackson")
          library("jackson-datatype-jsr310","com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val testContainers = "1.20.1"
+         val testContainers = "1.21.1"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
          library("testcontainers-rabbitmq", "org.testcontainers:rabbitmq:$testContainers")
@@ -109,17 +109,17 @@ dependencyResolutionManagement {
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
          library("testcontainers-cassandra", "org.testcontainers:cassandra:$testContainers")
 
-         val vertx = "4.5.9"
+         val vertx = "4.5.12"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
          library("vertx-web", "io.vertx:vertx-web:$vertx")
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
          library("vertx-coroutines", "io.vertx:vertx-lang-kotlin-coroutines:$vertx")
          library("vertx-micrometer", "io.vertx:vertx-micrometer-metrics:$vertx")
 
-         val cassandra = "4.19.0"
+         val cassandra = "4.19.1"
          library("cassandra", "org.apache.cassandra:java-driver-core:$cassandra")
 
-         val mockk = "1.14.2"
+         val mockk = "1.14.3"
          library("mockk", "io.mockk:mockk:$mockk")
       }
    }
