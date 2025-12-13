@@ -42,7 +42,7 @@ class HealthCheckRegistry(
 
    init {
       Runtime.getRuntime().addShutdownHook(Thread {
-         logger.info("Cohort HealthCheckRegistry shuthook hook is executing")
+         logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
          close()
       })
    }
