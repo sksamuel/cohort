@@ -25,14 +25,13 @@ dependencies {
 
    implementation("com.sksamuel.tabby:tabby-fp:2.2.12")
 
-   testImplementation("io.kotest:kotest-runner-junit5:6.0.2")
-   testImplementation("io.kotest:kotest-assertions-core:6.0.2")
-   testImplementation("io.kotest:kotest-runner-junit5:6.0.2")
-   testImplementation("io.kotest:kotest-assertions-core:6.0.2")
-   testImplementation("io.kotest:kotest-assertions-json:6.0.2")
-   testImplementation("io.kotest:kotest-assertions-ktor:6.0.2")
-   testImplementation("io.kotest:kotest-property:6.0.2")
-   testImplementation("io.kotest:kotest-extensions-testcontainers:6.0.2")
+   val kotest = "6.1.4"
+   testImplementation("io.kotest:kotest-runner-junit5:$kotest")
+   testImplementation("io.kotest:kotest-assertions-core:$kotest")
+   testImplementation("io.kotest:kotest-assertions-json:$kotest")
+   testImplementation("io.kotest:kotest-assertions-ktor:$kotest")
+   testImplementation("io.kotest:kotest-property:$kotest")
+   testImplementation("io.kotest:kotest-extensions-testcontainers:$kotest")
 }
 
 kotlin {
