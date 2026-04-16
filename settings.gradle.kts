@@ -100,14 +100,14 @@ dependencyResolutionManagement {
          library("jackson-datatype-jsr310","com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val testContainers = "1.21.4"
+         val testContainers = "2.0.4"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
-         library("testcontainers-postgresql", "org.testcontainers:postgresql:$testContainers")
-         library("testcontainers-rabbitmq", "org.testcontainers:rabbitmq:$testContainers")
-         library("testcontainers-elasticsearch", "org.testcontainers:elasticsearch:$testContainers")
-         library("testcontainers-mongodb", "org.testcontainers:mongodb:$testContainers")
-         library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
-         library("testcontainers-cassandra", "org.testcontainers:cassandra:$testContainers")
+         library("testcontainers-postgresql", "org.testcontainers:testcontainers-postgresql:$testContainers")
+         library("testcontainers-rabbitmq", "org.testcontainers:testcontainers-rabbitmq:$testContainers")
+         library("testcontainers-elasticsearch", "org.testcontainers:testcontainers-elasticsearch:$testContainers")
+         library("testcontainers-mongodb", "org.testcontainers:testcontainers-mongodb:$testContainers")
+         library("testcontainers-kafka", "org.testcontainers:testcontainers-kafka:$testContainers")
+         library("testcontainers-cassandra", "org.testcontainers:testcontainers-cassandra:$testContainers")
 
          val vertx = "5.0.10"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
