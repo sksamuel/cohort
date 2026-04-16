@@ -17,8 +17,9 @@ class RabbitConnectionHealthCheck(
       return runCatching {
          withTimeout(5.seconds) {
             runInterruptible(Dispatchers.IO) {
-               factory.newConnection()
-               HealthCheckResult.healthy("Connected to rabbit instance")
+               factory.newConnection().use {
+                  HealthCheckResult.healthy("Connected to rabbit instance")
+               }
             }
          }
       }.getOrElse {
