@@ -17,9 +17,9 @@ class MaxFileDescriptorsHealthCheck(private val requiredMaxDescriptors: Int) : H
   override val name: String = "max_file_descriptors"
 
   override suspend fun check(): HealthCheckResult {
-    val max = bean.maxFileDescriptorCount
-    val msg = "Max file descriptors $max [required at least $requiredMaxDescriptors]"
-    return if (max < requiredMaxDescriptors) {
+    val files = bean.maxFileDescriptorCount
+    val msg = "Max file descriptors $files [required at least $requiredMaxDescriptors]"
+    return if (files < requiredMaxDescriptors) {
       HealthCheckResult.healthy(msg)
     } else {
       HealthCheckResult.unhealthy(msg, null)

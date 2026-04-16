@@ -21,7 +21,7 @@ class RedisConnectionHealthCheck(
       if (it.ping()) {
          HealthCheckResult.healthy("Connected to redis cluster")
       } else {
-         HealthCheckResult.healthy("Ping to redis cluster failed")
+         HealthCheckResult.unhealthy("Ping to redis cluster failed", null)
       }
    },
    override val name: String = "redis",
@@ -37,7 +37,7 @@ class RedisConnectionHealthCheck(
             if (it.ping()) {
                HealthCheckResult.healthy("Connected to redis cluster")
             } else {
-               HealthCheckResult.healthy("Ping to redis cluster failed")
+               HealthCheckResult.unhealthy("Ping to redis cluster failed", null)
             }
          }
       ): RedisConnectionHealthCheck {
