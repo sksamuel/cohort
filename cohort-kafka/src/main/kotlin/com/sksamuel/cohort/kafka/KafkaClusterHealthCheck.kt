@@ -15,18 +15,20 @@ class KafkaClusterHealthCheck(
 ) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
-      return try {
-         val clusterResult = admin.describeCluster()
-         val controller = clusterResult.controller().toCompletionStage().await()
-         val nodes = clusterResult.nodes().toCompletionStage().await()
+      return withTimeout(5.seconds) {
+         try {
+            val clusterResult = admin.describeCluster()
+            val controller = clusterResult.controller().toCompletionStage().await()
+            val nodes = clusterResult.nodes().toCompletionStage().await()
 
-         when {
-            nodes.isEmpty() -> HealthCheckResult.unhealthy("Kafka cluster is showing no nodes", null)
-            controller == null -> HealthCheckResult.unhealthy("Kafka cluster returned without controller", null)
-            else -> HealthCheckResult.healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
+            when {
+               nodes.isEmpty() -> HealthCheckResult.unhealthy("Kafka cluster is showing no nodes", null)
+               controller == null -> HealthCheckResult.unhealthy("Kafka cluster returned without controller", null)
+               else -> HealthCheckResult.healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
+            }
+         } catch (t: Throwable) {
+            HealthCheckResult.unhealthy("Could not connect to kafka cluster", t)
          }
-      } catch (t: Throwable) {
-         HealthCheckResult.unhealthy("Could not connect to kafka cluster", t)
       }
    }
 }

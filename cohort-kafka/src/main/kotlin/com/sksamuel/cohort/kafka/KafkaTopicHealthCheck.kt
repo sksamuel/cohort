@@ -15,15 +15,16 @@ class KafkaTopicHealthCheck(
 ) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
+      return withTimeout(5.seconds) {
+         val descriptionMap = runCatching {
+            admin.describeTopics(listOf(topic)).allTopicNames().toCompletionStage().await()
+         }.getOrElse { emptyMap() }
 
-      val descriptionMap = runCatching {
-         admin.describeTopics(listOf(topic)).allTopicNames().toCompletionStage().await()
-      }.getOrElse { emptyMap() }
-
-      val topicDescription = descriptionMap[topic]
-      return if (topicDescription == null)
-         HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", null)
-      else
-         HealthCheckResult.healthy("Kafka topic $topicDescription confirmed (${topicDescription.partitions().size} partitions)")
+         val topicDescription = descriptionMap[topic]
+         if (topicDescription == null)
+            HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", null)
+         else
+            HealthCheckResult.healthy("Kafka topic $topicDescription confirmed (${topicDescription.partitions().size} partitions)")
+      }
    }
 }

@@ -26,8 +26,10 @@ class ElasticClusterHealthCheck(
   override suspend fun check(): HealthCheckResult {
     return runCatching {
 
-      val health = withContext(Dispatchers.IO) {
-        client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
+      val health = withTimeout(5.seconds) {
+        withContext(Dispatchers.IO) {
+          client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
+        }
       }
 
       val status = health.status

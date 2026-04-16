@@ -38,7 +38,9 @@ class RedisHealthCheck<K, V>(
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {
-         command(conn)
+         withTimeout(5.seconds) {
+            command(conn)
+         }
          HealthCheckResult.healthy("Redis command successful")
       }.getOrElse { HealthCheckResult.unhealthy("Redis command failure", it) }
    }
