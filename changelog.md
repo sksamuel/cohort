@@ -1,5 +1,7 @@
 # Changelog
 
+## Changelog updates have moved to the [releases](https://github.com/sksamuel/cohort/releases) page.
+
 ### 2.8.0 (August 2025)
 
 * Updated Ktor support for 3.2.x
