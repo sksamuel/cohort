@@ -6,4 +6,5 @@ plugins {
 dependencies {
    implementation(projects.cohortApi)
    implementation(libs.kafka.client)
+   testImplementation(libs.mockk)
 }
