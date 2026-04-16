@@ -39,6 +39,7 @@ class HealthCheckRegistry(
 
    var startUnhealthy: Boolean = true
    var logUnhealthy: Boolean = true
+   var checkTimeout: Duration = 10.seconds
 
    init {
       Runtime.getRuntime().addShutdownHook(Thread {
@@ -183,7 +184,9 @@ class HealthCheckRegistry(
    private suspend fun run(name: String) {
       val check = checks[name] ?: return
       try {
-         val result = check.check()
+         val result = withTimeout(checkTimeout) {
+            check.check()
+         }
          notifySubscribers(name, check, result)
          notifyListeners(name, result)
          when (result.status) {
@@ -270,6 +273,9 @@ class HealthCheckRegistry(
    override fun close() {
       scope.cancel()
       scheduler.shutdown()
+      runCatching {
+         scheduler.awaitTermination(5, TimeUnit.SECONDS)
+      }
    }
 }
 
