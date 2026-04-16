@@ -53,7 +53,7 @@ class RedisClusterHealthCheck(
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
          runCatching {
-            jedis.use { command(it) }
+            command(jedis)
          }.getOrElse {
             HealthCheckResult.unhealthy("Could not connect to redis cluster", it)
          }
