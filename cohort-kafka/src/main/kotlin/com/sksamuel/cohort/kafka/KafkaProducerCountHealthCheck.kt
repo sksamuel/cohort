@@ -19,7 +19,7 @@ class KafkaProducerCountHealthCheck(
 
    private val metricName = "record-send-total"
 
-   private var lastTotal: Long = -1
+   @Volatile private var lastTotal: Long = -1
 
    override suspend fun check(): HealthCheckResult {
 

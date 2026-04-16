@@ -26,16 +26,17 @@ class KafkaConsumerRecordsConsumedHealthCheck(
    }
 
    private val metricName = "records-consumed-total"
-   private var lastTotal = 0L
+   @Volatile private var lastTotal = 0L
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->
          val total = metric.metricValue().toString().toDoubleOrNull()?.roundToLong() ?: 0L
-         val diff = lastTotal - total
+         val diff = total - lastTotal
+         lastTotal = total
          val msg = "Kafka consumer $metricName total=$total diff=$diff [minRecords $minRecords]"
          return when {
             total == 0L -> HealthCheckResult.healthy(msg)
-            total < minRecords -> HealthCheckResult.unhealthy(msg, null)
+            diff < minRecords -> HealthCheckResult.unhealthy(msg, null)
             else -> HealthCheckResult.healthy(msg)
          }
       }.fold({ it }, { it })

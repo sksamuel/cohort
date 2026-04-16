@@ -19,17 +19,17 @@ class TcpHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {
-         val socket = Socket()
-         val start = System.currentTimeMillis()
-         socket.connect(InetSocketAddress(host, port), connectionTimeout.inWholeMilliseconds.toInt())
-         val time = (System.currentTimeMillis() - start).milliseconds
-         if (socket.isConnected) {
-            withContext(Dispatchers.IO) {
-               socket.close()
+         withContext(Dispatchers.IO) {
+            Socket().use { socket ->
+               val start = System.currentTimeMillis()
+               socket.connect(InetSocketAddress(host, port), connectionTimeout.inWholeMilliseconds.toInt())
+               val time = (System.currentTimeMillis() - start).milliseconds
+               if (socket.isConnected) {
+                  HealthCheckResult.healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
+               } else {
+                  HealthCheckResult.unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
+               }
             }
-            HealthCheckResult.healthy("Connected to $host:$port after ${time.inWholeMilliseconds}ms")
-         } else {
-            HealthCheckResult.unhealthy("Connection to $host:$port timed out after $connectionTimeout", null)
          }
       }.getOrElse { HealthCheckResult.unhealthy("Connection to $host:$port failed", it) }
    }
