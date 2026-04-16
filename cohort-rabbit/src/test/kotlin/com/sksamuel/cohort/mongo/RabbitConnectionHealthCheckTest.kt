@@ -1,5 +1,6 @@
 package com.sksamuel.cohort.mongo
 
+import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.sksamuel.cohort.HealthCheckResult
 import com.sksamuel.cohort.rabbit.RabbitConnectionHealthCheck
@@ -32,4 +33,21 @@ class RabbitConnectionHealthCheckTest : FunSpec({
       .message.shouldBe("Could not connect to rabbit instance")
   }
 
+  test("connection is closed after a successful check") {
+    val createdConnections = mutableListOf<Connection>()
+
+    val trackingFactory = object : ConnectionFactory() {
+      override fun newConnection(): Connection {
+        return super.newConnection().also { createdConnections += it }
+      }
+    }.apply {
+      host = container.host
+      port = container.amqpPort
+    }
+
+    RabbitConnectionHealthCheck(trackingFactory).check()
+
+    createdConnections.size shouldBe 1
+    createdConnections[0].isOpen shouldBe false
+  }
 })
