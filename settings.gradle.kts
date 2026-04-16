@@ -109,7 +109,7 @@ dependencyResolutionManagement {
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
          library("testcontainers-cassandra", "org.testcontainers:cassandra:$testContainers")
 
-         val vertx = "4.5.12"
+         val vertx = "4.5.26"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
          library("vertx-web", "io.vertx:vertx-web:$vertx")
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
