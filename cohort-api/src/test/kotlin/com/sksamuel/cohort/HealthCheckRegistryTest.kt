@@ -84,4 +84,18 @@ class HealthCheckRegistryTest : FunSpec({
          }
       }
    }
+
+   test("health check should timeout") {
+      val reg = HealthCheckRegistry {
+         checkTimeout = 100.milliseconds
+         register("timeout", {
+            delay(500.milliseconds)
+            HealthCheckResult.healthy("ok")
+         }, 1.milliseconds, 1.milliseconds)
+      }
+      eventually(1.seconds) {
+         reg.status().healthchecks["timeout"]?.result?.status shouldBe HealthStatus.Unhealthy
+         reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout failed due to kotlinx.coroutines.TimeoutCancellationException"
+      }
+   }
 })
