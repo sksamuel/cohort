@@ -41,10 +41,10 @@ dependencyResolutionManagement {
          val micrometer = "1.16.5"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
-         val hikari = "6.3.3"
+         val hikari = "7.0.2"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
-         val flyway = "11.3.2"
+         val flyway = "12.4.0"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
          val kafka = "4.2.0"
@@ -53,15 +53,15 @@ dependencyResolutionManagement {
          val lettuce = "7.5.1.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
-         val liquibase = "4.31.1"
+         val liquibase = "5.0.2"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
-         val jedis = "5.2.0"
+         val jedis = "7.4.1"
          library("jedis", "redis.clients:jedis:$jedis")
 
          library("rabbitmq", "com.rabbitmq:amqp-client:5.30.0")
-         library("dbcp2", "org.apache.commons:commons-dbcp2:2.13.0")
-         library("pulsar-client", "org.apache.pulsar:pulsar-client:4.0.4")
+         library("dbcp2", "org.apache.commons:commons-dbcp2:2.14.0")
+         library("pulsar-client", "org.apache.pulsar:pulsar-client:4.2.0")
 
          val mongo = "5.3.0"
          library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:$mongo")
@@ -109,17 +109,17 @@ dependencyResolutionManagement {
          library("testcontainers-kafka", "org.testcontainers:kafka:$testContainers")
          library("testcontainers-cassandra", "org.testcontainers:cassandra:$testContainers")
 
-         val vertx = "4.5.26"
+         val vertx = "5.0.10"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
          library("vertx-web", "io.vertx:vertx-web:$vertx")
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")
          library("vertx-coroutines", "io.vertx:vertx-lang-kotlin-coroutines:$vertx")
          library("vertx-micrometer", "io.vertx:vertx-micrometer-metrics:$vertx")
 
-         val cassandra = "4.19.1"
+         val cassandra = "4.19.2"
          library("cassandra", "org.apache.cassandra:java-driver-core:$cassandra")
 
-         val mockk = "1.14.3"
+         val mockk = "1.14.9"
          library("mockk", "io.mockk:mockk:$mockk")
       }
    }
