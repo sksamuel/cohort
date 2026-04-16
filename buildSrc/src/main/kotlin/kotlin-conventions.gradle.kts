@@ -25,7 +25,7 @@ dependencies {
 
    implementation("com.sksamuel.tabby:tabby-fp:2.2.12")
 
-   val kotest = "6.1.4"
+   val kotest = "6.1.11"
    testImplementation("io.kotest:kotest-runner-junit5:$kotest")
    testImplementation("io.kotest:kotest-assertions-core:$kotest")
    testImplementation("io.kotest:kotest-assertions-json:$kotest")
