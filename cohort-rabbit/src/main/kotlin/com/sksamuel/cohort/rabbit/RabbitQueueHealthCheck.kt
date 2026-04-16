@@ -24,10 +24,12 @@ class RabbitQueueHealthCheck(
       return runCatching {
          withTimeout(5.seconds) {
             runInterruptible(Dispatchers.IO) {
-               val conn = factory.newConnection()
-               val channel = conn.createChannel()
-               channel.queueDeclarePassive(queue)
-               HealthCheckResult.healthy("Confirmed connection to RabbitMQ queue $queue")
+               factory.newConnection().use { conn ->
+                  conn.createChannel().use { channel ->
+                     channel.queueDeclarePassive(queue)
+                     HealthCheckResult.healthy("Confirmed connection to RabbitMQ queue $queue")
+                  }
+               }
             }
          }
       }.getOrElse {
