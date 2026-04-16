@@ -38,8 +38,8 @@ kotlin {
    jvmToolchain(11)
    compilerOptions {
       jvmTarget.set(JvmTarget.JVM_11)
-      apiVersion.set(KotlinVersion.KOTLIN_2_1)
-      languageVersion.set(KotlinVersion.KOTLIN_2_1)
+      apiVersion.set(KotlinVersion.KOTLIN_2_3)
+      languageVersion.set(KotlinVersion.KOTLIN_2_3)
    }
 }
 
