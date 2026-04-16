@@ -47,6 +47,7 @@ tasks.test {
    useJUnitPlatform()
    filter {
       isFailOnNoMatchingTests = false
+      failOnNoDiscoveredTests = false
    }
    testLogging {
       showExceptions = true
