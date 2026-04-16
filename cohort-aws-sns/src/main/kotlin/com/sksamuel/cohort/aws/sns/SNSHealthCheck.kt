@@ -11,17 +11,17 @@ import com.sksamuel.tabby.results.flatMap
  * A Cohort [HealthCheck] that checks for connectivity to an AWS SNS by listing topics.
  */
 class SNSHealthCheck(
-   val createClient: () -> AmazonSNS = { AmazonSNSClient.builder().build() },
+   private val client: AmazonSNS,
    override val name: String = "aws_sns_topic",
 ) : HealthCheck {
 
-   private fun use(client: AmazonSNS): Result<ListTopicsResult> {
-      return runCatching { client.listTopics() }.also { client.shutdown() }
-   }
+   constructor(
+      createClient: () -> AmazonSNS = { AmazonSNSClient.builder().build() },
+      name: String = "aws_sns_topic",
+   ) : this(createClient(), name)
 
    override suspend fun check(): HealthCheckResult {
-      return runCatching { createClient() }
-         .flatMap { use(it) }
+      return runCatching { client.listTopics() }
          .fold(
             { HealthCheckResult.healthy("SNS access confirmed") },
             { HealthCheckResult.unhealthy("Could not connect to SNS", it) }

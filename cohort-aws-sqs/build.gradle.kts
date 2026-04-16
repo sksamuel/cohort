@@ -6,4 +6,5 @@ plugins {
 dependencies {
    implementation(projects.cohortApi)
    api(libs.aws.java.sdk.sqs)
+   testImplementation(libs.mockk)
 }

@@ -15,24 +15,24 @@ import kotlinx.coroutines.runInterruptible
  */
 class S3ReadBucketHealthCheck(
    private val bucketName: String,
-   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
+   private val client: AmazonS3,
    override val name: String = "aws_s3_bucket",
 ) : HealthCheck {
 
-   private suspend fun use(client: AmazonS3): Result<HeadBucketResult> {
+   constructor(
+      bucketName: String,
+      createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
+      name: String = "aws_s3_bucket",
+   ) : this(bucketName, createClient(), name)
+
+   override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
          runCatching {
             client.headBucket(HeadBucketRequest(bucketName))
          }
-      }.also { client.shutdown() }
-   }
-
-   override suspend fun check(): HealthCheckResult {
-      return runCatching { createClient() }
-         .flatMap { use(it) }
-         .fold(
-            { HealthCheckResult.healthy("Connected to bucket $bucketName") },
-            { HealthCheckResult.unhealthy("Could not connect to bucket $bucketName", it) }
-         )
+      }.fold(
+         { HealthCheckResult.healthy("Connected to bucket $bucketName") },
+         { HealthCheckResult.unhealthy("Could not connect to bucket $bucketName", it) }
+      )
    }
 }

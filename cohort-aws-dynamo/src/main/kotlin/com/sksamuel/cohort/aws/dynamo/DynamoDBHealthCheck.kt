@@ -12,20 +12,19 @@ import kotlinx.coroutines.runInterruptible
  * by connecting and requesting to list the tables (limit of 1).
  */
 class DynamoDBHealthCheck(
-   val createClient: () -> AmazonDynamoDB = { AmazonDynamoDBClient.builder().build() },
+   private val client: AmazonDynamoDB,
    override val name: String = "aws_dynamodb",
 ) : HealthCheck {
 
-   private fun <T> AmazonDynamoDB.use(f: (AmazonDynamoDB) -> T): Result<T> {
-      val result = runCatching { f(this) }
-      this.shutdown()
-      return result
-   }
+   constructor(
+      createClient: () -> AmazonDynamoDB = { AmazonDynamoDBClient.builder().build() },
+      name: String = "aws_dynamodb",
+   ) : this(createClient(), name)
 
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
-         createClient().use {
-            it.listTables(1)
+         runCatching {
+            client.listTables(1)
          }
       }.fold(
          { HealthCheckResult.healthy("DynamoDB access successful") },

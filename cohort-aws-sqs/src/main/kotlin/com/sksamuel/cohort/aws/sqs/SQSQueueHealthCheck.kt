@@ -12,17 +12,18 @@ import com.sksamuel.tabby.results.flatMap
  */
 class SQSQueueHealthCheck(
    private val queue: String,
-   val createClient: () -> AmazonSQS = { AmazonSQSClient.builder().build() },
+   private val client: AmazonSQS,
    override val name: String = "aws_sqs_queue",
 ) : HealthCheck {
 
-   private fun use(client: AmazonSQS): Result<GetQueueUrlResult> {
-      return runCatching { client.getQueueUrl(queue) }.also { client.shutdown() }
-   }
+   constructor(
+      queue: String,
+      createClient: () -> AmazonSQS = { AmazonSQSClient.builder().build() },
+      name: String = "aws_sqs_queue",
+   ) : this(queue, createClient(), name)
 
    override suspend fun check(): HealthCheckResult {
-      return runCatching { createClient() }
-         .flatMap { use(it) }
+      return runCatching { client.getQueueUrl(queue) }
          .fold(
             { HealthCheckResult.healthy("SQS queue access confirmed $queue") },
             { HealthCheckResult.unhealthy("Could not connect to SQS queue $queue", it) }

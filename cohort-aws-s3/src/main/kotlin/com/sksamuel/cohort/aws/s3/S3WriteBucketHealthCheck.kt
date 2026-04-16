@@ -14,26 +14,29 @@ import kotlin.random.Random
  */
 class S3WriteBucketHealthCheck(
    private val bucketName: String,
-   val createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
+   private val client: AmazonS3,
    override val name: String = "aws_s3_bucket_write"
 ) : HealthCheck {
 
-   private suspend fun use(client: AmazonS3): Result<Unit> {
+   constructor(
+      bucketName: String,
+      createClient: () -> AmazonS3 = { AmazonS3Client.builder().build() },
+      name: String = "aws_s3_bucket_write"
+   ) : this(bucketName, createClient(), name)
+
+   override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
          runCatching {
             val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
-            client.putObject(bucketName, key, "test")
-            client.deleteObject(bucketName, key)
+            try {
+               client.putObject(bucketName, key, "test")
+            } finally {
+               runCatching { client.deleteObject(bucketName, key) }
+            }
          }
-      }.also { client.shutdown() }
-   }
-
-   override suspend fun check(): HealthCheckResult {
-      return runCatching { createClient() }
-         .flatMap { use(it) }
-         .fold(
-            { HealthCheckResult.healthy("Put operation to bucket $bucketName successful") },
-            { HealthCheckResult.unhealthy("Could not write to bucket $bucketName", it) }
-         )
+      }.fold(
+         { HealthCheckResult.healthy("Put operation to bucket $bucketName successful") },
+         { HealthCheckResult.unhealthy("Could not write to bucket $bucketName", it) }
+      )
    }
 }
