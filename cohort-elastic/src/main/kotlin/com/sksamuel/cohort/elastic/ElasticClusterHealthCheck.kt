@@ -22,14 +22,11 @@ class ElasticClusterHealthCheck(
   private val errorOnYellow: Boolean = false,
   override val name: String = "elastic_cluster_health",
 ) : HealthCheck {
-
-  override suspend fun check(): HealthCheckResult {
-    return runCatching {
-
-      val health = withContext(Dispatchers.IO) {
-        client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
-      }
-
+override suspend fun check(): HealthCheckResult {
+  return runCatching {
+    runInterruptible(Dispatchers.IO) {
+      client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
+    }.let { health ->
       val status = health.status
       val msg = "Elastic cluster is ${status.name}"
       when (status) {
@@ -40,9 +37,8 @@ class ElasticClusterHealthCheck(
           true -> HealthCheckResult.unhealthy(msg, null)
         }
       }
-
-    }.getOrElse {
-      HealthCheckResult.unhealthy("Error connecting to elastic", it)
     }
+  }.getOrElse {
+    HealthCheckResult.unhealthy("Error connecting to elastic", it)
   }
 }
