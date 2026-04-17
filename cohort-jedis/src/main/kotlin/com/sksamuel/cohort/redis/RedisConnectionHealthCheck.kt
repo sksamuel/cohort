@@ -50,7 +50,7 @@ class RedisConnectionHealthCheck(
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
          runCatching {
-            jedis.connection.use { command(it) }
+            command(jedis.connection)
          }.getOrElse {
             HealthCheckResult.unhealthy("Could not connect to Redis", it)
          }
