@@ -191,10 +191,9 @@ fun Router.cohort(cohort: CohortConfiguration) {
                )
             }
 
-            when (status.healthy) {
-               true -> context.json(results)
-               false -> context.response().setStatusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.code()).end()
-            }
+            val httpStatus = if (status.healthy) HttpResponseStatus.OK else HttpResponseStatus.SERVICE_UNAVAILABLE
+            context.response().setStatusCode(httpStatus.code())
+            context.json(results)
          }
    }
 }
