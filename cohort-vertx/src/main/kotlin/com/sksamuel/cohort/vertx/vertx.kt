@@ -191,8 +191,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
                )
             }
 
-            registry.logUnhealthy
-
             val httpStatus = if (status.healthy) HttpResponseStatus.OK else HttpResponseStatus.SERVICE_UNAVAILABLE
             context.response().setStatusCode(httpStatus.code())
             context.json(results)
