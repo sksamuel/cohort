@@ -18,9 +18,9 @@ import kotlin.time.TimeSource
 class GarbageCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
 
   private val beans = ManagementFactory.getGarbageCollectorMXBeans()
-  private var lastTime = 0L
+  @Volatile private var lastTime = 0L
   private val source = TimeSource.Monotonic
-  private var lastMark: TimeMark? = null
+  @Volatile private var lastMark: TimeMark? = null
 
   override val name: String = "garbage_collection_time"
 
@@ -34,7 +34,7 @@ class GarbageCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
     val elapsed = lastMark?.elapsedNow()?.inWholeMilliseconds
     lastMark = source.markNow()
 
-    return if (elapsed == null) {
+    return if (elapsed == null || elapsed == 0L) {
       HealthCheckResult.healthy("GC Collection time was 0%")
     } else {
       val pc = (timeDiff / elapsed.toDouble()).roundToInt()
