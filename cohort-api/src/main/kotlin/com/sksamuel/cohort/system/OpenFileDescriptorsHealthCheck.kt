@@ -18,7 +18,7 @@ class OpenFileDescriptorsHealthCheck(private val maxOpenFileDescriptors: Int) : 
 
   override suspend fun check(): HealthCheckResult {
     val open = bean.openFileDescriptorCount
-    return if (open < maxOpenFileDescriptors) {
+    return if (open <= maxOpenFileDescriptors) {
       HealthCheckResult.healthy("Open file descriptor count within threshold [$open <= $maxOpenFileDescriptors]")
     } else {
       HealthCheckResult.unhealthy("Open file descriptors count above threshold [$open > $maxOpenFileDescriptors]", null)
