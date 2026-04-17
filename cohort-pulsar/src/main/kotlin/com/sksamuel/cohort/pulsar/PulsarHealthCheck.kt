@@ -19,7 +19,7 @@ class PulsarHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {
-         client.bookies()
+         client.clusters().getClusters()
          HealthCheckResult.healthy("Connected to Pulsar")
       }.getOrElse { HealthCheckResult.unhealthy("Could not connect to Pulsar", it) }
    }

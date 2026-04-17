@@ -10,11 +10,11 @@ import java.lang.management.MemoryPoolMXBean
  *
  * The check is considered healthy if the amount of free memory is above [minFreeBytes].
  */
-class FreememHealthCheck(private val minFreeBytes: Int) : HealthCheck {
+class FreememHealthCheck(private val minFreeBytes: Long) : HealthCheck {
 
   companion object {
-    fun mb(mb: Int) = FreememHealthCheck(mb * 1024 * 1024)
-    fun gb(gb: Int) = FreememHealthCheck(gb * 1024 * 1024 * 1024)
+    fun mb(mb: Int) = FreememHealthCheck(mb.toLong() * 1024L * 1024L)
+    fun gb(gb: Int) = FreememHealthCheck(gb.toLong() * 1024L * 1024L * 1024L)
   }
 
   override val name: String = "free_mem"
