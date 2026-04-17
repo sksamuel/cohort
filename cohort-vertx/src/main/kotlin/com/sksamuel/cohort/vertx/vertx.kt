@@ -191,8 +191,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
                )
             }
 
-            registry.logUnhealthy
-
             when (status.healthy) {
                true -> context.json(results)
                false -> context.response().setStatusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.code()).end()
