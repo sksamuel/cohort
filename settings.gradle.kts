@@ -100,7 +100,7 @@ dependencyResolutionManagement {
          library("jackson-datatype-jsr310","com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
          library("jackson-module-kotlin", "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
 
-         val testContainers = "2.0.4"
+         val testContainers = "2.0.5"
          library("testcontainers", "org.testcontainers:testcontainers:$testContainers")
          library("testcontainers-postgresql", "org.testcontainers:testcontainers-postgresql:$testContainers")
          library("testcontainers-rabbitmq", "org.testcontainers:testcontainers-rabbitmq:$testContainers")
