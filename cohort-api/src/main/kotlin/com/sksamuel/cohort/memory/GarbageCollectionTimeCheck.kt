@@ -37,7 +37,7 @@ class GarbageCollectionTimeCheck(private val maxGcTime: Int) : HealthCheck {
     return if (elapsed == null || elapsed == 0L) {
       HealthCheckResult.healthy("GC Collection time was 0%")
     } else {
-      val pc = (timeDiff / elapsed.toDouble()).roundToInt()
+      val pc = (timeDiff / elapsed.toDouble() * 100).roundToInt()
       val message = "GC Collection time was ${timeDiff}ms / $pc% [Max is $maxGcTime%]"
       if (pc <= maxGcTime) {
         HealthCheckResult.healthy(message)
