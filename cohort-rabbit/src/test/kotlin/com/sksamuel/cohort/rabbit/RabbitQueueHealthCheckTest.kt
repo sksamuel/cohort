@@ -22,10 +22,12 @@ class RabbitQueueHealthCheckTest : FunSpec({
    }
 
    beforeSpec {
-      // Create the queue used in the healthy tests
+      // Create the queue used in the healthy tests.
+      // Declared as durable because RabbitMQ 4.0+ rejects transient non-exclusive queues
+      // (feature `transient_nonexcl_queues` is deprecated).
       factory().newConnection().use { conn ->
          conn.createChannel().use { ch ->
-            ch.queueDeclare("test-queue", false, false, false, null)
+            ch.queueDeclare("test-queue", true, false, false, null)
          }
       }
    }
