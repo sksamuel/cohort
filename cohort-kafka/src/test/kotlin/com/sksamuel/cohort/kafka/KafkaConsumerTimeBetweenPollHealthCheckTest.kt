@@ -1,70 +1,45 @@
-//package com.sksamuel.cohort.kafka
-//
-//import com.sksamuel.cohort.HealthStatus
-//import io.kotest.assertions.nondeterministic.continually
-//import io.kotest.assertions.nondeterministic.eventually
-//import io.kotest.assertions.withClue
-//import io.kotest.core.extensions.install
-//import io.kotest.core.spec.style.FunSpec
-//import io.kotest.extensions.testcontainers.kafka.KafkaContainerExtension
-//import io.kotest.extensions.testcontainers.kafka.admin
-//import io.kotest.extensions.testcontainers.kafka.consumer
-//import io.kotest.extensions.testcontainers.kafka.producer
-//import io.kotest.matchers.shouldBe
-//import kotlinx.coroutines.delay
-//import kotlinx.coroutines.isActive
-//import kotlinx.coroutines.launch
-//import org.apache.kafka.clients.admin.NewTopic
-//import org.apache.kafka.clients.producer.ProducerRecord
-//import org.apache.kafka.common.utils.Bytes
-//import org.testcontainers.containers.KafkaContainer
-//import org.testcontainers.utility.DockerImageName
-//import java.time.Duration
-//import kotlin.time.Duration.Companion.milliseconds
-//import kotlin.time.Duration.Companion.seconds
-//
-//class KafkaConsumerTimeBetweenPollHealthCheckTest : FunSpec({
-//
-//   val kafka = install(KafkaContainerExtension(KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka"))))
-//
-//   test("health check should pass while consumer has not yet consumed") {
-//
-//      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic1", 1, 1))).all().get() }
-//      val consumer = kafka.consumer()
-//      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 1)
-//      continually(5.seconds) {
-//         healthcheck.check().status shouldBe HealthStatus.Healthy
-//         delay(250.milliseconds)
-//      }
-//   }
-//
-//   test("health check should pass while rate is above threshold") {
-//
-//      kafka.admin().use { it.createTopics(listOf(NewTopic("mytopic2", 1, 1))).all().get() }
-//
-//      val producer = kafka.producer()
-//      val consumer = kafka.consumer()
-//      consumer.subscribe(listOf("mytopic2"))
-//
-//      val job = launch {
-//         while (isActive) {
-//            delay(10)
-//            producer.send(ProducerRecord("mytopic2", Bytes.wrap(byteArrayOf()), Bytes.wrap(byteArrayOf())))
-//         }
-//      }
-//
-//      val healthcheck = KafkaConsumerTimeBetweenPollHealthCheck(consumer, 200)
-//      eventually(5.seconds) {
-//         consumer.poll(Duration.ofMillis(100))
-//         val result = healthcheck.check()
-//         withClue(result) {
-//            result.status shouldBe HealthStatus.Healthy
-//         }
-//         delay(250.milliseconds)
-//      }
-//
-//      job.cancel()
-//      producer.close()
-//      consumer.close()
-//   }
-//})
+package com.sksamuel.cohort.kafka
+
+import com.sksamuel.cohort.HealthStatus
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.common.Metric
+import org.apache.kafka.common.MetricName
+
+class KafkaConsumerTimeBetweenPollHealthCheckTest : FunSpec({
+
+   fun consumer(timeBetweenPollMs: Double): Consumer<*, *> {
+      val consumer = mockk<Consumer<*, *>>()
+      val metricName = MetricName("time-between-poll-avg", "consumer-fetch-manager-metrics", "", emptyMap())
+      val metric = mockk<Metric>()
+      every { metric.metricName() } returns metricName
+      every { metric.metricValue() } returns timeBetweenPollMs
+      every { consumer.metrics() } returns mapOf(metricName to metric)
+      return consumer
+   }
+
+   test("returns healthy when time is zero (consumer not yet polling)") {
+      KafkaConsumerTimeBetweenPollHealthCheck(consumer(0.0), maxThreshold = 5000L)
+         .check().status shouldBe HealthStatus.Healthy
+   }
+
+   test("returns healthy when time between polls is well below threshold") {
+      // Polling every 100ms is well under the 5000ms stall threshold
+      KafkaConsumerTimeBetweenPollHealthCheck(consumer(100.0), maxThreshold = 5000L)
+         .check().status shouldBe HealthStatus.Healthy
+   }
+
+   test("returns unhealthy when time between polls exceeds threshold") {
+      // 10 seconds between polls with a 5000ms threshold — consumer is stalled
+      KafkaConsumerTimeBetweenPollHealthCheck(consumer(10000.0), maxThreshold = 5000L)
+         .check().status shouldBe HealthStatus.Unhealthy
+   }
+
+   test("returns healthy when time between polls exactly equals threshold") {
+      KafkaConsumerTimeBetweenPollHealthCheck(consumer(5000.0), maxThreshold = 5000L)
+         .check().status shouldBe HealthStatus.Healthy
+   }
+})
