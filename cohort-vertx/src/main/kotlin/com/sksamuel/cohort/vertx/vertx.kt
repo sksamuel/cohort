@@ -129,7 +129,7 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.threadDump) {
       val endpoint = "${cohort.endpointPrefix}/threaddump"
-      logger.debug("Deploying operatingSystem endpoint at $endpoint")
+      logger.debug("Deploying threadDump endpoint at $endpoint")
       router.get(endpoint)
          .consumes("*")
          .produces("*")
@@ -143,7 +143,7 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.sysprops) {
       val endpoint = "${cohort.endpointPrefix}/sysprops"
-      logger.debug("Deploying operatingSystem endpoint at $endpoint")
+      logger.debug("Deploying sysprops endpoint at $endpoint")
       router.get(endpoint)
          .consumes("*")
          .produces("*")
