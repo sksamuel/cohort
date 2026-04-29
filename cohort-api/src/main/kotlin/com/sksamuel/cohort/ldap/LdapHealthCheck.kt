@@ -2,6 +2,8 @@ package com.sksamuel.cohort.ldap
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import java.util.Hashtable
 import javax.naming.directory.InitialDirContext
 
@@ -25,8 +27,10 @@ class LdapHealthCheck(
       val table = Hashtable<String, String>()
       environment.forEach { (key, value) -> table[key] = value }
 
-      val context = InitialDirContext(table)
-      context.close()
+      runInterruptible(Dispatchers.IO) {
+         val context = InitialDirContext(table)
+         context.close()
+      }
 
       HealthCheckResult.healthy("LDAP connection success")
    }.getOrElse { HealthCheckResult.unhealthy("LDAP Failure", it) }
