@@ -2,6 +2,8 @@ package com.sksamuel.cohort.db
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import javax.sql.DataSource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -22,13 +24,15 @@ class DatabaseConnectionHealthCheck(
 ) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult = runCatching {
-      ds.connection.use { conn ->
-         if (!conn.isValid(timeout.inWholeSeconds.toInt())) {
-            return@use HealthCheckResult.unhealthy("Connection is invalid")
+      runInterruptible(Dispatchers.IO) {
+         ds.connection.use { conn ->
+            if (!conn.isValid(timeout.inWholeSeconds.toInt())) {
+               return@use HealthCheckResult.unhealthy("Connection is invalid")
+            }
+            if (query != null)
+               conn.createStatement().use { it.execute(query) }
+            HealthCheckResult.healthy("Connected to database successfully")
          }
-         if (query != null)
-            conn.createStatement().use { it.execute(query) }
-         HealthCheckResult.healthy("Connected to database successfully")
       }
    }.getOrElse { HealthCheckResult.unhealthy("Unable to connect to the database", it) }
 }
