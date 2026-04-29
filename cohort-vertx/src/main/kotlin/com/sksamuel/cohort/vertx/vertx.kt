@@ -83,7 +83,7 @@ fun Router.cohort(cohort: CohortConfiguration) {
             runCatching {
                val levels = manager.levels()
                val loggers = manager.loggers()
-               LogInfo(levels, loggers).toJson()
+               LogInfo(levels, loggers)
             }.fold(
                { context.json(it) },
                { context.response().setStatusCode(500).end() },
