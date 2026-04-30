@@ -107,7 +107,7 @@ class HealthCheckRegistry(
     */
    @Deprecated(
       "Use register(check, initialDelay, checkInterval) to be explicit",
-      ReplaceWith("register(check.name, check, delay, delay)")
+      ReplaceWith("register(check, delay, delay)")
    )
    fun register(
       check: HealthCheck,
