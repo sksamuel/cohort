@@ -6,10 +6,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.binder.MeterBinder
+import java.util.concurrent.ConcurrentHashMap
 
 class CohortMetrics(private val healthCheckRegistry: HealthCheckRegistry) : MeterBinder {
 
-   private val counters = mutableMapOf<Pair<String, HealthStatus>, Counter>()
+   private val counters = ConcurrentHashMap<Pair<String, HealthStatus>, Counter>()
    private val tags = mutableSetOf<Tag>()
 
    /**
@@ -21,7 +22,7 @@ class CohortMetrics(private val healthCheckRegistry: HealthCheckRegistry) : Mete
 
    override fun bindTo(registry: MeterRegistry) {
       healthCheckRegistry.addSubscriber { name, check, result ->
-         val counter = counters.getOrPut(Pair(name, result.status)) {
+         val counter = counters.computeIfAbsent(Pair(name, result.status)) {
             Counter.builder("cohort.healthcheck")
                .tag("name", name)
                .tag("type", check::class.java.name)
