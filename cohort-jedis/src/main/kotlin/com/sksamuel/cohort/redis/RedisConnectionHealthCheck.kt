@@ -19,9 +19,9 @@ class RedisConnectionHealthCheck(
    private val jedis: Jedis,
    private val command: (Connection) -> HealthCheckResult = {
       if (it.ping()) {
-         HealthCheckResult.healthy("Connected to redis cluster")
+         HealthCheckResult.healthy("Connected to Redis")
       } else {
-         HealthCheckResult.unhealthy("Ping to redis cluster failed", null)
+         HealthCheckResult.unhealthy("Ping to Redis failed", null)
       }
    },
    override val name: String = "redis",
@@ -35,9 +35,9 @@ class RedisConnectionHealthCheck(
          tls: Boolean,
          command: (Connection) -> HealthCheckResult = {
             if (it.ping()) {
-               HealthCheckResult.healthy("Connected to redis cluster")
+               HealthCheckResult.healthy("Connected to Redis")
             } else {
-               HealthCheckResult.unhealthy("Ping to redis cluster failed", null)
+               HealthCheckResult.unhealthy("Ping to Redis failed", null)
             }
          }
       ): RedisConnectionHealthCheck {
