@@ -27,7 +27,6 @@ class HealthCheckRegistry(
 
    private val scope = CoroutineScope(dispatcher)
    private val scheduler = Executors.newScheduledThreadPool(1, NamedThreadFactory("cohort-healthcheck-scheduler"))
-   private val names = mutableSetOf<String>()
 
    private val checks = ConcurrentHashMap<String, HealthCheck>()
    private val statuses = ConcurrentHashMap<String, HealthCheckStatus>()
