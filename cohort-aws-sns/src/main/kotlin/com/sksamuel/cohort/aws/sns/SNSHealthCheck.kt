@@ -6,6 +6,8 @@ import com.amazonaws.services.sns.model.ListTopicsResult
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import com.sksamuel.tabby.results.flatMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 
 /**
  * A Cohort [HealthCheck] that checks for connectivity to an AWS SNS by listing topics.
@@ -15,8 +17,10 @@ class SNSHealthCheck(
    override val name: String = "aws_sns_topic",
 ) : HealthCheck {
 
-   private fun use(client: AmazonSNS): Result<ListTopicsResult> {
-      return runCatching { client.listTopics() }.also { client.shutdown() }
+   private suspend fun use(client: AmazonSNS): Result<ListTopicsResult> {
+      return runInterruptible(Dispatchers.IO) {
+         runCatching { client.listTopics() }
+      }.also { client.shutdown() }
    }
 
    override suspend fun check(): HealthCheckResult {
