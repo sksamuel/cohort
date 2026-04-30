@@ -2,6 +2,8 @@ package com.sksamuel.cohort.db
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import javax.sql.DataSource
 
 /**
@@ -17,8 +19,10 @@ class DatabaseHealthCheck(
    override val name: String = "database",
 ) : HealthCheck {
 
-   override suspend fun check(): HealthCheckResult = ds.connection.use { conn ->
-      conn.createStatement().use { it.executeQuery(query) }
-      HealthCheckResult.healthy("Connected to database successfully")
+   override suspend fun check(): HealthCheckResult = runInterruptible(Dispatchers.IO) {
+      ds.connection.use { conn ->
+         conn.createStatement().use { it.executeQuery(query) }
+         HealthCheckResult.healthy("Connected to database successfully")
+      }
    }
 }
