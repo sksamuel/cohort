@@ -11,7 +11,7 @@ import redis.clients.jedis.Jedis
 
 /**
  * A [HealthCheck] that checks that a connection can be made to a redis instance and a command
- * invoked succesfully.
+ * invoked successfully.
  *
  * @param command an optional command to execute against the redis instance. Defaults to ping.
  */
