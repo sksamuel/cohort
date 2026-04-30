@@ -40,11 +40,13 @@ class HealthCheckRegistry(
    var logUnhealthy: Boolean = true
    var checkTimeout: Duration = 10.seconds
 
+   private val shutdownHook = Thread {
+      logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
+      close()
+   }
+
    init {
-      Runtime.getRuntime().addShutdownHook(Thread {
-         logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
-         close()
-      })
+      Runtime.getRuntime().addShutdownHook(shutdownHook)
    }
 
    companion object {
@@ -272,6 +274,10 @@ class HealthCheckRegistry(
    }
 
    override fun close() {
+      // Deregister the shutdown hook so a manually-closed registry can be GC'd. If close() was
+      // invoked from inside the hook, removeShutdownHook throws IllegalStateException because
+      // shutdown is in progress — tolerate that.
+      runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
       scope.cancel()
       scheduler.shutdown()
       runCatching {
