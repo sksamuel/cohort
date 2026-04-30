@@ -11,6 +11,7 @@ import com.sksamuel.cohort.system.getSysProps
 import com.sksamuel.cohort.threads.getThreadDump
 import com.sksamuel.tabby.results.sequence
 import io.netty.handler.codec.http.HttpResponseStatus
+import io.vertx.core.buffer.Buffer
 import io.vertx.ext.web.Router
 import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
@@ -30,7 +31,11 @@ fun Router.cohort(cohort: CohortConfiguration) {
          .produces("*")
          .handler { context ->
             getHeapDump().fold(
-               { context.json(it) },
+               {
+                  context.response()
+                     .putHeader("Content-Type", "application/octet-stream")
+                     .end(Buffer.buffer(it))
+               },
                { context.response().setStatusCode(500).end() },
             )
          }
