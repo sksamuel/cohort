@@ -5,7 +5,7 @@ package com.sksamuel.cohort.elastic
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
@@ -26,7 +26,7 @@ class ElasticClusterHealthCheck(
   override suspend fun check(): HealthCheckResult {
     return runCatching {
 
-      val health = withContext(Dispatchers.IO) {
+      val health = runInterruptible(Dispatchers.IO) {
         client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
       }
 

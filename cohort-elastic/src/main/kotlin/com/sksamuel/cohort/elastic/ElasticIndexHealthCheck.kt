@@ -5,7 +5,7 @@ import co.elastic.clients.elasticsearch.core.CountRequest
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 
 /**
  * A cohort [HealthCheck] which checks that an elastic index exists, and optionally, that it is not empty.
@@ -23,7 +23,7 @@ class ElasticIndexHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {
-         withContext(Dispatchers.IO) {
+         runInterruptible(Dispatchers.IO) {
             val count = client.count(CountRequest.Builder().index(index).build())
             if (count.count() == 0L && failIfEmpty) {
                HealthCheckResult.unhealthy("Elastic index '$index' is empty")
