@@ -219,7 +219,9 @@ class HealthCheckRegistry(
       val previous = statuses[name]
       val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
 
-      logger.warn("HealthCheck $name reported $failures failures $result")
+      if (logUnhealthy) {
+         logger.warn("HealthCheck $name reported $failures failures $result")
+      }
 
       statuses[name] = HealthCheckStatus(
          consecutiveSuccesses = 0, // reset to 0 when we have a failure
