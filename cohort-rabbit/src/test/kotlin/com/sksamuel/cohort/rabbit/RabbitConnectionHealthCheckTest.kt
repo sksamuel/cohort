@@ -1,9 +1,8 @@
-package com.sksamuel.cohort.mongo
+package com.sksamuel.cohort.rabbit
 
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.sksamuel.cohort.HealthCheckResult
-import com.sksamuel.cohort.rabbit.RabbitConnectionHealthCheck
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerSpecExtension
