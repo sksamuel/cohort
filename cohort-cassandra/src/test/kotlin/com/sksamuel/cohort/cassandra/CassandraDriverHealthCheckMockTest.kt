@@ -1,4 +1,4 @@
-package com.sksaumel.cohort.cassandra
+package com.sksamuel.cohort.cassandra
 
 import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.metadata.Metadata
