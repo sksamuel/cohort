@@ -22,7 +22,7 @@ class KafkaConsumerRecordsConsumedHealthCheck(
 ) : AbstractKafkaConsumerMetricHealthCheck(consumer) {
 
    init {
-      require(minRecords > 0) { "The minimum thresold is > 0" }
+      require(minRecords > 0) { "The minimum threshold is > 0" }
    }
 
    private val metricName = "records-consumed-total"
