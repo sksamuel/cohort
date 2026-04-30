@@ -101,6 +101,10 @@ fun Router.cohort(cohort: CohortConfiguration) {
          .handler { context ->
             val name = context.pathParam("name")
             val level = context.pathParam("level")
+            if (name == null || level == null) {
+               context.response().setStatusCode(400).end()
+               return@handler
+            }
             manager.set(name, level).fold(
                { context.json(it) },
                { context.response().setStatusCode(500).end() },
