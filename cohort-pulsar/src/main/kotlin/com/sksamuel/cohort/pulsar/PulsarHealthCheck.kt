@@ -2,6 +2,8 @@ package com.sksamuel.cohort.pulsar
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import org.apache.pulsar.client.admin.PulsarAdmin
 
 class PulsarHealthCheck(
@@ -19,7 +21,9 @@ class PulsarHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runCatching {
-         client.clusters().getClusters()
+         runInterruptible(Dispatchers.IO) {
+            client.clusters().getClusters()
+         }
          HealthCheckResult.healthy("Connected to Pulsar")
       }.getOrElse { HealthCheckResult.unhealthy("Could not connect to Pulsar", it) }
    }
