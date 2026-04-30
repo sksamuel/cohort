@@ -183,22 +183,25 @@ fun Router.cohort(cohort: CohortConfiguration) {
          .handler { context ->
 
             val status = registry.status()
-
-            val results = status.healthchecks.map {
-               ResultJson(
-                  name = it.key,
-                  status = it.value.result.status,
-                  lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
-                  message = it.value.result.message,
-                  cause = it.value.result.cause?.stackTraceToString(),
-                  consecutiveSuccesses = it.value.consecutiveSuccesses,
-                  consecutiveFailures = it.value.consecutiveFailures,
-               )
-            }
-
             val httpStatus = if (status.healthy) HttpResponseStatus.OK else HttpResponseStatus.SERVICE_UNAVAILABLE
             context.response().setStatusCode(httpStatus.code())
-            context.json(results)
+
+            if (cohort.verboseHealthCheckResponse) {
+               val results = status.healthchecks.map {
+                  ResultJson(
+                     name = it.key,
+                     status = it.value.result.status,
+                     lastCheck = it.value.timestamp.atOffset(ZoneOffset.UTC).toString(),
+                     message = it.value.result.message,
+                     cause = it.value.result.cause?.stackTraceToString(),
+                     consecutiveSuccesses = it.value.consecutiveSuccesses,
+                     consecutiveFailures = it.value.consecutiveFailures,
+                  )
+               }
+               context.json(results)
+            } else {
+               context.response().end(httpStatus.reasonPhrase())
+            }
          }
    }
 }
