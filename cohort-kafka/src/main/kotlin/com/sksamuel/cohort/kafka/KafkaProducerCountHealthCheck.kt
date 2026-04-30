@@ -24,7 +24,12 @@ class KafkaProducerCountHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
 
-      val metric = producer.metrics().values.firstOrNull { it.metricName().name() == metricName }
+      // Pick the most aggregate metric (fewest tags). record-send-total is registered both at
+      // producer level (tags: client-id) and per-topic (tags: client-id, topic); firstOrNull is
+      // non-deterministic between the two. Mirrors AbstractKafkaConsumerMetricHealthCheck.metric().
+      val metric = producer.metrics().values
+         .filter { it.metricName().name() == metricName }
+         .minByOrNull { it.metricName().tags().size }
          ?: return HealthCheckResult.unhealthy("Could not locate kafka metric '${metricName}'", null)
 
       val total = metric.metricValue().toString().toDoubleOrNull()?.roundToLong() ?: 0L
