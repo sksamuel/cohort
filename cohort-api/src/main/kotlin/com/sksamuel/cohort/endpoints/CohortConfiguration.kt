@@ -43,12 +43,21 @@ class CohortConfiguration {
    // set to true to return the detailed status of the healthcheck response
    var verboseHealthCheckResponse: Boolean = true
 
-   var endpointPrefix = "cohort"
+   // Path prefix for cohort's endpoints. MUST start with `/` — Vert.x's Router rejects route
+   // patterns that don't start with a slash, so the previous default of `"cohort"` caused
+   // any Vert.x app enabling cohort to throw at startup with the default config.
+   var endpointPrefix = "/cohort"
 
    /**
     * Register a [HealthCheckRegistry] at the given [endpoint].
+    *
+    * Throws if an endpoint has already been registered, mirroring the duplicate-name behaviour
+    * of `HealthCheckRegistry.register`. The previous silent overwrite made typo'd endpoint
+    * strings impossible to diagnose.
     */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+      require(endpoint.startsWith("/")) { "endpoint must start with '/' but was '$endpoint'" }
+      require(!_healthchecks.containsKey(endpoint)) { "Endpoint $endpoint already registered" }
       _healthchecks[endpoint] = registry
    }
 }
