@@ -203,33 +203,33 @@ class HealthCheckRegistry(
    }
 
    private fun success(name: String, result: HealthCheckResult) {
-
-      val previous = statuses[name]
-      val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
-
-      statuses[name] = HealthCheckStatus(
-         consecutiveSuccesses = successes,
-         consecutiveFailures = 0, // reset to 0 when we have a success
-         timestamp = Instant.now(),
-         result = result
-      )
+      // compute() makes the read-modify-write atomic so two concurrent runs of the same check
+      // (possible if the scheduler launches one before the previous tail removed itself from
+      // the jobs map) cannot lose updates to consecutiveSuccesses.
+      statuses.compute(name) { _, previous ->
+         val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
+         HealthCheckStatus(
+            consecutiveSuccesses = successes,
+            consecutiveFailures = 0, // reset to 0 when we have a success
+            timestamp = Instant.now(),
+            result = result
+         )
+      }
    }
 
    private fun failure(name: String, result: HealthCheckResult) {
-
-      val previous = statuses[name]
-      val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
-
-      if (logUnhealthy) {
-         logger.warn("HealthCheck $name reported $failures failures $result")
+      val updated = statuses.compute(name) { _, previous ->
+         val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
+         HealthCheckStatus(
+            consecutiveSuccesses = 0, // reset to 0 when we have a failure
+            consecutiveFailures = failures,
+            timestamp = Instant.now(),
+            result = result
+         )
       }
-
-      statuses[name] = HealthCheckStatus(
-         consecutiveSuccesses = 0, // reset to 0 when we have a failure
-         consecutiveFailures = failures,
-         timestamp = Instant.now(),
-         result = result
-      )
+      if (logUnhealthy && updated != null) {
+         logger.warn("HealthCheck $name reported ${updated.consecutiveFailures} failures $result")
+      }
    }
 
    /**
