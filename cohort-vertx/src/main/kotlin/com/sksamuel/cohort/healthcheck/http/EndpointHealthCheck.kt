@@ -2,23 +2,22 @@ package com.sksamuel.cohort.healthcheck.http
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import io.vertx.core.Vertx
 import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpClientResponse
 
 /**
- * Executes a custom http request using a Vertx HTTP client.
- * The result is considered healthy if [eval] returns true, which by default looks for a 2xx status code.
+ * Executes a custom http request using a caller-supplied Vertx [HttpClient].
+ *
+ * The [HttpClient] is owned by the caller — its lifecycle (connection pool, netty event loops)
+ * is the caller's responsibility. Previously this class created its own client via
+ * `vertx.createHttpClient()` and never closed it, leaking pooled connections per instance.
  */
 class EndpointHealthCheck(
-   vertx: Vertx,
+   private val client: HttpClient,
    private val eval: suspend (HttpClientResponse) -> Boolean = { it.statusCode() in 200..299 },
    override val name: String = "endpoint_request",
    private val fn: suspend (HttpClient) -> HttpClientResponse,
 ) : HealthCheck {
-
-
-   private val client = vertx.createHttpClient()
 
    override suspend fun check(): HealthCheckResult {
       val resp = fn(client)
