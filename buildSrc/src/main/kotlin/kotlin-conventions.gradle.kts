@@ -15,7 +15,7 @@ java {
 
 dependencies {
 
-   val coroutines = "1.10.2"
+   val coroutines = "1.11.0"
    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines")
 
