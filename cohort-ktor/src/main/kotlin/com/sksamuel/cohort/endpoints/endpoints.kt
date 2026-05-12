@@ -148,7 +148,11 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
             false -> HttpStatusCode.ServiceUnavailable
          }
 
-         val resultPayload = when (config.verboseHealthCheckResponse) {
+         // Pair payload and content-type so the non-verbose branch (which writes a plain
+         // status reason phrase like "OK" / "Service Unavailable") doesn't claim
+         // Content-Type: application/json — that broke any client that tried to parse the
+         // body as JSON.
+         val (resultPayload, contentType) = when (config.verboseHealthCheckResponse) {
             true -> status.healthchecks.map {
                ResultJson(
                   name = it.key,
@@ -159,11 +163,11 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
                   consecutiveSuccesses = it.value.consecutiveSuccesses,
                   consecutiveFailures = it.value.consecutiveFailures,
                )
-            }.toJson()
-            false -> httpStatusCode.description
+            }.toJson() to ContentType.Application.Json
+            false -> httpStatusCode.description to ContentType.Text.Plain
          }
 
-         call.respondText(resultPayload, ContentType.Application.Json, httpStatusCode)
+         call.respondText(resultPayload, contentType, httpStatusCode)
       }
    }
 }
