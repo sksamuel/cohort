@@ -98,4 +98,12 @@ class HealthCheckRegistryTest : FunSpec({
          reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout failed due to kotlinx.coroutines.TimeoutCancellationException"
       }
    }
+
+   test("close() is idempotent and does not throw") {
+      // close() removes the JVM shutdown hook so a manually-closed registry can be GC'd.
+      // A second close() finds the hook already deregistered — must not throw.
+      val reg = HealthCheckRegistry { }
+      reg.close()
+      reg.close()
+   }
 })

@@ -19,10 +19,10 @@ class CohortConfiguration {
    // set to true to enable the /cohort/memory endpoint which returns memory pool information
    var memory: Boolean = false
 
-   // set to true to enable the /cohort/log endpoint which returns log system information
+   // set to a non-null LogManager to enable the /cohort/logging endpoints which return and update logger levels
    var logManager: LogManager? = null
 
-   // register one or more DataSourceManagers to show information database pools
+   // register one or more DataSourceManagers to show information about database pools
    var dataSources: List<DataSourceManager> = emptyList()
 
    // register one or more DatabaseMigrationManagers to show information about database migrations

@@ -44,7 +44,7 @@ dependencyResolutionManagement {
          val hikari = "7.0.2"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
-         val flyway = "12.5.0"
+         val flyway = "12.6.0"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
          val kafka = "4.2.0"
@@ -72,7 +72,7 @@ dependencyResolutionManagement {
             "org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.29"
          )
 
-         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.19.14")
+         library("elasticsearch-java", "co.elastic.clients:elasticsearch-java:8.19.15")
 
          val awssdk = "1.12.797"
          library("aws-java-sdk-dynamodb", "com.amazonaws:aws-java-sdk-dynamodb:$awssdk")
@@ -80,7 +80,7 @@ dependencyResolutionManagement {
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
 
-         val log4j2 = "2.25.4"
+         val log4j2 = "2.26.0"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
@@ -109,7 +109,7 @@ dependencyResolutionManagement {
          library("testcontainers-kafka", "org.testcontainers:testcontainers-kafka:$testContainers")
          library("testcontainers-cassandra", "org.testcontainers:testcontainers-cassandra:$testContainers")
 
-         val vertx = "5.0.11"
+         val vertx = "5.0.12"
          library("vertx-core", "io.vertx:vertx-core:$vertx")
          library("vertx-web", "io.vertx:vertx-web:$vertx")
          library("vertx-kotlin", "io.vertx:vertx-lang-kotlin:$vertx")

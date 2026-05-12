@@ -16,10 +16,10 @@ class CassandraDriverHealthCheck(
       }.fold(
          onSuccess = { anyUp ->
             if (anyUp) HealthCheckResult.healthy("Cassandra access successful")
-            else HealthCheckResult.unhealthy("Could not access to Cassandra")
+            else HealthCheckResult.unhealthy("Could not access Cassandra")
          },
          onFailure = { error ->
-            HealthCheckResult.unhealthy("Could not access to Cassandra", error)
+            HealthCheckResult.unhealthy("Could not access Cassandra", error)
          }
       )
 }
