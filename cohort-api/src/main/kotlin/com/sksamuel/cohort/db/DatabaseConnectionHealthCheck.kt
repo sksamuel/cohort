@@ -26,7 +26,11 @@ class DatabaseConnectionHealthCheck(
    override suspend fun check(): HealthCheckResult = runCatching {
       runInterruptible(Dispatchers.IO) {
          ds.connection.use { conn ->
-            if (!conn.isValid(timeout.inWholeSeconds.toInt())) {
+            // Connection.isValid(0) means "no timeout — wait indefinitely". A caller passing a
+            // sub-second Duration like 500.milliseconds would have inWholeSeconds == 0 and
+            // silently disable the timeout — the opposite of what was requested.
+            val timeoutSeconds = timeout.inWholeSeconds.coerceAtLeast(1).toInt()
+            if (!conn.isValid(timeoutSeconds)) {
                return@use HealthCheckResult.unhealthy("Connection is invalid")
             }
             if (query != null)
