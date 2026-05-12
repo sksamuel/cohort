@@ -19,13 +19,25 @@ class S3WriteBucketHealthCheck(
 ) : HealthCheck {
 
    private suspend fun use(client: AmazonS3): Result<Unit> {
-      return runInterruptible(Dispatchers.IO) {
-         runCatching {
-            val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
-            client.putObject(bucketName, key, "test")
-            client.deleteObject(bucketName, key)
+      // `.also { client.shutdown() }` does not run if the inner runInterruptible block
+      // is cancelled (it throws CancellationException before returning a value). Use
+      // try/finally to guarantee the client is closed even on cancellation.
+      return try {
+         runInterruptible(Dispatchers.IO) {
+            runCatching {
+               val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
+               try {
+                  client.putObject(bucketName, key, "test")
+               } finally {
+                  // Always best-effort delete the test object so a put-then-delete failure or
+                  // interrupt between the two doesn't leave orphan cohort_* keys in the bucket.
+                  runCatching { client.deleteObject(bucketName, key) }
+               }
+            }
          }
-      }.also { client.shutdown() }
+      } finally {
+         runCatching { client.shutdown() }
+      }
    }
 
    override suspend fun check(): HealthCheckResult {

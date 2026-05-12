@@ -19,9 +19,16 @@ class SQSQueueHealthCheck(
 ) : HealthCheck {
 
    private suspend fun use(client: AmazonSQS): Result<GetQueueUrlResult> {
-      return runInterruptible(Dispatchers.IO) {
-         runCatching { client.getQueueUrl(queue) }
-      }.also { client.shutdown() }
+      // `.also { client.shutdown() }` does not run if the inner runInterruptible block
+      // is cancelled (it throws CancellationException before returning a value). Use
+      // try/finally to guarantee the client is closed even on cancellation.
+      return try {
+         runInterruptible(Dispatchers.IO) {
+            runCatching { client.getQueueUrl(queue) }
+         }
+      } finally {
+         runCatching { client.shutdown() }
+      }
    }
 
    override suspend fun check(): HealthCheckResult {
