@@ -18,6 +18,10 @@ class SystemLoadHealthCheck(private val maxLoad: Double) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
     val load = bean.systemLoadAverage
+    // OperatingSystemMXBean returns a negative value (typically -1.0) when the system load
+    // average is not available on the platform (notably some Windows JVMs). Without this guard,
+    // such platforms silently report healthy.
+    if (load < 0.0) return HealthCheckResult.unhealthy("System load average is unavailable [$load]", null)
     return if (load < maxLoad) {
       HealthCheckResult.healthy("System load is below threshold [$load < $maxLoad]")
     } else {
