@@ -93,7 +93,7 @@ class HealthCheckRegistry(
     * for both initial delay and intervals.
     *
     * @param name the name is associated with the [check] in the output json. By supplying a custom
-    *             name, the same check can be registered multiple times. o healthcheck can be registered
+    *             name, the same check can be registered multiple times. No healthcheck can be registered
     *             more than once with a repeated name.
     */
    fun register(
