@@ -106,7 +106,9 @@ fun Router.cohort(cohort: CohortConfiguration) {
                return@handler
             }
             manager.set(name, level).fold(
-               { context.json(it) },
+               // The success value is Unit; serializing it as JSON produces a nonsensical body.
+               // Mirror the Ktor endpoint, which returns an empty 200 OK on success.
+               { context.response().setStatusCode(200).end() },
                { context.response().setStatusCode(500).end() },
             )
          }
