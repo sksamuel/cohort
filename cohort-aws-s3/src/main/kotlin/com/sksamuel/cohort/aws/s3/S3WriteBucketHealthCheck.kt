@@ -22,9 +22,16 @@ class S3WriteBucketHealthCheck(
       return runInterruptible(Dispatchers.IO) {
          runCatching {
             val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
-            client.putObject(bucketName, key, "test")
-            client.deleteObject(bucketName, key)
-         }
+            try {
+               client.putObject(bucketName, key, "test")
+            } finally {
+               // Best-effort cleanup. The check's documented purpose is to verify write
+               // access (s3:PutObject); a missing s3:DeleteObject permission or a transient
+               // cleanup failure should not mask a successful put as unhealthy. Swallow
+               // any delete error here.
+               runCatching { client.deleteObject(bucketName, key) }
+            }
+         }.map { }
       }.also { client.shutdown() }
    }
 
