@@ -278,10 +278,26 @@ class HealthCheckRegistry(
       // invoked from inside the hook, removeShutdownHook throws IllegalStateException because
       // shutdown is in progress — tolerate that.
       runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
-      scope.cancel()
+      // Order matters: stop the scheduler first so no NEW launches happen, then cancel the
+      // scope and wait for in-flight coroutines to actually finish. The previous order ran
+      // `scope.cancel()` then `scheduler.shutdown()`, leaving a window where a scheduler tick
+      // could still observe an active scope. And `scope.cancel()` is fire-and-forget —
+      // without joining, `close()` returned while real health-check work (JDBC isValid,
+      // HTTP requests on Dispatchers.IO) was still running, racing with the caller's own
+      // resource teardown.
       scheduler.shutdown()
-      runCatching {
+      val schedulerTerminated = runCatching {
          scheduler.awaitTermination(5, TimeUnit.SECONDS)
+      }.getOrDefault(false)
+      if (!schedulerTerminated) logger.warn("Cohort scheduler did not terminate within 5s of close()")
+      // Cancel and join in-flight coroutines so the caller can rely on close() being a barrier.
+      // Bounded by 5s so a misbehaved check can't hang the JVM forever.
+      runCatching {
+         runBlocking {
+            withTimeoutOrNull(5_000) {
+               scope.coroutineContext.job.cancelAndJoin()
+            } ?: logger.warn("Cohort registry coroutines did not terminate within 5s of close()")
+         }
       }
    }
 }
