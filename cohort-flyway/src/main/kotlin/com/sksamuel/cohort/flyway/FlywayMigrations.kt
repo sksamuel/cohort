@@ -22,7 +22,10 @@ class FlywayMigrations(private val ds: DataSource) : DatabaseMigrationManager {
           checksum = it.checksum.toString(),
           author = it.installedBy ?: "",
           timestamp = it.installedOn?.toInstant() ?: Instant.ofEpochMilli(0),
-          version = it.version.toString(),
+          // Repeatable migrations have a null version. Without the safe-call this NPEs (or
+          // records the literal string "null") in the same way the pending-migration NPE
+          // fixed in 5ea010d did.
+          version = it.version?.toString() ?: "",
           state = it.state.displayName,
         )
       }
