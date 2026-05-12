@@ -47,8 +47,13 @@ class CohortConfiguration {
 
    /**
     * Register a [HealthCheckRegistry] at the given [endpoint].
+    *
+    * Throws if an endpoint has already been registered, mirroring the duplicate-name behaviour
+    * of `HealthCheckRegistry.register`. The previous silent overwrite made typo'd endpoint
+    * strings impossible to diagnose.
     */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+      require(!_healthchecks.containsKey(endpoint)) { "Endpoint $endpoint already registered" }
       _healthchecks[endpoint] = registry
    }
 }
