@@ -180,7 +180,11 @@ fun Router.cohort(cohort: CohortConfiguration) {
                }
                context.json(results)
             } else {
-               context.response().end(httpStatus.reasonPhrase())
+               // Set an explicit Content-Type — without one, Vert.x emits no header at all,
+               // which trips proxies and clients that sniff. Mirrors the Ktor sibling fix.
+               context.response()
+                  .putHeader("Content-Type", "text/plain")
+                  .end(httpStatus.reasonPhrase())
             }
          }
    }
