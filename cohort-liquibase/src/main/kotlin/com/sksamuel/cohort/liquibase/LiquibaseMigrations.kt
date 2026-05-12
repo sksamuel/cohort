@@ -18,40 +18,36 @@ class LiquibaseMigrations(
    override fun migrations(): Result<List<Migration>> = runCatching {
       ds.connection.use { conn ->
          val database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(JdbcConnection(conn))
-         val liquibase = Liquibase(
-            changelogFile,
-            ClassLoaderResourceAccessor(),
-            database
-         )
+         // Liquibase is AutoCloseable. Without .use it leaks the database/executor resources
+         // it retains internally on every /dbmigration request.
+         Liquibase(changelogFile, ClassLoaderResourceAccessor(), database).use { liquibase ->
 
-         val service = StandardChangeLogHistoryService()
-         service.database = database
-         val appliedChangeSets = service.getRanChangeSets()
-         val appliedIds = appliedChangeSets.map { "${it.id}:${it.author}" }.toSet()
+            val service = StandardChangeLogHistoryService()
+            service.database = database
+            val appliedChangeSets = service.getRanChangeSets()
+            val appliedIds = appliedChangeSets.map { "${it.id}:${it.author}" }.toSet()
 
-         liquibase.databaseChangeLog.changeSets.map { changeset ->
-            val changesetId = "${changeset.id}:${changeset.author}"
-            val isApplied = appliedIds.contains(changesetId)
+            liquibase.databaseChangeLog.changeSets.map { changeset ->
+               val changesetId = "${changeset.id}:${changeset.author}"
+               val isApplied = appliedIds.contains(changesetId)
 
-            val appliedChangeSet = if (isApplied) {
-               appliedChangeSets.find { it.id == changeset.id && it.author == changeset.author }
-            } else null
+               val appliedChangeSet = if (isApplied) {
+                  appliedChangeSets.find { it.id == changeset.id && it.author == changeset.author }
+               } else null
 
-            Migration(
-               script = changeset.filePath,
-               description = changeset.description ?: "",
-               checksum = changeset.storedCheckSum?.toString() ?: "",
-               author = changeset.author,
-               timestamp = appliedChangeSet?.let { Instant.ofEpochMilli(it.dateExecuted.time) } ?: Instant.ofEpochMilli(
-                  0
-               ),
-               version = "",
-               state = if (isApplied) "applied" else "pending"
-            )
-
+               Migration(
+                  script = changeset.filePath,
+                  description = changeset.description ?: "",
+                  checksum = changeset.storedCheckSum?.toString() ?: "",
+                  author = changeset.author,
+                  timestamp = appliedChangeSet?.let { Instant.ofEpochMilli(it.dateExecuted.time) }
+                     ?: Instant.ofEpochMilli(0),
+                  version = "",
+                  state = if (isApplied) "applied" else "pending"
+               )
+            }
          }
       }
-
    }
 }
 
