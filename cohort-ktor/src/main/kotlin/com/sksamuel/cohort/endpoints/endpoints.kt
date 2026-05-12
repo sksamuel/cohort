@@ -89,7 +89,10 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
          val level = call.parameters.getOrFail("level")
          manager.set(name, level).fold(
             { call.respond(HttpStatusCode.OK) },
-            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            // The only realistic failure is an unparseable level string — that's user input,
+            // so 400 BadRequest is more accurate than 500 InternalServerError and won't
+            // trigger 5xx alerts on a typo'd curl.
+            { call.respondText(it.message ?: "Bad request", ContentType.Text.Plain, HttpStatusCode.BadRequest) },
          )
       }
    }
