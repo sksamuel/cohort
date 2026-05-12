@@ -48,16 +48,13 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
    config.dataSources.let { dsm ->
       if (dsm.isNotEmpty()) {
          get("${config.endpointPrefix}/datasources") {
-            dsm.map { it.info() }.sequence().fold(
-               { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-               {
-                  call.respondText(
-                     it.stackTraceToString(),
-                     ContentType.Text.Plain,
-                     HttpStatusCode.InternalServerError
-                  )
-               }
-            )
+            // Return per-pool results. Previously the endpoint called `.sequence()` which
+            // collapses to a single Result.failure if ANY pool fails — operators trying to
+            // diagnose one broken pool lost visibility into the other healthy ones.
+            // `getOrNull()` returns null for failed pools so the JSON shape includes them
+            // explicitly rather than silently dropping; succeeds with 200 always.
+            val infos = dsm.map { it.info().getOrNull() }
+            call.respondText(infos.toJson(), ContentType.Application.Json, HttpStatusCode.OK)
          }
       }
    }
