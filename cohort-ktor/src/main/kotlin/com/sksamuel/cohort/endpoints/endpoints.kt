@@ -14,6 +14,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.application
@@ -30,7 +31,10 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
    if (config.heapDump) {
       get("${config.endpointPrefix}/heapdump") {
          getHeapDump().fold(
-            { call.respond(HttpStatusCode.OK, it) },
+            // Without an explicit content type, an application with ContentNegotiation
+            // installed (Jackson, kotlinx.serialization, etc.) re-serializes the ByteArray
+            // as a Base64 JSON string, producing an unusable hprof. Send raw bytes.
+            { call.respondBytes(it, ContentType.Application.OctetStream, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
          )
       }
