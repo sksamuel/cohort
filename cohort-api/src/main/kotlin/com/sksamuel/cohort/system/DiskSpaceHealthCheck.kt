@@ -49,7 +49,7 @@ class DiskSpaceHealthCheck(
     }
 
     /**
-     * Returns a [DiskSpaceHealthCheck] for each filestore in the get file system.
+     * Returns a [DiskSpaceHealthCheck] for each filestore in the default file system.
      */
     fun defaults(minFreeSpacePercentage: Double = 10.0): List<HealthCheck> =
       FileSystems.getDefault().fileStores.map { DiskSpaceHealthCheck(it, minFreeSpacePercentage) }
