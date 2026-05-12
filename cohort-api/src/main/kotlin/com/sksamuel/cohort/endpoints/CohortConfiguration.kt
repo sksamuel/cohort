@@ -40,8 +40,10 @@ class CohortConfiguration {
    // set to true to enable the /cohort/sysprops endpoint which returns current system properties
    var sysprops: Boolean = false
 
-   // set to true to return the detailed status of the healthcheck response
-   var verboseHealthCheckResponse: Boolean = true
+   // set to true to return the detailed status of the healthcheck response.
+   // @Volatile because the field is read from the request-handler thread (Netty event loop /
+   // Vert.x worker) but written from the configure { } block on a different thread.
+   @Volatile var verboseHealthCheckResponse: Boolean = true
 
    var endpointPrefix = "cohort"
 
