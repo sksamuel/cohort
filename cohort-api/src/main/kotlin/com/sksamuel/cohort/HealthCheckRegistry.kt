@@ -164,14 +164,29 @@ class HealthCheckRegistry(
 
       scheduler.scheduleWithFixedDelay(
          {
-            val previousCheck = jobs[name]
-            if(previousCheck == null || !previousCheck.isActive) {
-               jobs[name] = scope.launch {
-                  run(name)
-                  jobs.remove(name)
+            // Atomic check-and-replace via compute(). The previous read-modify-write was
+            // racy: the launched coroutine's tail `jobs.remove(name)` runs on a different
+            // dispatcher thread than the scheduler, so the scheduler could observe a
+            // not-yet-removed completed Job, see `!isActive`, overwrite the slot with a new
+            // launch, and then the previous launch's tail would `remove(name)` the
+            // *successor* job — leaving the active job invisible to the guard. Subsequent
+            // ticks would then pile up parallel runs because `jobs[name]` was null.
+            // Use value-keyed remove(name, self) inside the coroutine so a launch only ever
+            // removes its own entry.
+            jobs.compute(name) { _, prev ->
+               if (prev == null || !prev.isActive) {
+                  scope.launch {
+                     val self = coroutineContext[Job]
+                     try {
+                        run(name)
+                     } finally {
+                        if (self != null) jobs.remove(name, self) else jobs.remove(name)
+                     }
+                  }
+               } else {
+                  logger.debug("Check $name is still running. Skipping rescheduling to avoid pileup")
+                  prev
                }
-            } else {
-               logger.debug("Check $name is still running. Skipping rescheduling to avoid pileup")
             }
          },
          initialDelay.inWholeMilliseconds,
