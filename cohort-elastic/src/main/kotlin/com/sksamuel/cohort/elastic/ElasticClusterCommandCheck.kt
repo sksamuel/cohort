@@ -4,6 +4,7 @@ package com.sksamuel.cohort.elastic
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import org.elasticsearch.client.RestHighLevelClient
@@ -21,12 +22,15 @@ class ElasticClusterCommandCheck(
 ) : HealthCheck {
 
   override suspend fun check(): HealthCheckResult {
-    return runCatching {
+    return try {
       runInterruptible(Dispatchers.IO) {
         command(client)
       }
-    }.getOrElse {
-      HealthCheckResult.unhealthy("Error executing health check against elasticsearch", it)
+    } catch (c: CancellationException) {
+      // Let parent-scope cancellation propagate; runInterruptible may surface it.
+      throw c
+    } catch (t: Throwable) {
+      HealthCheckResult.unhealthy("Error executing health check against elasticsearch", t)
     }
   }
 }
