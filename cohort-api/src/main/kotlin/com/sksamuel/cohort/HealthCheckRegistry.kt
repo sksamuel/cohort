@@ -314,6 +314,16 @@ data class ServiceHealth(
    val healthchecks: Map<String, HealthCheckStatus>
 )
 
+/**
+ * Branches on [ServiceHealth.healthy]. The two lambdas have identical signatures, so callers
+ * must use named arguments to avoid swapping them — convention elsewhere (e.g. `Result.fold`)
+ * is success-first, but this function is unhealthy-first, so positional callers following the
+ * standard convention would silently invert behavior. Naming is enforced via deprecation.
+ */
+@Deprecated(
+   "Use named arguments — the two lambdas have identical signatures so positional calls can " +
+      "silently invert behavior. Prefer `if (health.healthy) ... else ...` for clarity.",
+)
 fun <A> ServiceHealth.fold(
    ifUnhealthy: (Map<String, HealthCheckStatus>) -> A,
    ifHealthy: (Map<String, HealthCheckStatus>) -> A
