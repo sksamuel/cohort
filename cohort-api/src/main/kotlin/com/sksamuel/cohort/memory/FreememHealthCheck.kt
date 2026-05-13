@@ -8,7 +8,7 @@ import java.lang.management.MemoryPoolMXBean
 /**
  * A Cohort [HealthCheck] that checks free memory in the system.
  *
- * The check is considered healthy if the amount of free memory is above [minFreeBytes].
+ * The check is considered healthy if the amount of free memory is at or above [minFreeBytes].
  */
 class FreememHealthCheck(private val minFreeBytes: Long) : HealthCheck {
 
