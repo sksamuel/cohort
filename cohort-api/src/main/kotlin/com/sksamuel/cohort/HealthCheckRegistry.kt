@@ -36,9 +36,13 @@ class HealthCheckRegistry(
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
    private val listeners = ConcurrentHashMap.newKeySet<Listener>()
 
-   var startUnhealthy: Boolean = true
-   var logUnhealthy: Boolean = true
-   var checkTimeout: Duration = 10.seconds
+   // @Volatile so the value written by the configure { } block on the thread that built the
+   // registry is visible to coroutines running on the worker dispatcher. Without it the JMM
+   // does not guarantee a happens-before edge, so checkTimeout could be read as the constructor
+   // default for an indeterminate period.
+   @Volatile var startUnhealthy: Boolean = true
+   @Volatile var logUnhealthy: Boolean = true
+   @Volatile var checkTimeout: Duration = 10.seconds
 
    private val shutdownHook = Thread {
       logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
@@ -278,10 +282,26 @@ class HealthCheckRegistry(
       // invoked from inside the hook, removeShutdownHook throws IllegalStateException because
       // shutdown is in progress — tolerate that.
       runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
-      scope.cancel()
+      // Order matters: stop the scheduler first so no NEW launches happen, then cancel the
+      // scope and wait for in-flight coroutines to actually finish. The previous order ran
+      // `scope.cancel()` then `scheduler.shutdown()`, leaving a window where a scheduler tick
+      // could still observe an active scope. And `scope.cancel()` is fire-and-forget —
+      // without joining, `close()` returned while real health-check work (JDBC isValid,
+      // HTTP requests on Dispatchers.IO) was still running, racing with the caller's own
+      // resource teardown.
       scheduler.shutdown()
-      runCatching {
+      val schedulerTerminated = runCatching {
          scheduler.awaitTermination(5, TimeUnit.SECONDS)
+      }.getOrDefault(false)
+      if (!schedulerTerminated) logger.warn("Cohort scheduler did not terminate within 5s of close()")
+      // Cancel and join in-flight coroutines so the caller can rely on close() being a barrier.
+      // Bounded by 5s so a misbehaved check can't hang the JVM forever.
+      runCatching {
+         runBlocking {
+            withTimeoutOrNull(5_000) {
+               scope.coroutineContext.job.cancelAndJoin()
+            } ?: logger.warn("Cohort registry coroutines did not terminate within 5s of close()")
+         }
       }
    }
 }
@@ -314,6 +334,16 @@ data class ServiceHealth(
    val healthchecks: Map<String, HealthCheckStatus>
 )
 
+/**
+ * Branches on [ServiceHealth.healthy]. The two lambdas have identical signatures, so callers
+ * must use named arguments to avoid swapping them — convention elsewhere (e.g. `Result.fold`)
+ * is success-first, but this function is unhealthy-first, so positional callers following the
+ * standard convention would silently invert behavior. Naming is enforced via deprecation.
+ */
+@Deprecated(
+   "Use named arguments — the two lambdas have identical signatures so positional calls can " +
+      "silently invert behavior. Prefer `if (health.healthy) ... else ...` for clarity.",
+)
 fun <A> ServiceHealth.fold(
    ifUnhealthy: (Map<String, HealthCheckStatus>) -> A,
    ifHealthy: (Map<String, HealthCheckStatus>) -> A
