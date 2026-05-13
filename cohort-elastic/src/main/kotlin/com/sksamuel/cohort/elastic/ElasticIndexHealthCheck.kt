@@ -2,6 +2,7 @@ package com.sksamuel.cohort.elastic
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
 import co.elastic.clients.elasticsearch.core.CountRequest
+import co.elastic.clients.elasticsearch._types.ElasticsearchException
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,16 @@ class ElasticIndexHealthCheck(
             }
          }
       }.getOrElse {
-         if (it.message?.contains("index_not_found_exception") == true) {
+         // Detect index-not-found via the typed ErrorCause when possible. The previous code
+         // matched the literal substring "index_not_found_exception" on the formatted message,
+         // which differs across client versions and wrappers — a genuine missing-index
+         // condition could end up reported as "Error connecting to elastic cluster".
+         val esException = it as? ElasticsearchException
+            ?: it.cause as? ElasticsearchException
+         val errorType = esException?.error()?.type()
+         val isIndexNotFound = errorType == "index_not_found_exception"
+            || it.message?.contains("index_not_found_exception") == true
+         if (isIndexNotFound) {
             HealthCheckResult.unhealthy("Elastic index '$index' was not found", it)
          } else {
             HealthCheckResult.unhealthy("Error connecting to elastic cluster", it)
