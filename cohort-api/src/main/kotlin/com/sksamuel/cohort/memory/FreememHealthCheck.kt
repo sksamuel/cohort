@@ -2,8 +2,6 @@ package com.sksamuel.cohort.memory
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import java.lang.management.BufferPoolMXBean
-import java.lang.management.MemoryPoolMXBean
 
 /**
  * A Cohort [HealthCheck] that checks free memory in the system.
@@ -31,5 +29,31 @@ class FreememHealthCheck(private val minFreeBytes: Long) : HealthCheck {
   }
 }
 
+data class MemoryInfo(
+  val memoryPools: List<MemoryPool>,
+  val bufferPools: List<BufferPool>,
+)
 
-data class MemoryInfo(val memoryPools: List<MemoryPoolMXBean>, val bufferPools: List<BufferPoolMXBean>)
+data class MemoryPool(
+  val name: String,
+  val type: String,
+  val usage: MemoryUsage?,
+  val peakUsage: MemoryUsage?,
+  val collectionUsage: MemoryUsage?,
+  val memoryManagerNames: List<String>,
+  val valid: Boolean,
+)
+
+data class BufferPool(
+  val name: String,
+  val count: Long,
+  val memoryUsed: Long,
+  val totalCapacity: Long,
+)
+
+data class MemoryUsage(
+  val init: Long,
+  val used: Long,
+  val committed: Long,
+  val max: Long,
+)
