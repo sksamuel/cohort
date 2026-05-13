@@ -36,9 +36,13 @@ class HealthCheckRegistry(
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
    private val listeners = ConcurrentHashMap.newKeySet<Listener>()
 
-   var startUnhealthy: Boolean = true
-   var logUnhealthy: Boolean = true
-   var checkTimeout: Duration = 10.seconds
+   // @Volatile so the value written by the configure { } block on the thread that built the
+   // registry is visible to coroutines running on the worker dispatcher. Without it the JMM
+   // does not guarantee a happens-before edge, so checkTimeout could be read as the constructor
+   // default for an indeterminate period.
+   @Volatile var startUnhealthy: Boolean = true
+   @Volatile var logUnhealthy: Boolean = true
+   @Volatile var checkTimeout: Duration = 10.seconds
 
    private val shutdownHook = Thread {
       logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
