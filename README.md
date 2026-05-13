@@ -108,10 +108,10 @@ val cohort = initializeCohort {
    sysprops = true
 
    // enable an endpoint to dump the heap in hprof format
-   heapdump = true
+   heapDump = true
 
    // enable an endpoint to dump threads
-   threaddump = true
+   threadDump = true
 
    // enable healthchecks for kubernetes
    // each of these is optional and can map to any healthcheck url you wish
@@ -590,11 +590,11 @@ Send a GET request to `/cohort/heapdump` to retrieve a heap dump for all live ob
 
 The file returned is in the format used by [hprof](https://docs.oracle.com/javase/7/docs/technotes/samples/hprof.html).
 
-To enable, set `heapdump` to true inside the `Cohort` plugin configuration block:
+To enable, set `heapDump` to true inside the `Cohort` plugin configuration block:
 
 ```kotlin
 install(Cohort) {
-   heapdump = true
+   heapDump = true
 }
 ```
 
@@ -602,11 +602,11 @@ install(Cohort) {
 
 Send a GET request to `/cohort/threaddump` to retrieve a thread dump for all current threads.
 
-To enable, set `threaddump` to true inside the `Cohort` plugin configuration block:
+To enable, set `threadDump` to true inside the `Cohort` plugin configuration block:
 
 ```kotlin
 install(Cohort) {
-   threaddump = true
+   threadDump = true
 }
 ```
 
