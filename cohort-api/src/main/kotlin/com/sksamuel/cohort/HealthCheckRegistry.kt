@@ -242,7 +242,11 @@ class HealthCheckRegistry(
     * A service is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): ServiceHealth {
-      val healthy = statuses.values.all { it.result.isHealthy }
+      // Iterable.all { } returns true on an empty collection. Without an isNotEmpty() guard, a
+      // registry with no health checks (or one whose statuses were never populated because
+      // startUnhealthy = false and no checks have run yet) reports the service as healthy with
+      // an empty payload — a silent green liveness probe with no underlying signal.
+      val healthy = statuses.isNotEmpty() && statuses.values.all { it.result.isHealthy }
       return ServiceHealth(healthy, statuses.toMap())
    }
 
