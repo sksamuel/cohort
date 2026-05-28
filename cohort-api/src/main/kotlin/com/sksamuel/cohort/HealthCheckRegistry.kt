@@ -36,9 +36,13 @@ class HealthCheckRegistry(
    private val subscribers = ConcurrentHashMap.newKeySet<Subscriber>()
    private val listeners = ConcurrentHashMap.newKeySet<Listener>()
 
-   var startUnhealthy: Boolean = true
-   var logUnhealthy: Boolean = true
-   var checkTimeout: Duration = 10.seconds
+   // @Volatile so the value written by the configure { } block on the thread that built the
+   // registry is visible to coroutines running on the worker dispatcher. Without it the JMM
+   // does not guarantee a happens-before edge, so checkTimeout could be read as the constructor
+   // default for an indeterminate period.
+   @Volatile var startUnhealthy: Boolean = true
+   @Volatile var logUnhealthy: Boolean = true
+   @Volatile var checkTimeout: Duration = 10.seconds
 
    private val shutdownHook = Thread {
       logger.info("Cohort HealthCheckRegistry shutdown hook is executing")
@@ -93,7 +97,7 @@ class HealthCheckRegistry(
     * for both initial delay and intervals.
     *
     * @param name the name is associated with the [check] in the output json. By supplying a custom
-    *             name, the same check can be registered multiple times. o healthcheck can be registered
+    *             name, the same check can be registered multiple times. No healthcheck can be registered
     *             more than once with a repeated name.
     */
    fun register(
@@ -107,7 +111,7 @@ class HealthCheckRegistry(
     */
    @Deprecated(
       "Use register(check, initialDelay, checkInterval) to be explicit",
-      ReplaceWith("register(check.name, check, delay, delay)")
+      ReplaceWith("register(check, delay, delay)")
    )
    fun register(
       check: HealthCheck,
@@ -203,33 +207,33 @@ class HealthCheckRegistry(
    }
 
    private fun success(name: String, result: HealthCheckResult) {
-
-      val previous = statuses[name]
-      val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
-
-      statuses[name] = HealthCheckStatus(
-         consecutiveSuccesses = successes,
-         consecutiveFailures = 0, // reset to 0 when we have a success
-         timestamp = Instant.now(),
-         result = result
-      )
+      // compute() makes the read-modify-write atomic so two concurrent runs of the same check
+      // (possible if the scheduler launches one before the previous tail removed itself from
+      // the jobs map) cannot lose updates to consecutiveSuccesses.
+      statuses.compute(name) { _, previous ->
+         val successes = if (previous == null) 1 else previous.consecutiveSuccesses + 1
+         HealthCheckStatus(
+            consecutiveSuccesses = successes,
+            consecutiveFailures = 0, // reset to 0 when we have a success
+            timestamp = Instant.now(),
+            result = result
+         )
+      }
    }
 
    private fun failure(name: String, result: HealthCheckResult) {
-
-      val previous = statuses[name]
-      val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
-
-      if (logUnhealthy) {
-         logger.warn("HealthCheck $name reported $failures failures $result")
+      val updated = statuses.compute(name) { _, previous ->
+         val failures = if (previous == null) 1 else previous.consecutiveFailures + 1
+         HealthCheckStatus(
+            consecutiveSuccesses = 0, // reset to 0 when we have a failure
+            consecutiveFailures = failures,
+            timestamp = Instant.now(),
+            result = result
+         )
       }
-
-      statuses[name] = HealthCheckStatus(
-         consecutiveSuccesses = 0, // reset to 0 when we have a failure
-         consecutiveFailures = failures,
-         timestamp = Instant.now(),
-         result = result
-      )
+      if (logUnhealthy && updated != null) {
+         logger.warn("HealthCheck $name reported ${updated.consecutiveFailures} failures $result")
+      }
    }
 
    /**
@@ -238,7 +242,11 @@ class HealthCheckRegistry(
     * A service is considered healthy if all the healthchecks are in healthy state.
     */
    fun status(): ServiceHealth {
-      val healthy = statuses.values.all { it.result.isHealthy }
+      // Iterable.all { } returns true on an empty collection. Without an isNotEmpty() guard, a
+      // registry with no health checks (or one whose statuses were never populated because
+      // startUnhealthy = false and no checks have run yet) reports the service as healthy with
+      // an empty payload — a silent green liveness probe with no underlying signal.
+      val healthy = statuses.isNotEmpty() && statuses.values.all { it.result.isHealthy }
       return ServiceHealth(healthy, statuses.toMap())
    }
 
@@ -278,10 +286,26 @@ class HealthCheckRegistry(
       // invoked from inside the hook, removeShutdownHook throws IllegalStateException because
       // shutdown is in progress — tolerate that.
       runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
-      scope.cancel()
+      // Order matters: stop the scheduler first so no NEW launches happen, then cancel the
+      // scope and wait for in-flight coroutines to actually finish. The previous order ran
+      // `scope.cancel()` then `scheduler.shutdown()`, leaving a window where a scheduler tick
+      // could still observe an active scope. And `scope.cancel()` is fire-and-forget —
+      // without joining, `close()` returned while real health-check work (JDBC isValid,
+      // HTTP requests on Dispatchers.IO) was still running, racing with the caller's own
+      // resource teardown.
       scheduler.shutdown()
-      runCatching {
+      val schedulerTerminated = runCatching {
          scheduler.awaitTermination(5, TimeUnit.SECONDS)
+      }.getOrDefault(false)
+      if (!schedulerTerminated) logger.warn("Cohort scheduler did not terminate within 5s of close()")
+      // Cancel and join in-flight coroutines so the caller can rely on close() being a barrier.
+      // Bounded by 5s so a misbehaved check can't hang the JVM forever.
+      runCatching {
+         runBlocking {
+            withTimeoutOrNull(5_000) {
+               scope.coroutineContext.job.cancelAndJoin()
+            } ?: logger.warn("Cohort registry coroutines did not terminate within 5s of close()")
+         }
       }
    }
 }
@@ -314,6 +338,16 @@ data class ServiceHealth(
    val healthchecks: Map<String, HealthCheckStatus>
 )
 
+/**
+ * Branches on [ServiceHealth.healthy]. The two lambdas have identical signatures, so callers
+ * must use named arguments to avoid swapping them — convention elsewhere (e.g. `Result.fold`)
+ * is success-first, but this function is unhealthy-first, so positional callers following the
+ * standard convention would silently invert behavior. Naming is enforced via deprecation.
+ */
+@Deprecated(
+   "Use named arguments — the two lambdas have identical signatures so positional calls can " +
+      "silently invert behavior. Prefer `if (health.healthy) ... else ...` for clarity.",
+)
 fun <A> ServiceHealth.fold(
    ifUnhealthy: (Map<String, HealthCheckStatus>) -> A,
    ifHealthy: (Map<String, HealthCheckStatus>) -> A

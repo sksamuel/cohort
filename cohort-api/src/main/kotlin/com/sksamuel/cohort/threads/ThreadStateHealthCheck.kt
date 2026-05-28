@@ -13,7 +13,11 @@ class ThreadStateHealthCheck(
   private val maxCount: Int
 ) : HealthCheck {
 
-  override val name: String = "thread_state"
+  // Encode the monitored state in the name so two checks (e.g. BLOCKED and WAITING) can be
+  // registered using the default register(check) overload. With a single "thread_state" name,
+  // HealthCheckRegistry.register threw "Check thread_state already registered" on the second
+  // registration, making the canonical use-case impossible without manually naming each check.
+  override val name: String = "thread_state_${state.name.lowercase()}"
 
   override suspend fun check(): HealthCheckResult {
     val count = Thread.getAllStackTraces().keys.count { it.state == state }

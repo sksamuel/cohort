@@ -40,10 +40,15 @@ class CohortConfiguration {
    // set to true to enable the /cohort/sysprops endpoint which returns current system properties
    var sysprops: Boolean = false
 
-   // set to true to return the detailed status of the healthcheck response
-   var verboseHealthCheckResponse: Boolean = true
+   // set to true to return the detailed status of the healthcheck response.
+   // @Volatile because the field is read from the request-handler thread (Netty event loop /
+   // Vert.x worker) but written from the configure { } block on a different thread.
+   @Volatile var verboseHealthCheckResponse: Boolean = true
 
-   var endpointPrefix = "cohort"
+   // Path prefix for cohort's endpoints. MUST start with `/` — Vert.x's Router rejects route
+   // patterns that don't start with a slash, so the previous default of `"cohort"` caused
+   // any Vert.x app enabling cohort to throw at startup with the default config.
+   var endpointPrefix = "/cohort"
 
    /**
     * Register a [HealthCheckRegistry] at the given [endpoint].
@@ -53,6 +58,7 @@ class CohortConfiguration {
     * strings impossible to diagnose.
     */
    fun healthcheck(endpoint: String, registry: HealthCheckRegistry) {
+      require(endpoint.startsWith("/")) { "endpoint must start with '/' but was '$endpoint'" }
       require(!_healthchecks.containsKey(endpoint)) { "Endpoint $endpoint already registered" }
       _healthchecks[endpoint] = registry
    }

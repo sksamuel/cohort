@@ -14,6 +14,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.application
@@ -30,7 +31,10 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
    if (config.heapDump) {
       get("${config.endpointPrefix}/heapdump") {
          getHeapDump().fold(
-            { call.respond(HttpStatusCode.OK, it) },
+            // Without an explicit content type, an application with ContentNegotiation
+            // installed (Jackson, kotlinx.serialization, etc.) re-serializes the ByteArray
+            // as a Base64 JSON string, producing an unusable hprof. Send raw bytes.
+            { call.respondBytes(it, ContentType.Application.OctetStream, HttpStatusCode.OK) },
             { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
          )
       }
@@ -48,16 +52,13 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
    config.dataSources.let { dsm ->
       if (dsm.isNotEmpty()) {
          get("${config.endpointPrefix}/datasources") {
-            dsm.map { it.info() }.sequence().fold(
-               { call.respondText(it.toJson(), ContentType.Application.Json, HttpStatusCode.OK) },
-               {
-                  call.respondText(
-                     it.stackTraceToString(),
-                     ContentType.Text.Plain,
-                     HttpStatusCode.InternalServerError
-                  )
-               }
-            )
+            // Return per-pool results. Previously the endpoint called `.sequence()` which
+            // collapses to a single Result.failure if ANY pool fails — operators trying to
+            // diagnose one broken pool lost visibility into the other healthy ones.
+            // `getOrNull()` returns null for failed pools so the JSON shape includes them
+            // explicitly rather than silently dropping; succeeds with 200 always.
+            val infos = dsm.map { it.info().getOrNull() }
+            call.respondText(infos.toJson(), ContentType.Application.Json, HttpStatusCode.OK)
          }
       }
    }
@@ -89,7 +90,10 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
          val level = call.parameters.getOrFail("level")
          manager.set(name, level).fold(
             { call.respond(HttpStatusCode.OK) },
-            { call.respondText(it.stackTraceToString(), ContentType.Text.Plain, HttpStatusCode.InternalServerError) },
+            // The only realistic failure is an unparseable level string — that's user input,
+            // so 400 BadRequest is more accurate than 500 InternalServerError and won't
+            // trigger 5xx alerts on a typo'd curl.
+            { call.respondText(it.message ?: "Bad request", ContentType.Text.Plain, HttpStatusCode.BadRequest) },
          )
       }
    }
@@ -148,7 +152,11 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
             false -> HttpStatusCode.ServiceUnavailable
          }
 
-         val resultPayload = when (config.verboseHealthCheckResponse) {
+         // Pair payload and content-type so the non-verbose branch (which writes a plain
+         // status reason phrase like "OK" / "Service Unavailable") doesn't claim
+         // Content-Type: application/json — that broke any client that tried to parse the
+         // body as JSON.
+         val (resultPayload, contentType) = when (config.verboseHealthCheckResponse) {
             true -> status.healthchecks.map {
                ResultJson(
                   name = it.key,
@@ -159,11 +167,11 @@ fun Route.cohort(configure: CohortConfiguration.() -> Unit = {}) {
                   consecutiveSuccesses = it.value.consecutiveSuccesses,
                   consecutiveFailures = it.value.consecutiveFailures,
                )
-            }.toJson()
-            false -> httpStatusCode.description
+            }.toJson() to ContentType.Application.Json
+            false -> httpStatusCode.description to ContentType.Text.Plain
          }
 
-         call.respondText(resultPayload, ContentType.Application.Json, httpStatusCode)
+         call.respondText(resultPayload, contentType, httpStatusCode)
       }
    }
 }
