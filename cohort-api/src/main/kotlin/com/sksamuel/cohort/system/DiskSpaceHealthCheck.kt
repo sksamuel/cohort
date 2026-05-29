@@ -5,7 +5,6 @@ import com.sksamuel.cohort.HealthCheckResult
 import java.nio.file.FileStore
 import java.nio.file.FileSystems
 import java.nio.file.Files
-import kotlin.math.roundToInt
 
 /**
  * A Cohort [HealthCheck] that examines disk space on the given [FileStore].
@@ -27,11 +26,14 @@ class DiskSpaceHealthCheck(
 
   override suspend fun check(): HealthCheckResult {
     return try {
-      val availablePercent = (fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100).roundToInt()
+      // Compare on the raw Double so values just below the threshold (e.g. 9.5% with a
+      // 10.0% threshold) aren't rounded up and reported as healthy.
+      val availablePercent = fileStore.usableSpace.toDouble() / fileStore.totalSpace.toDouble() * 100
+      val msg = "Available disk space is %.2f%% on %s".format(availablePercent, fileStore.name())
       if (availablePercent < minFreeSpacePercentage)
-        HealthCheckResult.unhealthy("Available disk space is $availablePercent% on ${fileStore.name()}", null)
+        HealthCheckResult.unhealthy(msg, null)
       else
-        HealthCheckResult.healthy("Available disk space is $availablePercent% on ${fileStore.name()}")
+        HealthCheckResult.healthy(msg)
     } catch (t: Throwable) {
       HealthCheckResult.unhealthy("Error querying disk space on ${fileStore.name()}", t)
     }
