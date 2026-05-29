@@ -2,6 +2,7 @@ package com.sksamuel.cohort.redis
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import redis.clients.jedis.DefaultJedisClientConfig
@@ -52,10 +53,13 @@ class RedisClusterHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
-         runCatching {
+         try {
             command(jedis)
-         }.getOrElse {
-            HealthCheckResult.unhealthy("Could not connect to redis cluster", it)
+         } catch (c: CancellationException) {
+            throw c
+         } catch (t: Throwable) {
+            if (t is InterruptedException) Thread.currentThread().interrupt()
+            HealthCheckResult.unhealthy("Could not connect to redis cluster", t)
          }
       }
    }
