@@ -28,11 +28,21 @@ class KafkaConsumerRecordsConsumedRateHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->
-         val rate = metric.metricValue().toString().toDoubleOrNull() ?: 0.0
-         val msg = "Kafka consumer records-consumed-rate $rate [minThreshold $minThreshold]"
-         return when {
-            rate == 0.0 -> HealthCheckResult.healthy(msg)
-            rate < minThreshold -> HealthCheckResult.unhealthy(msg, null)
+         // "NaN".toDoubleOrNull() returns Double.NaN (not null). All comparisons against NaN
+         // are false, so the previous code fell through `rate == 0.0` and `rate < minThreshold`
+         // to the healthy branch, silently masking a NaN rate emitted by Kafka during
+         // reconfiguration or zero-window divisions. Treat NaN as unhealthy explicitly.
+         val raw = metric.metricValue().toString().toDoubleOrNull()
+         if (raw == null || raw.isNaN()) {
+            return@map HealthCheckResult.unhealthy(
+               "Kafka consumer records-consumed-rate is unavailable [$raw]",
+               null,
+            )
+         }
+         val msg = "Kafka consumer records-consumed-rate $raw [minThreshold $minThreshold]"
+         when {
+            raw == 0.0 -> HealthCheckResult.healthy(msg)
+            raw < minThreshold -> HealthCheckResult.unhealthy(msg, null)
             else -> HealthCheckResult.healthy(msg)
          }
       }.fold({ it }, { it })
