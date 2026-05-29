@@ -156,8 +156,10 @@ class HealthCheckRegistry(
       checkInterval: Duration,
    ): HealthCheckRegistry {
 
-      if (checks.containsKey(name)) error("Check $name already registered")
-      checks.putIfAbsent(name, check)
+      // Atomic check-and-insert. Using containsKey then putIfAbsent left a TOCTOU window where
+      // two concurrent register() calls with the same name could both pass the contains check,
+      // schedule independent jobs, and silently share the first-stored HealthCheck.
+      if (checks.putIfAbsent(name, check) != null) error("Check $name already registered")
 
       listeners.forEach { it.registered(name, initialDelay, checkInterval) }
 
