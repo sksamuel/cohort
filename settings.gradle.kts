@@ -38,7 +38,7 @@ dependencyResolutionManagement {
    versionCatalogs {
       create("libs") {
 
-         val micrometer = "1.16.5"
+         val micrometer = "1.17.0"
          library("micrometer-core", "io.micrometer:micrometer-core:$micrometer")
 
          val hikari = "7.0.2"
