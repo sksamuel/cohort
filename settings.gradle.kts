@@ -10,6 +10,7 @@ include(
    "cohort-dbcp",
    "cohort-elastic",
    "cohort-flyway",
+   "cohort-gcp",
    "cohort-hikari",
    "cohort-jedis",
    "cohort-kafka",
@@ -79,6 +80,8 @@ dependencyResolutionManagement {
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
+
+         library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
 
          val log4j2 = "2.26.0"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
