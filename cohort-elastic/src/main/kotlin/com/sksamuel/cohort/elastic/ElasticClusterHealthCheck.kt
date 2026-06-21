@@ -1,5 +1,3 @@
-@file:Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-
 package com.sksamuel.cohort.elastic
 
 import com.sksamuel.cohort.HealthCheck
@@ -30,7 +28,13 @@ class ElasticClusterHealthCheck(
         client.cluster().health(ClusterHealthRequest(), RequestOptions.DEFAULT)
       }
 
-      val status = health.status
+      // Treat `health.status` as a platform-nullable enum. The previous file-level
+      // @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") silenced a real concern: a Java-returned
+      // null would crash `${status.name}` with NPE, get caught by the outer runCatching, and
+      // be reported as "Error connecting to elastic" — misleading, since the connection
+      // succeeded. Handle null explicitly.
+      val status: ClusterHealthStatus? = health.status
+      if (status == null) return@runCatching HealthCheckResult.unhealthy("Elastic cluster returned no status", null)
       val msg = "Elastic cluster is ${status.name}"
       when (status) {
         ClusterHealthStatus.RED -> HealthCheckResult.unhealthy(msg, null)
