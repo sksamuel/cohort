@@ -6,4 +6,5 @@ plugins {
 dependencies {
    implementation(projects.cohortApi)
    api(libs.azure.storage.blob)
+   testImplementation(libs.testcontainers)
 }
