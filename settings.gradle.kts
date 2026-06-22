@@ -6,6 +6,7 @@ include(
    "cohort-aws-s3",
    "cohort-aws-sqs",
    "cohort-aws-sns",
+   "cohort-azure",
    "cohort-cassandra",
    "cohort-dbcp",
    "cohort-elastic",
@@ -79,6 +80,8 @@ dependencyResolutionManagement {
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
+
+         library("azure-storage-blob", "com.azure:azure-storage-blob:12.35.0")
 
          val log4j2 = "2.26.0"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
