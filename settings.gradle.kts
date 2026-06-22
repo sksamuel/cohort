@@ -7,6 +7,7 @@ include(
    "cohort-aws-sqs",
    "cohort-aws-sns",
    "cohort-cassandra",
+   "cohort-clickhouse",
    "cohort-dbcp",
    "cohort-elastic",
    "cohort-flyway",
@@ -79,6 +80,8 @@ dependencyResolutionManagement {
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
+
+         library("clickhouse-client", "com.clickhouse:client-v2:0.9.8")
 
          val log4j2 = "2.26.0"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
