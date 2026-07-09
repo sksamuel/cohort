@@ -8,7 +8,7 @@ import java.lang.management.ManagementFactory
 /**
  * A Cohort [HealthCheck] for the number of max file descriptors.
  *
- * The check is considered healthy if the max count is <= [requiredMaxDescriptors].
+ * The check is considered healthy if the max count is >= [requiredMaxDescriptors].
  */
 class MaxFileDescriptorsHealthCheck(private val requiredMaxDescriptors: Int) : HealthCheck {
 
@@ -19,7 +19,7 @@ class MaxFileDescriptorsHealthCheck(private val requiredMaxDescriptors: Int) : H
   override suspend fun check(): HealthCheckResult {
     val files = bean.maxFileDescriptorCount
     val msg = "Max file descriptors $files [required at least $requiredMaxDescriptors]"
-    return if (files < requiredMaxDescriptors) {
+    return if (files >= requiredMaxDescriptors) {
       HealthCheckResult.healthy(msg)
     } else {
       HealthCheckResult.unhealthy(msg, null)
