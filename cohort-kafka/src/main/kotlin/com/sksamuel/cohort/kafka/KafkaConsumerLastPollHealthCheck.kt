@@ -29,12 +29,17 @@ class KafkaConsumerLastPollHealthCheck(
    private val metricName = "last-poll-seconds-ago"
 
    override suspend fun check(): HealthCheckResult {
-      val metric = metricOrNull(metricName)
-      val lastPollSecondsAgo = metric?.metricValue()?.toString()?.toDoubleOrNull()?.roundToInt() ?: 0
-      val msg = "Kafka consumer last polled $lastPollSecondsAgo [max ${interval.inWholeSeconds}]"
-      return if (lastPollSecondsAgo > interval.inWholeSeconds)
-         HealthCheckResult.unhealthy(msg, null)
-      else
-         HealthCheckResult.healthy(msg)
+      // Use metric() (Either) so a missing metric reports unhealthy, matching the sibling
+      // KafkaConsumerRecordsConsumed* checks. The previous metricOrNull() + ?: 0 fallback
+      // hid misconfiguration (wrong consumer, not yet subscribed, version skew) by reporting
+      // a happy "last polled 0s ago".
+      return metric(metricName).map { metric ->
+         val lastPollSecondsAgo = metric.metricValue().toString().toDoubleOrNull()?.roundToInt() ?: 0
+         val msg = "Kafka consumer last polled $lastPollSecondsAgo [max ${interval.inWholeSeconds}]"
+         if (lastPollSecondsAgo > interval.inWholeSeconds)
+            HealthCheckResult.unhealthy(msg, null)
+         else
+            HealthCheckResult.healthy(msg)
+      }.fold({ it }, { it })
    }
 }
