@@ -19,6 +19,9 @@ class ProcessCpuHealthCheck(private val maxLoad: Double) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
       val load = bean.processCpuLoad
+      // OperatingSystemMXBean returns a negative value (typically -1.0) when the metric is
+      // not available. Without this guard, an unsupported platform silently reports healthy.
+      if (load < 0.0) return HealthCheckResult.unhealthy("Process CPU load is unavailable [$load]", null)
       val msg = "Process CPU $load [max load $maxLoad]"
       return if (load < maxLoad) {
          HealthCheckResult.healthy(msg)
