@@ -54,7 +54,7 @@ dependencyResolutionManagement {
          val lettuce = "7.6.0.RELEASE"
          library("lettuce-core", "io.lettuce:lettuce-core:$lettuce")
 
-         val liquibase = "5.0.3"
+         val liquibase = "5.0.4"
          library("liquibase-core", "org.liquibase:liquibase-core:$liquibase")
 
          val jedis = "7.5.3"
