@@ -83,7 +83,7 @@ dependencyResolutionManagement {
 
          library("clickhouse-client", "com.clickhouse:client-v2:0.9.8")
 
-         val log4j2 = "2.26.0"
+         val log4j2 = "2.26.1"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
          library("log4j2-core", "org.apache.logging.log4j:log4j-core:$log4j2")
          library("log4j2-slf4j2-impl", "org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2")
