@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-   testImplementation("com.h2database:h2:2.4.240")
+   testImplementation("com.h2database:h2:2.5.250")
    testImplementation(libs.hikari)
 }
