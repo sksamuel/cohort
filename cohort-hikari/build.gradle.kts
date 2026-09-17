@@ -6,6 +6,6 @@ plugins {
 dependencies {
    implementation(projects.cohortApi)
    implementation(libs.hikari)
-   testImplementation("com.h2database:h2:2.4.240")
+   testImplementation("com.h2database:h2:2.5.250")
    testImplementation(libs.log4j2.slf4j2.impl)
 }
