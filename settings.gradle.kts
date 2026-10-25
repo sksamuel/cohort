@@ -119,7 +119,7 @@ dependencyResolutionManagement {
          library("vertx-coroutines", "io.vertx:vertx-lang-kotlin-coroutines:$vertx")
          library("vertx-micrometer", "io.vertx:vertx-micrometer-metrics:$vertx")
 
-         val cassandra = "4.19.3"
+         val cassandra = "4.19.4"
          library("cassandra", "org.apache.cassandra:java-driver-core:$cassandra")
 
          val mockk = "1.14.11"
