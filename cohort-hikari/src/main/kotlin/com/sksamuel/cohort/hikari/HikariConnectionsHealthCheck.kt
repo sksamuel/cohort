@@ -18,6 +18,12 @@ class HikariConnectionsHealthCheck(
    override val name: String = "hikari_open_connections",
 ) : HealthCheck {
 
+   init {
+      // Without this guard, minConnections=0 makes the check vacuously healthy (totalConnections
+      // is always >= 0), so a pool that failed to initialize would still report green.
+      require(minConnections > 0) { "minConnections must be > 0, was $minConnections" }
+   }
+
    override suspend fun check(): HealthCheckResult {
       val conns = ds.hikariPoolMXBean.totalConnections
       val msg = "$conns connection(s) to Hikari db-pool ${ds.poolName} [minConnections:$minConnections]"

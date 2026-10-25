@@ -2,7 +2,6 @@ package com.sksamuel.cohort.healthcheck.http
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
-import io.vertx.core.Vertx
 import io.vertx.core.http.HttpClient
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -15,15 +14,17 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * It does not continually ping a service, to avoid an upstream service going down, and bringing
  * down all the dependent services with it in a cascading fashion.
+ *
+ * The supplied [client] is owned by the caller. Previously this class created its own client
+ * via `vertx.createHttpClient()` and never closed it.
  */
 class EndpointStartupHealthCheck(
-   vertx: Vertx,
+   private val client: HttpClient,
    override val name: String = "endpoint_startup_request",
    private val fn: suspend (HttpClient) -> Boolean,
 ) : HealthCheck {
 
    private val successful = AtomicBoolean(false)
-   private val client = vertx.createHttpClient()
 
    override suspend fun check(): HealthCheckResult {
       return if (successful.get()) {

@@ -30,9 +30,16 @@ class HikariDataSourceManager(private val ds: HikariDataSource) : DataSourceMana
         maximumIdle = -1,
         minIdle = ds.minimumIdle,
         maxOpenPreparedStatements = -1,
-        testOnBorrow = ds.connectionTestQuery != null,
+        // Hikari always tests on borrow (uses JDBC4 isValid by default; connectionTestQuery
+        // is only a legacy fallback string). Deriving testOnBorrow from connectionTestQuery
+        // therefore reported `false` for the vast majority of Hikari pools even though every
+        // borrow is validated.
+        testOnBorrow = true,
         testOnReturn = null,
-        testOnCreate = ds.connectionInitSql != null,
+        // Hikari has no test-on-create concept. connectionInitSql is one-off initialization
+        // SQL run when a new connection is created — not a test. Reporting testOnCreate=true
+        // when only an init statement was configured was simply misleading.
+        testOnCreate = null,
       )
     }
   }

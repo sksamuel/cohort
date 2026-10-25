@@ -24,6 +24,9 @@ object LogbackManager : LogManager {
   override fun set(name: String, level: String) = runCatching {
     val context = LoggerFactory.getILoggerFactory() as LoggerContext
     val logger = context.getLogger(name)
-    logger.level = Level.toLevel(level)
+    // Level.toLevel(String) defaults to DEBUG on unknown input, which silently lowers the
+    // log level instead of reporting an error. Use the explicit two-arg variant with a null
+    // default and fail loudly if the level can't be parsed.
+    logger.level = Level.toLevel(level, null) ?: error("Unknown log level: $level")
   }
 }

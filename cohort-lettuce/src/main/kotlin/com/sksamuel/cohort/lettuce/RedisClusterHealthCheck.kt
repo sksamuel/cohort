@@ -3,6 +3,7 @@ package com.sksamuel.cohort.lettuce
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.future.await
 import kotlin.random.Random
 
@@ -40,9 +41,15 @@ class RedisClusterHealthCheck<K, V>(
    }
 
    override suspend fun check(): HealthCheckResult {
-      return runCatching {
+      return try {
          command(conn)
          HealthCheckResult.healthy("Redis command successful")
-      }.getOrElse { HealthCheckResult.unhealthy("Redis command failure", it) }
+      } catch (c: CancellationException) {
+         // Don't convert parent-scope cancellation (e.g. registry shutdown / checkTimeout) into
+         // a fake "Redis command failure". Let it propagate so structured concurrency works.
+         throw c
+      } catch (t: Throwable) {
+         HealthCheckResult.unhealthy("Redis command failure", t)
+      }
    }
 }

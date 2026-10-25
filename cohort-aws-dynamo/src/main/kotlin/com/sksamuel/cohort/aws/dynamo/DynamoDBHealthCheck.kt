@@ -18,18 +18,26 @@ class DynamoDBHealthCheck(
 
    private fun <T> AmazonDynamoDB.use(f: (AmazonDynamoDB) -> T): Result<T> {
       val result = runCatching { f(this) }
-      this.shutdown()
+      runCatching { this.shutdown() }
       return result
    }
 
    override suspend fun check(): HealthCheckResult {
-      return runInterruptible(Dispatchers.IO) {
-         createClient().use {
-            it.listTables(1)
+      // Catch errors from createClient() itself (AWS region/credential resolution can throw
+      // synchronously on builder().build()). Previously such failures escaped runInterruptible
+      // and propagated out of check() instead of producing an Unhealthy result.
+      return runCatching {
+         runInterruptible(Dispatchers.IO) {
+            createClient().use {
+               it.listTables(1)
+            }
          }
       }.fold(
-         { HealthCheckResult.healthy("DynamoDB access successful") },
-         { HealthCheckResult.unhealthy("Could not connect to DynamoDB", it) }
+         { it.fold(
+            { HealthCheckResult.healthy("DynamoDB access successful") },
+            { HealthCheckResult.unhealthy("Could not connect to DynamoDB", it) }
+         )},
+         { HealthCheckResult.unhealthy("Could not connect to DynamoDB", it) },
       )
    }
 }
