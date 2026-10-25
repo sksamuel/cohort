@@ -48,7 +48,7 @@ dependencyResolutionManagement {
          val flyway = "12.11.0"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
-         val kafka = "4.3.1"
+         val kafka = "4.4.0"
          library("kafka-client", "org.apache.kafka:kafka-clients:$kafka")
 
          val lettuce = "7.6.0.RELEASE"
