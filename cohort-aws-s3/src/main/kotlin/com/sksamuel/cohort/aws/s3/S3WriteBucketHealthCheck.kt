@@ -29,11 +29,13 @@ class S3WriteBucketHealthCheck(
                try {
                   client.putObject(bucketName, key, "test")
                } finally {
-                  // Always best-effort delete the test object so a put-then-delete failure or
-                  // interrupt between the two doesn't leave orphan cohort_* keys in the bucket.
+                  // Best-effort cleanup. The check's documented purpose is to verify write
+                  // access (s3:PutObject); a missing s3:DeleteObject permission or a transient
+                  // cleanup failure should not mask a successful put as unhealthy. Swallow
+                  // any delete error here.
                   runCatching { client.deleteObject(bucketName, key) }
                }
-            }
+            }.map { }
          }
       } finally {
          runCatching { client.shutdown() }

@@ -19,10 +19,10 @@ class FlywayMigrations(private val ds: DataSource) : DatabaseMigrationManager {
         Migration(
           script = it.script,
           description = it.description,
-          checksum = it.checksum.toString(),
+          checksum = it.checksum?.toString() ?: "",
           author = it.installedBy ?: "",
           timestamp = it.installedOn?.toInstant() ?: Instant.ofEpochMilli(0),
-          version = it.version.toString(),
+          version = it.version?.toString() ?: "",
           state = it.state.displayName,
         )
       }

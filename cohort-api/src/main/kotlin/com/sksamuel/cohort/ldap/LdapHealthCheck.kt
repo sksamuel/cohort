@@ -28,8 +28,16 @@ class LdapHealthCheck(
       environment.forEach { (key, value) -> table[key] = value }
 
       runInterruptible(Dispatchers.IO) {
+         // InitialDirContext's constructor opens an LDAP/TCP connection. If anything happens
+         // between construction and the bare close() call (an exception, an interrupt fired by
+         // a parent cancellation, future code injected in between) the context would leak its
+         // socket. try/finally ensures close runs in all paths.
          val context = InitialDirContext(table)
-         context.close()
+         try {
+            // No-op: construction itself is the liveness probe.
+         } finally {
+            context.close()
+         }
       }
 
       HealthCheckResult.healthy("LDAP connection success")

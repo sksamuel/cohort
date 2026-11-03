@@ -2,6 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.future.await
 import org.apache.kafka.clients.admin.Admin
 
@@ -25,6 +26,10 @@ class KafkaClusterHealthCheck(
             controller == null -> HealthCheckResult.unhealthy("Kafka cluster returned without controller", null)
             else -> HealthCheckResult.healthy("Connected to kafka cluster with controller ${controller.host()} and ${nodes.size} node(s)")
          }
+      } catch (c: CancellationException) {
+         // Don't convert parent-scope cancellation (registry shutdown or checkTimeout) into
+         // a fake "could not connect" failure — let it propagate.
+         throw c
       } catch (t: Throwable) {
          HealthCheckResult.unhealthy("Could not connect to kafka cluster", t)
       }

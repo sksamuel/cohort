@@ -29,6 +29,9 @@ fun List<ResultJson>.toJson(): String = mapper.writeValueAsString(this)
 @JvmName("DataSourceInfoToJson")
 fun List<DataSourceInfo>.toJson(): String = mapper.writeValueAsString(this)
 
+@JvmName("NullableDataSourceInfoToJson")
+fun List<DataSourceInfo?>.toJson(): String = mapper.writeValueAsString(this)
+
 @JvmName("MigrationToJson")
 fun List<Migration>.toJson(): String = mapper.writeValueAsString(this)
 
