@@ -12,6 +12,8 @@ import java.lang.management.ManagementFactory
  * 2000 is a fair value for most smaller microservices.
  */
 class HotSpotCompilationTimeHealthCheck(private val time: Long = 2000) : HealthCheck {
+   override val name: String = "hotspot_compilation_time"
+
    override suspend fun check(): HealthCheckResult {
       val compilationTime = ManagementFactory.getCompilationMXBean().totalCompilationTime
       return if (compilationTime >= time)

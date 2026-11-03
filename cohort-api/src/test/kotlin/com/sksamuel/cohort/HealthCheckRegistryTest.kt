@@ -69,7 +69,7 @@ class HealthCheckRegistryTest : FunSpec({
       }
 
       check1.callCount.get() shouldBeGreaterThan 1
-      check1.callCount.get() shouldBeGreaterThan 1
+      check3.callCount.get() shouldBeGreaterThan 1
 
       //Unblock the slow 2nd check
       check2.blocker.set(false)

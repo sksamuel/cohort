@@ -2,6 +2,7 @@ package com.sksamuel.cohort.kafka
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.future.await
 import org.apache.kafka.clients.admin.Admin
 import org.apache.kafka.common.errors.UnknownTopicOrPartitionException
@@ -26,6 +27,10 @@ class KafkaTopicHealthCheck(
          }
       } catch (e: UnknownTopicOrPartitionException) {
          HealthCheckResult.unhealthy("Topic $topic does not exist on kafka cluster", e)
+      } catch (c: CancellationException) {
+         // Don't convert parent-scope cancellation (registry shutdown or checkTimeout) into
+         // a fake "could not query" failure — let it propagate.
+         throw c
       } catch (t: Throwable) {
          HealthCheckResult.unhealthy("Could not query kafka cluster for topic $topic", t)
       }

@@ -34,8 +34,15 @@ class Log4j2HealthCheckLoggingListener(private val logHealthyStatus: Boolean) : 
    private val logger = LogManager.getLogger(Log4j2HealthCheckLoggingListener::class.java)
 
    override fun invoked(name: String, result: HealthCheckResult) {
-      if (result.status == HealthStatus.Unhealthy || logHealthyStatus)
-         logger.info("Healthcheck ${result.status.name.padEnd(10, ' ')} '${name.padEnd(50, ' ')}': ${result.message}")
+      if (result.status == HealthStatus.Unhealthy || logHealthyStatus) {
+         val msg = "Healthcheck ${result.status.name.padEnd(10, ' ')} '${name.padEnd(50, ' ')}': ${result.message}"
+         // Attach the cause as the throwable arg when the check is unhealthy, so the full
+         // stack trace is logged. Without this, the listener-based replacement drops
+         // diagnostic information that the deprecated subscriber-based class included.
+         val cause = result.cause
+         if (cause != null && result.status == HealthStatus.Unhealthy) logger.warn(msg, cause)
+         else logger.info(msg)
+      }
    }
 
    override fun registered(name: String, initialDelay: Duration, checkInterval: Duration) {

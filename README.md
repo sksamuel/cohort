@@ -108,10 +108,10 @@ val cohort = initializeCohort {
    sysprops = true
 
    // enable an endpoint to dump the heap in hprof format
-   heapdump = true
+   heapDump = true
 
    // enable an endpoint to dump threads
-   threaddump = true
+   threadDump = true
 
    // enable healthchecks for kubernetes
    // each of these is optional and can map to any healthcheck url you wish
@@ -194,6 +194,7 @@ This table lists the available health checks and their uses.
 | `ElasticIndexHealthCheck`              | `cohort-elastic`    | Checks that a topic exists on an elastic cluster, with an optional setting to fail if the topic is empty.                                                                                                                                        |
 | `FreememHealthCheck`                   | `cohort-core`       | Checks that the available freemem is above a threshold.                                                                                                                                                                                          |
 | `GarbageCollectionTimeCheck`           | `cohort-core`       | Checks that the time spent in GC is below a threshold. The time is specified as a percentage and is calculated as the period between invocations.                                                                                                |
+| `ClickHouseConnectionHealthCheck`      | `cohort-clickhouse` | Checks for connectivity to a ClickHouse database.                                                                                                                                                                                               |
 | `HikariConnectionsHealthCheck`         | `cohort-hikari`     | Confirms that the number of connections in a Hikari DataSource connection pool is equal or above a threshold. This is useful to ensure a required number of connections are open before accepting traffic.                                       |
 | `HikariMinIdleHealthCheck`             | `cohort-hikari`     | Checks that the number of idle connections in an Hikari DataSource connection pool is at least equal to a min value.                                                                                                                             |
 | `HikariPendingThreadsHealthCheck`      | `cohort-hikari`     | Checks that the number of threads awaiting a connection from a Hikari DataSource is below a threshold. This is useful to detect when queries are running slowly and causing threads to back up waiting for a connection                          |
@@ -590,11 +591,11 @@ Send a GET request to `/cohort/heapdump` to retrieve a heap dump for all live ob
 
 The file returned is in the format used by [hprof](https://docs.oracle.com/javase/7/docs/technotes/samples/hprof.html).
 
-To enable, set `heapdump` to true inside the `Cohort` plugin configuration block:
+To enable, set `heapDump` to true inside the `Cohort` plugin configuration block:
 
 ```kotlin
 install(Cohort) {
-   heapdump = true
+   heapDump = true
 }
 ```
 
@@ -602,11 +603,11 @@ install(Cohort) {
 
 Send a GET request to `/cohort/threaddump` to retrieve a thread dump for all current threads.
 
-To enable, set `threaddump` to true inside the `Cohort` plugin configuration block:
+To enable, set `threadDump` to true inside the `Cohort` plugin configuration block:
 
 ```kotlin
 install(Cohort) {
-   threaddump = true
+   threadDump = true
 }
 ```
 

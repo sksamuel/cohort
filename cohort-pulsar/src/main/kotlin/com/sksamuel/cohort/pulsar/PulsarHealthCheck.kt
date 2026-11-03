@@ -22,10 +22,15 @@ class PulsarHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return try {
-         runInterruptible(Dispatchers.IO) {
+         val clusters = runInterruptible(Dispatchers.IO) {
             client.clusters().getClusters()
          }
-         HealthCheckResult.healthy("Connected to Pulsar")
+         // An empty cluster list means the broker is reachable but unconfigured (no clusters
+         // registered). Without this check, a misconfigured broker silently reports healthy.
+         if (clusters.isNullOrEmpty())
+            HealthCheckResult.unhealthy("Pulsar reachable but reports no clusters", null)
+         else
+            HealthCheckResult.healthy("Connected to Pulsar; clusters=${clusters.joinToString(",")}")
       } catch (c: CancellationException) {
          throw c
       } catch (t: Throwable) {
