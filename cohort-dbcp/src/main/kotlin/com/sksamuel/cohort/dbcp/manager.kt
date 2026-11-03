@@ -21,7 +21,10 @@ class ApacheDBCPDataSourceManager(private val ds: BasicDataSource) : DataSourceM
         idleConnections = ds.numIdle,
         totalConnections = ds.numActive + ds.numIdle,
         threadsAwaitingConnection = -1,
-        connectionTimeoutMs = ds.loginTimeout.toLong(),
+        // DataSource.loginTimeout and BasicDataSource.validationQueryTimeout are in seconds
+        // (per CommonDataSource / DBCP2), while the DataSourceInfo fields are documented as
+        // milliseconds. Convert so observability shows the real values.
+        connectionTimeoutMs = ds.loginTimeout.toLong() * 1000,
         idleTimeoutMs = ds.minEvictableIdleTimeMillis,
         maxLifetimeMs = ds.maxConnLifetimeMillis,
         leakDetectionThreshold = -1,
@@ -32,7 +35,7 @@ class ApacheDBCPDataSourceManager(private val ds: BasicDataSource) : DataSourceM
         testOnCreate = ds.testOnCreate,
         maximumPoolSize = ds.maxTotal,
         maximumIdle = ds.maxIdle,
-        validationTimeoutMs = ds.validationQueryTimeout.toLong(),
+        validationTimeoutMs = ds.validationQueryTimeout.toLong() * 1000,
       )
     }
   }

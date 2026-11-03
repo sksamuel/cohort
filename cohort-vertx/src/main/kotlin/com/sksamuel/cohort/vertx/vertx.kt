@@ -27,8 +27,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.heapDump) {
       router.get("${cohort.endpointPrefix}/heapdump")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getHeapDump().fold(
                {
@@ -43,8 +41,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.memory) {
       router.get("${cohort.endpointPrefix}/memory")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getMemoryInfo().fold(
                { context.json(it) },
@@ -56,8 +52,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
    cohort.dataSources.let { dsm ->
       if (dsm.isNotEmpty()) {
          router.get("${cohort.endpointPrefix}/datasources")
-            .consumes("*")
-            .produces("*")
             .handler { context ->
                dsm.map { it.info() }.sequence().fold(
                   { context.json(it) },
@@ -69,8 +63,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    cohort.migrations?.let { m ->
       router.get("${cohort.endpointPrefix}/dbmigration")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             m.migrations().fold(
                { context.json(it) },
@@ -82,8 +74,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
    cohort.logManager?.let { manager ->
 
       router.get("${cohort.endpointPrefix}/logging")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             runCatching {
                val levels = manager.levels()
@@ -96,8 +86,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
          }
 
       router.put("${cohort.endpointPrefix}/logging/{name}/{level}")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             val name = context.pathParam("name")
             val level = context.pathParam("level")
@@ -106,7 +94,9 @@ fun Router.cohort(cohort: CohortConfiguration) {
                return@handler
             }
             manager.set(name, level).fold(
-               { context.json(it) },
+               // The success value is Unit; serializing it as JSON produces a nonsensical body.
+               // Mirror the Ktor endpoint, which returns an empty 200 OK on success.
+               { context.response().setStatusCode(200).end() },
                { context.response().setStatusCode(500).end() },
             )
          }
@@ -114,8 +104,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.jvmInfo) {
       router.get("${cohort.endpointPrefix}/jvm")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getJvmDetails().fold(
                { context.json(it) },
@@ -126,8 +114,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
 
    if (cohort.gc) {
       router.get("${cohort.endpointPrefix}/gc")
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getGcInfo().fold(
                { context.json(it) },
@@ -140,8 +126,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
       val endpoint = "${cohort.endpointPrefix}/threaddump"
       logger.debug("Deploying threadDump endpoint at $endpoint")
       router.get(endpoint)
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getThreadDump().fold(
                { context.response().end(it) },
@@ -154,8 +138,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
       val endpoint = "${cohort.endpointPrefix}/sysprops"
       logger.debug("Deploying sysprops endpoint at $endpoint")
       router.get(endpoint)
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getSysProps().fold(
                { context.json(it) },
@@ -168,8 +150,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
       val endpoint = "${cohort.endpointPrefix}/os"
       logger.debug("Deploying operatingSystem endpoint at $endpoint")
       router.get(endpoint)
-         .consumes("*")
-         .produces("*")
          .handler { context ->
             getOperatingSystem().fold(
                { context.json(it) },
@@ -182,8 +162,6 @@ fun Router.cohort(cohort: CohortConfiguration) {
       logger.debug("Deploying healthcheck at $endpoint")
 
       router.get(endpoint)
-         .consumes("*")
-         .produces("*")
          .handler { context ->
 
             val status = registry.status()
@@ -204,7 +182,11 @@ fun Router.cohort(cohort: CohortConfiguration) {
                }
                context.json(results)
             } else {
-               context.response().end(httpStatus.reasonPhrase())
+               // Set an explicit Content-Type — without one, Vert.x emits no header at all,
+               // which trips proxies and clients that sniff. Mirrors the Ktor sibling fix.
+               context.response()
+                  .putHeader("Content-Type", "text/plain")
+                  .end(httpStatus.reasonPhrase())
             }
          }
    }
