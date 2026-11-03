@@ -2,11 +2,13 @@ package com.sksamuel.cohort.mongo
 
 import com.mongodb.client.MongoClients
 import com.mongodb.kotlin.client.coroutine.MongoClient
-import com.sksamuel.cohort.HealthCheckResult
+import com.sksamuel.cohort.HealthStatus
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldStartWith
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 
@@ -17,9 +19,11 @@ class MongoConnectionHealthCheckTest : FunSpec({
 
    test("mongo health check should connect to mongo") {
       val client = MongoClients.create(container.connectionString)
-      MongoConnectionHealthCheck(
-         client,
-      ).check() shouldBe HealthCheckResult.healthy("Connected to mongo instance (3 databases)")
+      // Don't assert the database count — it depends on which mongo image we run against and
+      // changes when the image is bumped. The presence of the prefix is the real signal.
+      val result = MongoConnectionHealthCheck(client).check()
+      result.status shouldBe HealthStatus.Healthy
+      result.message shouldStartWith "Connected to mongo instance"
    }
 
    test("mongo health check should fail if cannot connect") {
@@ -29,9 +33,9 @@ class MongoConnectionHealthCheckTest : FunSpec({
 
    test("mongo coroutine health check should connect to mongo") {
       val client = MongoClient.create(container.connectionString)
-      MongoConnectionHealthCheck(
-         client,
-      ).check() shouldBe HealthCheckResult.healthy("Connected to mongo instance (3 databases)")
+      val result = MongoConnectionHealthCheck(client).check()
+      result.status shouldBe HealthStatus.Healthy
+      result.message shouldStartWith "Connected to mongo instance"
    }
 
    test("mongo coroutine check should fail if cannot connect") {
