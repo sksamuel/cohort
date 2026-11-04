@@ -18,9 +18,16 @@ class SNSHealthCheck(
 ) : HealthCheck {
 
    private suspend fun use(client: AmazonSNS): Result<ListTopicsResult> {
-      return runInterruptible(Dispatchers.IO) {
-         runCatching { client.listTopics() }
-      }.also { client.shutdown() }
+      // `.also { client.shutdown() }` does not run if the inner runInterruptible block
+      // is cancelled (it throws CancellationException before returning a value). Use
+      // try/finally to guarantee the client is closed even on cancellation.
+      return try {
+         runInterruptible(Dispatchers.IO) {
+            runCatching { client.listTopics() }
+         }
+      } finally {
+         runCatching { client.shutdown() }
+      }
    }
 
    override suspend fun check(): HealthCheckResult {
