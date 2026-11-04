@@ -6,6 +6,7 @@ include(
    "cohort-aws-s3",
    "cohort-aws-sqs",
    "cohort-aws-sns",
+   "cohort-azure",
    "cohort-cassandra",
    "cohort-clickhouse",
    "cohort-dbcp",
@@ -81,6 +82,8 @@ dependencyResolutionManagement {
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
+
+         library("azure-storage-blob", "com.azure:azure-storage-blob:12.35.0")
 
          library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
 
