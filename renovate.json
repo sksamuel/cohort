@@ -2,5 +2,12 @@
    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
    "extends": [
       "config:recommended"
+   ],
+   "packageRules": [
+      {
+         "description": "Pulsar 5 requires Java 17; cohort targets Java 11",
+         "matchPackageNames": ["org.apache.pulsar:pulsar-client"],
+         "allowedVersions": "<5"
+      }
    ]
 }
