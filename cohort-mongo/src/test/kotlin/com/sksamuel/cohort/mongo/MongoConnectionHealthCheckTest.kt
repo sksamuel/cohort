@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName
 
 class MongoConnectionHealthCheckTest : FunSpec({
 
-   val container = MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
+   val container = MongoDBContainer(DockerImageName.parse("mongo:7.0"))
    install(TestContainerExtension(container))
 
    test("mongo health check should connect to mongo") {
