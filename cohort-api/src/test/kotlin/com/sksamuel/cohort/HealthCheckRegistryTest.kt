@@ -95,7 +95,7 @@ class HealthCheckRegistryTest : FunSpec({
       }
       eventually(1.seconds) {
          reg.status().healthchecks["timeout"]?.result?.status shouldBe HealthStatus.Unhealthy
-         reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout failed due to kotlinx.coroutines.TimeoutCancellationException"
+         reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout timed out after 100ms"
       }
    }
 
