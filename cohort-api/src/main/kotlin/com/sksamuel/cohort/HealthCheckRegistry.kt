@@ -215,6 +215,17 @@ class HealthCheckRegistry(
             HealthStatus.Healthy -> success(name, result)
             HealthStatus.Unhealthy -> failure(name, result)
          }
+      } catch (timeout: TimeoutCancellationException) {
+         // Distinguish a checkTimeout firing from a generic exception so operators see a
+         // clear "timed out after Xs" message instead of "failed due to TimeoutCancellationException".
+         val result = HealthCheckResult.unhealthy("$name timed out after $checkTimeout", timeout)
+         notifySubscribers(name, check, result)
+         notifyListeners(name, result)
+         failure(name, result)
+      } catch (cancel: CancellationException) {
+         // The enclosing scope was cancelled (e.g. registry.close()). Don't convert this into
+         // a fake "unhealthy" status — propagate so structured concurrency works correctly.
+         throw cancel
       } catch (t: Throwable) {
          val result = HealthCheckResult.unhealthy("$name failed due to ${t.javaClass.name}", t)
          notifySubscribers(name, check, result)

@@ -11,6 +11,7 @@ include(
    "cohort-dbcp",
    "cohort-elastic",
    "cohort-flyway",
+   "cohort-gcp",
    "cohort-hikari",
    "cohort-jedis",
    "cohort-kafka",
@@ -80,6 +81,8 @@ dependencyResolutionManagement {
          library("aws-java-sdk-s3", "com.amazonaws:aws-java-sdk-s3:$awssdk")
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
+
+         library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
 
          library("clickhouse-client", "com.clickhouse:client-v2:0.11.0")
 
