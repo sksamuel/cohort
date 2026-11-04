@@ -3,7 +3,9 @@ package com.sksamuel.cohort.rabbit
 import com.rabbitmq.client.ConnectionFactory
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
@@ -21,7 +23,7 @@ class RabbitQueueHealthCheck(
 ) : HealthCheck {
 
    override suspend fun check(): HealthCheckResult {
-      return runCatching {
+      return try {
          withTimeout(5.seconds) {
             runInterruptible(Dispatchers.IO) {
                factory.newConnection().use { conn ->
@@ -32,8 +34,12 @@ class RabbitQueueHealthCheck(
                }
             }
          }
-      }.getOrElse {
-         HealthCheckResult.unhealthy("Could not connect to RabbitMQ, or queue does not exist $queue", it)
+      } catch (t: TimeoutCancellationException) {
+         HealthCheckResult.unhealthy("Could not connect to RabbitMQ queue $queue (timed out)", t)
+      } catch (c: CancellationException) {
+         throw c
+      } catch (t: Throwable) {
+         HealthCheckResult.unhealthy("Could not connect to RabbitMQ, or queue does not exist $queue", t)
       }
    }
 }
