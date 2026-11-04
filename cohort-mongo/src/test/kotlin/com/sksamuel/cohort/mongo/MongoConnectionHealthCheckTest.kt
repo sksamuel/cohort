@@ -40,6 +40,7 @@ class MongoConnectionHealthCheckTest : FunSpec({
 
    test("mongo coroutine check should fail if cannot connect") {
       val client = MongoClient.create("mongodb://localhost:11111")
-      MongoConnectionHealthCheck(client).check().message.shouldBe("Could not connect to mongo instance")
+      // The coroutine client keeps retrying server selection, so the check's own 5s timeout fires first.
+      MongoConnectionHealthCheck(client).check().message.shouldBe("Could not connect to mongo instance (timed out)")
    }
 })
