@@ -83,7 +83,7 @@ dependencyResolutionManagement {
          library("aws-java-sdk-sns", "com.amazonaws:aws-java-sdk-sns:$awssdk")
          library("aws-java-sdk-sqs", "com.amazonaws:aws-java-sdk-sqs:$awssdk")
 
-         library("azure-storage-blob", "com.azure:azure-storage-blob:12.35.0")
+         library("azure-storage-blob", "com.azure:azure-storage-blob:12.37.2")
 
          library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
 
