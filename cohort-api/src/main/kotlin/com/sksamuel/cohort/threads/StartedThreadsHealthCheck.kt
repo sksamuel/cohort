@@ -17,6 +17,8 @@ class StartedThreadsHealthCheck(
   private val threadMXBean: ThreadMXBean = ManagementFactory.getThreadMXBean(),
 ) : HealthCheck {
 
+  override val name: String = "started_threads"
+
   override suspend fun check(): HealthCheckResult {
     val count = threadMXBean.totalStartedThreadCount
     return if (count <= maxStartedThreads) {

@@ -2,6 +2,7 @@ package com.sksamuel.cohort.redis
 
 import com.sksamuel.cohort.HealthCheck
 import com.sksamuel.cohort.HealthCheckResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import redis.clients.jedis.Connection
@@ -49,10 +50,17 @@ class RedisConnectionHealthCheck(
 
    override suspend fun check(): HealthCheckResult {
       return runInterruptible(Dispatchers.IO) {
-         runCatching {
+         try {
             command(jedis.connection)
-         }.getOrElse {
-            HealthCheckResult.unhealthy("Could not connect to Redis", it)
+         } catch (c: CancellationException) {
+            // runInterruptible converts thread interrupts to CancellationException. Don't
+            // swallow it into a "Could not connect to Redis" result — let cancellation flow.
+            throw c
+         } catch (t: Throwable) {
+            // InterruptedException surfaces here for non-coroutine interrupt paths; re-arm
+            // the interrupt flag so the caller can observe it.
+            if (t is InterruptedException) Thread.currentThread().interrupt()
+            HealthCheckResult.unhealthy("Could not connect to Redis", t)
          }
       }
    }

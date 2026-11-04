@@ -19,10 +19,15 @@ class DatabaseHealthCheck(
    override val name: String = "database",
 ) : HealthCheck {
 
-   override suspend fun check(): HealthCheckResult = runInterruptible(Dispatchers.IO) {
-      ds.connection.use { conn ->
-         conn.createStatement().use { it.executeQuery(query) }
-         HealthCheckResult.healthy("Connected to database successfully")
+   override suspend fun check(): HealthCheckResult = runCatching {
+      runInterruptible(Dispatchers.IO) {
+         ds.connection.use { conn ->
+            conn.createStatement().use { it.executeQuery(query) }
+            HealthCheckResult.healthy("Connected to database successfully")
+         }
       }
-   }
+      // Without runCatching, the most obvious failure mode (DB unreachable, pool exhausted,
+      // query error) throws out of check(), so the registry sees an exception rather than the
+      // expected Unhealthy result. DatabaseConnectionHealthCheck already wraps the same way.
+   }.getOrElse { HealthCheckResult.unhealthy("Unable to connect to the database", it) }
 }

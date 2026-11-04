@@ -29,8 +29,16 @@ class LogbackHealthCheckLoggingListener(private val logHealthyStatus: Boolean) :
    private val logger = LoggerFactory.getLogger(LogbackHealthCheckLoggingListener::class.java)
 
    override fun invoked(name: String, result: HealthCheckResult) {
-      if (result.status == HealthStatus.Unhealthy || logHealthyStatus)
-         logger.info("Healthcheck ${result.status.name.padEnd(10, ' ')} '${name.padEnd(50, ' ')}': ${result.message}")
+      if (result.status == HealthStatus.Unhealthy || logHealthyStatus) {
+         val msg = "Healthcheck ${result.status.name.padEnd(10, ' ')} '${name.padEnd(50, ' ')}': ${result.message}"
+         // Attach the cause as the throwable arg when the check is unhealthy, so the full
+         // stack trace is logged. The deprecated subscriber-based class interpolated
+         // `$result`, which included the cause via data-class toString — without this, the
+         // listener-based replacement drops diagnostic information.
+         val cause = result.cause
+         if (cause != null && result.status == HealthStatus.Unhealthy) logger.warn(msg, cause)
+         else logger.info(msg)
+      }
    }
 
    override fun registered(name: String, initialDelay: Duration, checkInterval: Duration) {

@@ -26,15 +26,23 @@ class KafkaConsumerRecordsConsumedHealthCheck(
    }
 
    private val metricName = "records-consumed-total"
-   @Volatile private var lastTotal = 0L
+   // -1L sentinel: the first invocation merely captures the baseline and reports healthy.
+   // Using 0L (the previous default) caused the first scan to compare the lifetime total against
+   // minRecords — so a consumer that started before the check was registered could be flagged
+   // unhealthy on its first scan. The sibling KafkaProducerCountHealthCheck uses this same pattern.
+   @Volatile private var lastTotal = -1L
 
    override suspend fun check(): HealthCheckResult {
       return metric(metricName).map { metric ->
          val total = metric.metricValue().toString().toDoubleOrNull()?.roundToLong() ?: 0L
+         if (lastTotal == -1L) {
+            lastTotal = total
+            return@map HealthCheckResult.healthy("Kafka consumer $metricName initial scan total=$total")
+         }
          val diff = total - lastTotal
          lastTotal = total
          val msg = "Kafka consumer $metricName total=$total diff=$diff [minRecords $minRecords]"
-         return when {
+         when {
             total == 0L -> HealthCheckResult.healthy(msg)
             diff < minRecords -> HealthCheckResult.unhealthy(msg, null)
             else -> HealthCheckResult.healthy(msg)

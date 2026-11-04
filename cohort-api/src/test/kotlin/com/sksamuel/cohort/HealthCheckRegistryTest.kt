@@ -69,7 +69,7 @@ class HealthCheckRegistryTest : FunSpec({
       }
 
       check1.callCount.get() shouldBeGreaterThan 1
-      check1.callCount.get() shouldBeGreaterThan 1
+      check3.callCount.get() shouldBeGreaterThan 1
 
       //Unblock the slow 2nd check
       check2.blocker.set(false)
@@ -95,7 +95,7 @@ class HealthCheckRegistryTest : FunSpec({
       }
       eventually(1.seconds) {
          reg.status().healthchecks["timeout"]?.result?.status shouldBe HealthStatus.Unhealthy
-         reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout failed due to kotlinx.coroutines.TimeoutCancellationException"
+         reg.status().healthchecks["timeout"]?.result?.message shouldBe "timeout timed out after 100ms"
       }
    }
 

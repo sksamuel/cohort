@@ -19,20 +19,27 @@ class S3WriteBucketHealthCheck(
 ) : HealthCheck {
 
    private suspend fun use(client: AmazonS3): Result<Unit> {
-      return runInterruptible(Dispatchers.IO) {
-         runCatching {
-            val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
-            try {
-               client.putObject(bucketName, key, "test")
-            } finally {
-               // Best-effort cleanup. The check's documented purpose is to verify write
-               // access (s3:PutObject); a missing s3:DeleteObject permission or a transient
-               // cleanup failure should not mask a successful put as unhealthy. Swallow
-               // any delete error here.
-               runCatching { client.deleteObject(bucketName, key) }
-            }
-         }.map { }
-      }.also { client.shutdown() }
+      // `.also { client.shutdown() }` does not run if the inner runInterruptible block
+      // is cancelled (it throws CancellationException before returning a value). Use
+      // try/finally to guarantee the client is closed even on cancellation.
+      return try {
+         runInterruptible(Dispatchers.IO) {
+            runCatching {
+               val key = "cohort_" + Random.nextInt(0, Integer.MAX_VALUE)
+               try {
+                  client.putObject(bucketName, key, "test")
+               } finally {
+                  // Best-effort cleanup. The check's documented purpose is to verify write
+                  // access (s3:PutObject); a missing s3:DeleteObject permission or a transient
+                  // cleanup failure should not mask a successful put as unhealthy. Swallow
+                  // any delete error here.
+                  runCatching { client.deleteObject(bucketName, key) }
+               }
+            }.map { }
+         }
+      } finally {
+         runCatching { client.shutdown() }
+      }
    }
 
    override suspend fun check(): HealthCheckResult {
