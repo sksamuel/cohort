@@ -85,7 +85,7 @@ dependencyResolutionManagement {
 
          library("azure-storage-blob", "com.azure:azure-storage-blob:12.35.0")
 
-         library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
+         library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.78.0")
 
          library("clickhouse-client", "com.clickhouse:client-v2:0.11.0")
 
