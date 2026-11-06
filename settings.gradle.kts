@@ -47,7 +47,7 @@ dependencyResolutionManagement {
          val hikari = "7.1.0"
          library("hikari", "com.zaxxer:HikariCP:$hikari")
 
-         val flyway = "13.12.0"
+         val flyway = "13.12.1"
          library("flyway-core", "org.flywaydb:flyway-core:$flyway")
 
          val kafka = "4.3.1"
