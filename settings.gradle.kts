@@ -128,7 +128,7 @@ dependencyResolutionManagement {
          val cassandra = "4.19.4"
          library("cassandra", "org.apache.cassandra:java-driver-core:$cassandra")
 
-         val mockk = "1.14.11"
+         val mockk = "1.14.12"
          library("mockk", "io.mockk:mockk:$mockk")
       }
    }
