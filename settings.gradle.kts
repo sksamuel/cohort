@@ -87,7 +87,7 @@ dependencyResolutionManagement {
 
          library("google-cloud-storage", "com.google.cloud:google-cloud-storage:2.69.0")
 
-         library("clickhouse-client", "com.clickhouse:client-v2:0.11.0")
+         library("clickhouse-client", "com.clickhouse:client-v2:0.11.2")
 
          val log4j2 = "2.26.1"
          library("log4j2-api", "org.apache.logging.log4j:log4j-api:$log4j2")
